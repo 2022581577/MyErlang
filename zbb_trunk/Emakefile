@@ -1,0 +1,13 @@
+{
+	[
+		'src/*'
+		,'src/*/*'
+		,'src/*/*/*'
+	]
+	,[
+		{i, "include/"},
+		{outdir, "ebin"},
+		inline,
+		warnings_as_errors
+	]
+}.
