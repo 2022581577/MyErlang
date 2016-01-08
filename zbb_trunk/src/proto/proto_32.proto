@@ -1,0 +1,26 @@
+// 奖励大厅模块
+package run_race;
+
+// 32001 队伍信息
+message c2s31001 {
+    required int32 auto_sgin_up=1;  // 是否满员后自动报名   0、不自动报名，1、自动报名
+    required int32 gender_limit=2;  // 性别限制             0、不限，1、男性，2、女性
+    required string password=3;     // 密码 空为没有密码
+}
+message struct_group {
+    required int32 id=1;            // 队伍id
+    required int32 leader=2;        // 队长
+    required int32 member=3;        // 队员
+    required int32 gender_limit=4;  // 性别限制
+    required string password=5;     // 密码
+}
+
+message struct_self_group {
+    required int32 id=1;            // 队伍id
+    required int32 state=2;         // 状态
+    required int32 leader=3;        // 队长
+    required int32 member=4;        // 队员
+    required int32 auto_sgin_up=5;  // 是否满员后自动报名   0、不自动报名，1、自动报名
+    required int32 gender_limit=6;  // 性别限制             0、不限，1、男性，2、女性
+    required string password=7;     // 密码
+}

@@ -1,0 +1,132 @@
+// 任务模块
+
+import "common.proto";
+
+package task;
+
+// 16001 任务信息
+message s2c16001 {
+	repeated p_task list = 1;
+}
+
+// 16002 接受任务
+message c2s16002 {
+	required int32 task_id = 1;
+}
+message s2c16002 {
+	required int32 task_id = 1;
+	required int32 result = 2;
+}
+
+// 16003 完成任务
+message c2s16003 {
+	required int32 task_id = 1;
+}
+message s2c16003 {
+	required int32 task_id = 1;
+	required int32 result = 2;
+	repeated p_task list = 3;
+}
+
+// 16004 放弃任务 
+message c2s16004 {
+	required int32 task_id = 1;
+}
+message s2c16004 {
+	required int32 task_id = 1;
+	required int32 result = 2;
+}
+
+message p_task {
+	required int32 task_id = 1;
+	required int32 state = 2;
+	required int32 target_type = 3;
+	required int32 target_id = 4;
+	required int32 target_count = 5;
+	required int32 current_count = 6;
+}
+
+// 16005 日常任务
+message s2c16005 {
+	repeated p_loop_task list = 1;
+}
+
+message p_loop_task {
+	required int32 type = 1;
+	required int32 turn = 2;
+	required int32 award_flag = 4;			//	日常任务20环奖励领奖标志(0-未领取 1-已领取)
+	repeated p_loop_task_item list = 3;
+}
+
+message p_loop_task_item {
+	required int32 seq = 9;
+	required int32 task_id = 1;
+	required int32 difficulty = 2;
+	required int32 award = 3;
+	required int32 target_type = 4;
+	required int32 target_id = 5;
+	required int32 target_count = 6;
+	required int32 current_count = 7;
+	required int32 task_state = 8;
+	required int32 user_level = 10;
+}
+
+// 16006 完成日常任务
+message c2s16006 {
+	required int32 type = 1;				// 任务类型 3-日常 4-试炼 5-帮派
+	required int32 seq = 2;
+	required int32 finish_type = 3;			// 1-正常完成 2-直接完成
+}
+
+message s2c16006 {
+	required int32 result = 1;
+	required int32 type = 2;
+	required int32 seq = 3;
+}
+
+// 16007 一键快速完成日常任务
+message c2s16007 {
+	required int32 type = 1;				// 任务类型 3-日常 4-试炼 5-帮派 6-打宝
+}
+
+// 16008 降低难度(只对日常任务有效)
+message c2s16008 {
+	
+}
+
+// 16009 提升奖励(日常任务)
+message c2s16009 {
+	
+}
+
+// 16010 提升品质(试炼任务)
+message c2s16010 {
+	required int32 seq = 1;
+}
+
+// 16011 任务进度更新
+message c2s16011 {
+	required int32 target_type = 1;
+	required int32 target_id = 2;
+	required int32 target_count = 3;
+}
+
+// 16012 领取日常任务20环奖励
+message c2s16012 {
+	optional int32 type = 1[default=3];				// 任务类型 3-日常 6-打宝
+}
+
+//result 1-成功 其他-失败
+
+//-define(TASK_STATE_UNACCEPTABLE,	0).	%% 不可接
+//-define(TASK_STATE_ACCEPTABLE,	1). %% 可接
+//-define(TASK_STATE_ACCEPTED,		2). %% 已接
+//-define(TASK_STATE_CAN_SUBMIT,	3). %% 可提交(前端使用 后端无此状态)
+//-define(TASK_STATE_FINISHED,		4). %% 已完成
+//-define(TASK_STATE_ABANDONED,		5). %% 已放弃
+
+//-define(TARGET_DIALOGUE,		1).		%% NPC对话
+//-define(TARGET_KILL_MON,		2).		%% 杀怪
+//-define(TARGET_COLLECT,		3).		%% 采集
+
+

@@ -1,0 +1,86 @@
+// 战斗模块
+import "common.proto";
+
+package battle;
+
+
+
+
+// 14001 战斗释放技能
+message c2s14001{
+	required int64 target_id = 1;		//目标ID
+	required int32 target_type = 2;		//目标类型
+	required int32 skill_id = 3;		//技能ID
+	optional int32 x = 4[default=0];	//施法者位移类技能坐标X
+	optional int32 y = 5[default=0];	//施法者位移类技能坐标Y
+	optional int32 career = 6[default=0];	//目标职业
+	required path_point current_pos  = 7;		//当前位置 同步校验使用
+}
+
+message s2c14001{
+	required int32 skill_id = 1;
+	required map_actor_battle actor = 2;
+	repeated map_target_battle target_list = 3;
+}
+
+message map_actor_battle{
+	required int64 id = 1;			//ID
+	required int32 type = 2;		//类型
+	required int32 hp = 3;		//血
+	required int32 effect_hp = 4;		//怒气
+	optional int32 attack_steal = 5[default=0];   // 吸血值
+	optional int32 attack_rebound = 6[default=0];  //攻击反弹
+	optional int32 bak = 7[default=0];		//备用字段
+	optional int32 x = 8[default=0];		//位移X
+	optional int32 y = 9[default=0];		//位移Y
+	repeated map_buff add_buff_list = 10;	//增加buff列表
+	repeated map_buff mod_buff_list = 11;	//修改buff列表
+	repeated int32 del_buff_list = 12;	//删除buff列表
+	required int32 old_x = 13;//初始位置x
+	required int32 old_y = 14;//初始位置y
+	required int32 is_clear_path = 15; //是否清除路径
+	optional int32 speed = 16[default=0];
+}
+
+message map_target_battle{
+	required int64 id = 1;			//ID
+	required int32 type = 2;		//类型
+	required int32 hp = 3;		//血
+	required int32 effect_hp = 4;		//变化血量
+	optional int32 is_hit = 5[default=0];   // 是否命中
+	optional int32 is_crit = 6[default=0];  //是否暴击
+	optional int32 is_holy = 7[default=0];//是否神圣一击
+	optional int32 x = 8[default=0];		//位移X
+	optional int32 y = 9[default=0];		//位移Y
+	repeated map_buff add_buff_list = 10;	//增加buff列表
+	repeated map_buff mod_buff_list = 11;	//修改buff列表
+	repeated int32 del_buff_list = 12;	//删除buff列表
+	required int32 old_x = 13;		//初始位置x
+	required int32 old_y = 14;		//初始位置y
+	required int32 is_clear_path = 15; //是否清除路径
+	optional int32 speed = 16[default=0];
+}
+
+
+// 14002 战斗错误消息提示
+message s2c14002{
+	required int32 skill_id = 1;
+	required int32 code = 2;
+	required string message = 3;
+}
+
+// 14003 战斗状态
+message s2c14003{
+	required int32 state = 1;  // 0 脱战 1进入pvp战斗
+	required int32 pve_state = 2;  // 0 脱战 1进入pve战斗
+}
+
+
+//14004 战斗属性变更
+message s2c14004{
+	message attr_id_value{
+		required int32 attr_id = 1;
+		required int32 attr_value = 2;
+	}
+	repeated attr_id_value attr = 1;  // 战斗属性变更
+}

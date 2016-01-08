@@ -1,0 +1,99 @@
+// 邮件模块
+
+import "common.proto";
+
+package mail;
+
+// 未读邮件通知
+message s2c19001{
+    repeated int32 list = 1;	// 邮件id列表
+}
+
+// 请求邮件列表
+message c2s19002{
+	required int32 page = 1;	// 请求页数
+	required int32 size = 2;	// 每页大小
+}
+// 邮件列表信息通知
+message s2c19002{
+	required int32 page = 1;
+	required int32 num = 2;
+	repeated mail_info list = 3;
+}
+// 邮件粗略信息
+message mail_info{
+	required int32 id = 1;				// 邮件id
+	required int64 sender = 2;			// 发送者id
+	required string sender_name = 3;	// 发送者名字
+	required int32 send_time = 4;		// 发送时间(时间戳)
+	required int32 type = 5;				// 邮件类型 0 系统 1 玩家
+	required int32 state = 6;			// 邮件状态 0 未读 1 已读
+	required int32 lock = 7;				// 邮件状态 0 未锁 1 已锁
+	required int32 attachment = 8;		// 附件状态 0 无 1 有
+	required string title = 9;			// 标题
+	required int32 read_time = 10;		// 读取时间(时间戳)
+}
+
+// 请求邮件具体信息 返回 19005 19003
+message c2s19003{
+	required int32 id = 1;				// 邮件id
+}
+// 邮件具体信息通知
+message s2c19003{
+	required int32 id = 1;				// 邮件id
+	required int64 sender = 2;			// 发送者id
+	required string sender_name = 3;	// 发送者名字
+	required int32 send_time = 4;		// 发送时间(时间戳)
+	required int32 type = 5;				// 邮件类型 0 系统 1 玩家
+	required int32 state = 6;			// 邮件状态 0 未读 1 已读
+	required int32 lock = 7;				// 邮件状态 0 未锁 1 已锁
+	required string title = 9;			// 标题
+	required string content = 10;		// 内容
+	required int32 is_geted = 11;		// 附件状态 0 未领 1 已领
+	repeated item_form attachment = 12; // 附件列表
+	required int32 read_time = 13;		// 读取时间(时间戳)
+}
+
+// 请求删除邮件 返回 19004
+message c2s19004{
+	repeated int32 list = 1;	// 邮件id列表
+}
+// 删除邮件通知
+message s2c19004{
+	repeated int32 list = 1;	// 邮件id列表
+}
+
+// 邮件错误码通知
+message s2c19005{
+	required int32 code = 1;		// 错误码
+}
+// 返回码列表
+// 0   操作成功
+// 1   该邮件不存在
+// 2   背包已满
+// 3   附件超出限制
+// 4   包含无效的物品
+// 5   缺少金钱
+// 6   标题或内容超长
+// 7   发物品只能发一个人
+
+// 发送邮件 返回 19005
+message c2s19006{
+	repeated int64 tar_list = 1;	// 对象id列表 等级请前段自行筛选
+	required string title = 2;		// 标题
+	required string content = 3;	// 内容
+	required int32 gold = 4;		// 发送非绑定元宝数量
+	required int32 coin = 5;		// 发送非绑定铜币数量
+	repeated int64 item_ids = 6;	// 附件列表 物品唯一id
+}
+
+//  锁定/解锁 返回19003 19005
+message c2s19007{
+	required int32 id = 1;				// 邮件id
+	required int32 state = 2;			// 0 解锁 1 锁定
+}
+
+//  提取附件 返回 19003 19005
+message c2s19008{
+	required int32 id = 1;				// 邮件id
+}

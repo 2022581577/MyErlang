@@ -1,0 +1,73 @@
+// 奖励大厅模块
+package reward;
+
+// 31001 签到信息
+message c2s31001 {
+}
+message s2c31001 {
+	repeated int32 date_list=1;         // 已签到的日期列表
+	repeated int32 reward_list=2;       // 已领取的奖励id列表
+    required int32 resign_num=3;        // 已使用vip补签次数
+}
+
+// 31002 签到
+message c2s31002 {
+}
+
+// 31003 补签
+message c2s31003 {
+    required int32 date=1;           // 补签日期
+}
+
+// 31004 领取签到奖励
+message c2s31004 {
+    required int32 id=1;           // 领取奖励id    
+}
+
+
+// 31005 领取在线奖励
+message c2s31005 {
+}
+message s2c31005 {
+    required int32 type=1;                  // 奖励列表类型：1、滚动特效用，2、奖励列表历史信息
+    repeated struct_reward reward_list=2;   // 奖励列表    
+}
+message struct_reward {
+    required int32 id=1;            // 奖励id
+    required int32 item_id=2;       // 奖励道具
+    required int32 num=3;           // 道具数量
+}
+
+// 31006 领取离线经验奖励
+message c2s31006 {
+    required int32 type=1;      // 类型：1、基础奖励，2、双倍奖励，3、5倍奖励
+}
+
+// 31007 获取奖励找回信息
+message s2c31007 {
+    repeated struct_reward_back back1=1;    // 前一天的找回信息
+    repeated struct_reward_back back2=2;    // 前二天的找回信息
+    repeated struct_reward_back back3=3;    // 前三天的找回信息
+    
+}
+message struct_reward_back {
+    required int32 type=1;          // 类型
+    required int32 num=2;           // 次数
+    required int32 state=3;         // 状态 1、已找回，2、可找回，3、不可找回
+}
+
+// 31008 找回
+message c2s31008 {
+    required int32 cost=1;      // 消耗类型 1、免费，2、金币，3、钻石
+    required int32 type=2;      // 类型 0、一键找回，其它对应类型
+}
+
+// 31009 领取等级礼包
+message c2s31009 {
+    required int32 lv=1;        // 领取的等级
+}
+
+// 31010 领取在线天数礼包
+message c2s31010 {
+    required int32 day=1;       // 领取天数    
+}

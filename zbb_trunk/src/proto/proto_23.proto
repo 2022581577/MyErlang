@@ -1,0 +1,149 @@
+// 排位战模块
+package arena;
+import "common.proto";
+
+// 查询基本信息
+// key 308 	value 今日挑战次数 value1 购买次数 mtime 下次可挑战时间
+
+// 23001 查询排位信息
+message c2s23001 {
+}
+message s2c23001 {
+	required int32 rank=1;				//当前名次
+	repeated award list=2;				//历史每日排名 领取每日排名奖励用的 最近排名优先 为空没有奖励可领取
+	required int32 best_rank=3;			//最佳排名
+}
+
+message award {
+	required int32 rank=1;
+	required int32 user_lv=2;
+}
+
+// 23002 刷新挑战列表
+// 成功返回 23002 失败返回 23006
+message c2s23002 {
+}
+message s2c23002 {
+	repeated tar_info list=1;			//可挑战列表
+}
+
+message tar_info {
+	required p_user tar=1;			//玩家信息
+	required int32 rank=2;				//排名
+}
+
+// 23003 清除挑战CD
+// 成功返回 23000 失败返回 23006
+message c2s23003 {
+}
+
+// 23004 开始挑战
+// 成功返回 12005  失败返回  23002 23006
+message c2s23004 {
+	required int32 order=1;				//挑战列表第几个人
+	required int64 tar_id=2;			//当前位置的玩家信息 用于校验信息是否过期
+	required int32 type=3;				//0 检测 1 真实进入
+}
+
+// 23005 领取每日排名奖励
+// 
+message c2s23005 {
+}
+
+// 23006 错误码
+// 0 成功
+// 1 当前名次信息已失效
+// 2 冷却中
+// 3 没钱
+// 4 没次数
+// 5 购买上限
+// 6 正在挑战中
+// 7 副本中或战斗状态
+// 8 赢了,但是名次信息发生变化
+// 9 可以挑战
+message s2c23006 {
+	required int32 code=1;
+}
+
+// 23007 购买挑战次数
+// 成功返回 23000 失败返回 23006
+message c2s23007 {
+}
+
+// 23008 战报
+message c2s23008 {
+}
+message s2c23008 {
+	repeated log list=1;
+}
+
+message log {
+	required p_user_little aer=1;			// 攻击者
+	required p_user_little der=2;			// 防御方
+	required int32 aer_rank=3;			// 攻击方名字
+	required int32 der_rank=4;			// 防守方名次
+	required int32 result=5;			// 对战结果 1 赢 0 输
+	required int32 time=6;				// 对战时间 时间戳
+}
+
+// 23009 排名变化通知
+message s2c23009 {
+	required int32 new=1;				//新排名
+	required int32 old=2;				//旧排名
+}
+
+// 输赢通知
+message s2c23010 {
+	required int32 result=1;			//1赢 0输
+	required int32 rank=2;				//最新排名
+	required int32 old_rank=3;			//旧排名
+	required int32 tar_rank=4;			//目标排名
+}
+
+// 战报更新通知
+message s2c23011 {
+}
+
+
+// 请求玩家信息
+message c2s23012 {
+	repeated int32 list=1;		// 排名列表
+}
+message s2c23012 {
+	repeated tar_info list=1;
+}
+
+
+// 天地榜位置信息变更通知
+message s2c23013 {
+	required int32 pos=1;		// 0 表示失去 -1 表示当前位置信息过时 其他表示占领新的位置
+}
+
+// 天地榜列表
+message c2s23014 {
+}
+message s2c23014 {
+	repeated p_legend list=1;
+}
+// 玩家形象通过查询玩家信息接口
+message p_legend {
+	required int32 pos=1;		//位置
+	required int32 boss_lv=2;		//当前等阶
+	required int64 user_id=3;
+	required p_user user=4;
+}
+
+// 开始挑战天地榜
+message c2s23015 {
+	required int32 pos=1;		//boss位置
+	required int32 lv=2;		//boss档次
+}
+
+// 购买天地榜次数
+message c2s23016 {
+}
+
+// 挑战结果
+message s2c23017 {
+	required int32 result=1; // 1赢 2输
+}

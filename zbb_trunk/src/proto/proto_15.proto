@@ -1,0 +1,742 @@
+// 物品模块
+
+import "common.proto";
+
+package item;
+
+//%% key分类1000以上2000以下为动态key
+//-define(KEY_EQUIP_STREN_LEVEL,              1001).  %%强化——强化等级
+//-define(KEY_EQUIP_MAX_STREN_LEVEL,          1002).  %%最高强化等级记录//时间失效则无效
+//-define(KEY_EQUIP_MAX_STREN_LEVEL_END_TIME, 1003).  %%最高强化等级记录失效时间
+
+//-define(KEY_EQUIP_PART_RP,                  1004).  %%部位——当前部位人品值
+//-define(KEY_EQUIP_PART_ADD_STREN_SUCC_RATE, 1005).  %%部位——部位下一次强化成功率
+//-define(KEY_EQUIP_MAGIC_STREN_LEVEL,        1006).  %%神兵强化——神兵强化等级
+//-define(KEY_EQUIP_MAGIC_STREN_TIMES,        1007).  %%神兵强化——已使用神兵强化次数
+//-define(KEY_EQUIP_ELEMENT_TYPE,             1008).  %%元素——元素类型
+//-define(KEY_EQUIP_ELEMENT_VALUE,            1009).  %%元素——元素值 Value:[{AttrId, AttrValue}...]
+//-define(KEY_EQUIP_RAND_ATTR,                1010).  %%极品属性——随机属性(极品属性)  Value:[{Index, [{AttrId, AttrValue}...]}...]
+//-define(KEY_EQUIP_IS_SELECT,                1011).  %%是否换装     Value:0未使用 1使用
+//-define(KEY_EQUIP_PART_RP_LV,               1012).  %%部位——当前人品等级 
+//-define(KEY_INLAY,                          1021).  %%镶嵌——镶嵌        Value:[{Index, InlayTplId}...]
+//-define(KEY_VESTMENT_XILIAN_NTH,            1022).  %%洗炼——圣兵装备    Value:Num
+
+//-define(KEY_EXPIRE_TIME,                    1200).  %%失效时间              %%公用key 0无时效 >0失效时间
+//-define(KEY_TO_ITEMS,                       1201).  %%程序封装类(获得物品)   %%公用key Value:[{TplId, Num}...]
+
+//-define(KEY_SKILL_UPGRADE_BLESS,            1902).  %%技能升级祝福值 
+//-define(KEY_SKILL_RANK_BLESS,               1903).  %%技能品级祝福值 
+
+//%% key分类2000以上为静态key
+//%% 静态key值会默认取配置数据//因此不可用静态key来保存对应动态数据
+//-define(KEY_TO_STREN_LEVEL,                 2001).  %%可强化至多少级//直接强化石
+//-define(KEY_GROW_TYPE,                      2002).  %%成长系统类型
+//-define(KEY_VESTMENT_ID,                    2004).  %%圣衣ID
+//-define(KEY_VESTMENT_INDEX,                 2005).  %%圣衣套数编号
+//-define(KEY_STONE_LV,                       2006).  %%符石宝石等级  %%公用key
+//-define(KEY_EQUIP_IS_ANCIENT,               2007).  %%是否是神器
+//-define(KEY_TITLE_TPL_ID,                   2008).  %%对应称号ID
+//-define(KEY_FASHION_ID,                     2009).  %%对应时装ID
+//-define(KEY_EQUIP_GROW_LEVEL,               2011).  %%成长装备阶数限制
+//-define(KEY_EQUIP_VESTMENT_LEVEL,           2012).  %%圣兵装备注灵限制
+//-define(KEY_BUFF_ID,                        2013).  %%对应buffID
+//-define(KEY_LIMIT_UPPER,                    2014).  %%使用上限 KEY_GROW_RANK_UPPER -> KEY_LIMIT_UPPER
+//-define(KEY_GFIT_COST_GOLD,                 2015).  %%钻石开启礼包消耗值
+//-define(KEY_DEL_PK_VALUE,                   2016).  %%删除pk值
+//-define(KEY_LIMIT_LOWER,                    2017).  %%使用下限
+//-define(KEY_SERVANT_ID,                     2018).  %%英灵ID
+
+//-define(KEY_EXPIRE_TIME_STATIC,             2100).  %%有效时长(小时)  %%公用key
+
+//-define(KEY_SKILL_ID,                       2901).  %%技能ID          %%公用key
+//-define(KEY_SKILL_LV,                       2902).  %%技能LV          %%公用key
+//-define(KEY_INLAY_UP_BASE,                  2903).  %%符石升级基数    %%公用key
+
+//EVENT_TYPE{event_type, 描述}
+//     {1002, "背包_扩展背包返还"}
+//     ,{1003, "装备_强化返还"}
+//     ,{1004, "任务_完成奖励"}
+//     ,{1005, "邮件_附件提取"}
+//%%   ,{1006, "副本结算奖励"}
+//     ,{1007, "拾取掉落"}
+//     ,{1008, "宝石符石_拆卸获得"}
+//     ,{1009, "装备_新增系统部位"}
+//     ,{1010, "活跃度_奖励"}
+//     ,{1011, "日常任务_单环奖励"}
+//     ,{1012, "日常任务_额外奖励"}
+//     ,{1013, "日常任务_一键完成奖励"}
+//     ,{1014, "试炼任务_单环奖励"}
+//     ,{1015, "试炼任务_一键完成奖励"}
+//     ,{1016, "商城_通用购买"}
+//     ,{1017, "女神祝福_获得"}
+//     ,{1018, "技能副本_每波怪奖励"}
+//     ,{1019, "技能副本_跳关N波怪奖励"}
+//     ,{1020, "技能副本_首次通XX关奖励"}
+//     ,{1021, "转生副本_通XX关奖励"}
+//     ,{1022, "转生副本_每关奖励"}
+//     ,{1023, "世界boss奖励"}
+//     ,{1024, "行会_每日宝箱"}
+//     ,{1025, "行会_等级宝箱"}
+//     ,{1026, "行会_申请物品"}
+//     ,{1027, "护送_奖励"}
+//     ,{1028, "排位战_挑战奖励"}
+//     ,{1029, "排位战_排名奖励"}
+//     ,{1030, "使用物品_打开礼包"}
+//     ,{1031, "使用物品_打开封装物品"}
+//     ,{1032, "行会任务_完成奖励"}
+//     ,{1033, "剧情副本_领取章节宝箱"}
+//     ,{1034, "功能开启_奖励"}
+//     ,{1035, "行会神树_定时奖励"}
+//     ,{1036, "行会神树_采集收获"}
+//     ,{1037, "行会神树_打劫获得"}
+//     ,{1038, "行会副本_采集奖励"}
+//     ,{1039, "行会副本_结算奖励"}
+//     ,{1040, "商城_钻石购买"}
+//     ,{1041, "商城_绑定钻石购买"}
+//     ,{1042, "商城_声望购买"}
+//     ,{1043, "商城_荣誉购买"}
+//     ,{1044, "商城_功勋购买"}
+//     ,{1045, "商城_贡献购买"}
+//     ,{1046, "副本结算奖励_剧情"}
+//     ,{1047, "副本结算奖励_VIP"}
+//     ,{1048, "副本结算奖励_装备"}
+//     ,{1049, "副本结算奖励_帮派BOSS"}
+//     ,{1050, "副本结算奖励_金币"}
+//     ,{1051, "副本结算奖励_灵魂"}
+//     ,{1052, "丰收号角_掉宝"}
+//     ,{1053, "丰收号角_吹响号角"}
+//     ,{1054, "丰收号角_领取红包"}
+//     ,{1055, "沙滩答题_获得奖励"}
+//     ,{1056, "排位站_历史最高奖励"}
+//     ,{1057, "行会_贡献返还"}
+//     ,{1058, "领地战_领地奖励"}
+//     ,{1059, "经验副本_每日首次通关奖励"}
+//     ,{1060, "经验副本_杀怪奖励"}
+//     ,{1061, "经验副本_地精奖励"}
+//     ,{1062, "市场_物品下架"}
+//     ,{1063, "市场_系统下架"}
+//     ,{1064, "市场_出售物品获得"}
+//     ,{1065, "市场_购买物品获得"}
+//    ,{1066, "VIP副本_挖宝奖励"}  
+//     ,{1067, "装备_合成(进化)获得"}
+//     ,{1068, "装备_进阶(进化)获得"}
+//     ,{1069, "装备_神器(进化)获得"}
+//     ,{1070, "合成_获得"}
+//     ,{1071, "1VN单局奖励"}
+//     ,{1072, "副本结算奖励_新装备"}
+//     ,{1073, "副本结算奖励_新装备首通"}
+//     ,{1074, "vip_等级礼包"}
+//     ,{1075, "vip_每周礼包"}
+//     ,{1076, "战场任务奖励"}
+//     ,{1077, "圣衣_洗练选择"}
+//     ,{1078, "圣衣_装备分解"}
+//     ,{1079, "时装_新增时装"}
+//     ,{1080, "商城_圣衣购买"}
+//     ,{1081, "技能副本_塔回滚返回积分"}
+//     ,{1082, "后台_邮件获得"}
+//     ,{1083, "福利系统_奖励找回"}
+//     ,{1084, "成就系统_成就奖励"}
+//     ,{1085, "鲜花系统_获得"}
+//     ,{1086, "福利系统_签到奖励"}
+//     ,{1087, "福利系统_领取离线经验"}
+//     ,{1088, "寻宝_获得"}
+//     ,{1089, "福利系统_在线奖励"}
+//     ,{1090, "冥想_获得"}
+//     ,{1091, "装备_升级(进化)获得"}
+//     ,{1092, "行会_返回贡献"}
+//     ,{1093, "行会_捐献获得"}
+//     ,{1094, "护送_打劫获得"}
+//     ,{1095, "副本结算奖励_名人堂"}
+//     ,{1096, "活动奖励_达人榜"}
+//     ,{1097, "活动奖励_七天目标"}
+//     ,{1098, "调查奖励_问卷调查"}
+//     ,{1099, "奖励_秘境寻宝"}
+//     ,{1100, "等级礼包"}
+//     ,{1101, "提升境界获得"}
+//     ,{1102, "开箱子获得"}
+//     ,{1103, "领地战获得经验"}
+//     ,{1104, "商城_寻宝积分兑换"}
+//     ,{1105, "充值_累计充值天数奖励"}
+//     ,{1106, "活动_进阶返利"}
+//     ,{1107, "七天登陆奖励"}
+//     ,{1108, "限时抢购_购买获得"}
+//     ,{1109, "打宝任务_单环奖励"}
+//     ,{1110, "打宝任务_额外奖励"}
+//     ,{1111, "开宝箱获得"}
+//     ,{1998, "GM_获得"}
+//     ,{1999, "充值"}
+
+//%%宏BIND
+//-define(BIND_1,			1).		%%非绑定
+//-define(BIND_2,			2).		%%绑定
+
+//%%宏AUTOBUY
+//-define(AUTO_BUY_FALSE,		0).		%%非自动购买
+//-define(AUTO_BUY_TRUE,		1).		%%自动购买
+
+//%%宏RESULT
+//-define(RESULT_SUCC,			1).		%%成功
+//-define(RESULT_FAIL,			2).		%%失败
+
+//-define(COLOR_WHITE,        1).     %%白色
+//-define(COLOR_GREEN,        2).     %%绿色
+//-define(COLOR_BLUE,         3).     %%蓝色
+//-define(COLOR_PURPLE,       4).     %%紫色
+//-define(COLOR_ORANGE,       5).     %%橙色
+//-define(COLOR_RED,          6).     %%红色
+//-define(COLOR_GOLD,         7).     %%金色 
+
+//%%宏element attr
+//-define(ELEMENT_EARTH,      1).     %%地
+//-define(ELEMENT_WATER,      2).     %%水
+//-define(ELEMENT_FIRE,       3).     %%火
+//-define(ELEMENT_WIND,       4).     %%风
+//-define(ELEMENT_LIGHT,      5).     %%光
+//-define(ELEMENT_DARK,       6).     %%暗
+
+//%%宏LOACTION
+//-define(LOCATION_EQUIP,                 1).     %%装备
+//-define(LOCATION_BAG,                   2).     %%背包
+//-define(LOCATION_WAREHOUSE,             3).     %%仓库
+//-define(LOCATION_EQUIP_FASHION,         4).     %%时装
+//-define(LOCATION_WAREHOUSE_CHEST,       5).     %%打宝仓库
+//-define(LOCATION_EQUIP_VESTMENT,        6).     %%圣衣
+//-define(LOCATION_EQUIP_RIDE,            7).     %%坐骑
+//-define(LOCATION_EQUIP_MAGIC,           8).     %%神器
+//-define(LOCATION_EQUIP_WING,            9).     %%羽翼
+//-define(LOCATION_EQUIP_GODDESS,        10).     %%女神
+//-define(LOCATION_EQUIP_MATRIX,         11).     %%法阵
+//-define(LOCATION_EQUIP_FAIRY,          12).     %%精灵
+//-define(LOCATION_EQUIP_SHIELD,         13).     %%战盾
+
+//-define(LOCATION_WAREHOUSE_TREASURE,  101).     %%宝藏仓库
+
+//%%物品类型
+//%%物品类型宏以ITEM_TYPE为头
+//-define(ITEM_TYPE_SKILL, 					10). 	%%技能符
+//-define(ITEM_TYPE_SKILL_GROW,             11).    %%成长系统技能书
+
+//-define(ITEM_TYPE_EQUIP, 					20). 	%%装备
+//-define(ITEM_TYPE_EQUIP_GROW,				21).	%%装备(成长系统)
+//-define(ITEM_TYPE_EQUIP_VESTMENT_ELEM,    22).    %%装备(圣衣元素)
+//-define(ITEM_TYPE_EQUIP_VESTMENT,         23).    %%装备(圣兵装备)
+//-define(ITEM_TYPE_EQUIP_FASHION,          24).    %%装备(人物时装)
+
+//-define(ITEM_TYPE_PROPERTY,				30).	%%道具
+//-define(ITEM_TYPE_PROPERTY_GIFT,          32).    %%礼包
+
+//-define(ITEM_TYPE_MATERIAL,				40). 	%%材料
+//-define(ITEM_TYPE_MATERIAL_STONE,			42).	%%镶嵌类
+
+//物品子类
+//装备
+//-define(ITEM_SUBTYPE_EQUIP_WEAPON_PRI,	2001).  %%主武器
+//-define(ITEM_SUBTYPE_EQUIP_WEAPON_SEC,	2002).  %%副武器
+//-define(ITEM_SUBTYPE_EQUIP_HELMET,		2003).	%%头盔
+//-define(ITEM_SUBTYPE_EQUIP_CLOTHES,		2004).	%%衣服
+//-define(ITEM_SUBTYPE_EQUIP_SHOULDER,		2005).	%%肩膀
+//-define(ITEM_SUBTYPE_EQUIP_ARM,			2006).	%%护臂
+//-define(ITEM_SUBTYPE_EQUIP_NECKLACE,		2007).	%%项链
+//-define(ITEM_SUBTYPE_EQUIP_RING,			2008).	%%戒指
+//-define(ITEM_SUBTYPE_EQUIP_ARMLET,		2009).	%%臂环
+//-define(ITEM_SUBTYPE_EQUIP_BELT,			2010).	%%腰带
+//-define(ITEM_SUBTYPE_EQUIP_PANTS,			2011).	%%裤子
+//-define(ITEM_SUBTYPE_EQUIP_SHOES,			2012).	%%鞋子
+
+//%%时装
+//-define(ITEM_SUBTYPE_FASHION_WEAPON,      2401).  %%时装武器
+//-define(ITEM_SUBTYPE_FASHION_CLOTHES,     2404).  %%时装衣服
+//-define(ITEM_SUBTYPE_FASHION_RIDE,        2421).  %%时装坐骑
+//-define(ITEM_SUBTYPE_FASHION_MAGIC,       2422).  %%时装神器
+//-define(ITEM_SUBTYPE_FASHION_WING,        2423).  %%时装羽翼
+//-define(ITEM_SUBTYPE_FASHION_FAIRY,       2426).  %%时装精灵
+
+//%%道具分类
+//-define(ITEM_SUBTYPE_TRAIN_TASK,          3014).  %%试炼任务
+//-define(ITEM_SUBTYPE_TO_ITEMS,            3016).  %%程序封装产出
+//-define(ITEM_SUBTYPE_CARD_TITLE,          3017).  %%称号
+//-define(ITEM_SUBTYPE_ADD_HP,              3019).  %%血包
+
+//-define(ITEM_SUBTYPE_FASHION_COLLECT,     3024).  %%时装收集卡
+//-define(ITEM_SUBTYPE_FASHION_CARD,        3025).  %%时装卡
+
+//-define(ITEM_SUBTYPE_TEMP_VIP_CARD,       3027).  %%vip体验卡
+//-define(ITEM_SUBTYPE_CLEAN_RED_CARD,      3028).  %%消除红名卡
+
+//-define(ITEM_SUBTYPE_GIFT_FIX,            3201).  %%固定礼包
+//-define(ITEM_SUBTYPE_GIFT_RAND,           3202).  %%随机礼包
+//-define(ITEM_SUBTYPE_GIFT_GOLD,           3203).  %%钻石礼包
+
+//-define(ITEM_SUBTYPE_GROW_GROW,			3021).	%%成长丹(成长系统)
+//-define(ITEM_SUBTYPE_GROW_QUAL,			3022).	%%资质丹(成长系统)
+
+//-define(ITEM_SUBTYPE_GROW_RANK,           3034).  %% 超级进阶(成长系统)
+//-define(ITEM_SUBTYPE_GROW_BLESS,          3038).  %% 祝福石(成长系统)
+//-define(ITEM_SUBTYPE_GROW_STAR,           3040).  %% 超级升星(成长系统)
+
+//%%符石宝石
+//-define(ITEM_SUBTYPE_BLUE_STONE,			4201).	%%蓝符石
+//-define(ITEM_SUBTYPE_PURPLE_STONE,		4202).	%%紫符石
+//-define(ITEM_SUBTYPE_RED_STONE,			4203).	%%红符石
+
+//装备部位ID
+//-define(PART_WEAPON_PRI,		2001).  	%%主武器
+//-define(PART_WEAPON_SEC,		2002).  	%%副武器
+//-define(PART_HELMET,			2003).		%%头盔
+//-define(PART_CLOTHES,			2004).		%%衣服
+//-define(PART_SHOULDER,		2005).		%%肩膀
+//-define(PART_ARM,				2006).		%%护臂
+//-define(PART_NECKLACE,		2007).		%%项链
+//-define(PART_RING,			2008).		%%戒指
+//-define(PART_ARMLET,			2009).		%%臂环
+//-define(PART_BELT,			2010).		%%腰带
+//-define(PART_PANTS,			2011).		%%裤子
+//-define(PART_SHOES,			2012).		%%鞋子
+
+//进化方式
+//-define(EQUIP_EVOLVE_FLAG_UPGRADE_1,		1).		%%升级(合成)
+//-define(EQUIP_EVOLVE_FLAG_UPGRADE_2,		2).		%%升级(消耗)
+//-define(EQUIP_EVOLVE_FLAG_ADVANCE,		3).		%%进阶
+//-define(EQUIP_EVOLVE_FLAG_TO_ANCIENT,     4).     %%神器
+
+//套装属性
+//-define(SUIT_STREN,			1).		%%强化
+//-define(SUIT_MAGIC_STREN,		2).		%%神兵强化
+//-define(SUIT_COLOR,			3).		%%颜色
+//-define(SUIT_USE_LEVEL,		4).		%%等级
+
+//%% 商城类型
+//-define(SHOP_GOLD,                      1).     %%钻石区
+//-define(SHOP_BIND_GOLD,                 2).     %%绑定钻石区
+//-define(SHOP_PRESTIGE,                  3).     %%声望
+//-define(SHOP_HONOR,                     4).     %%荣誉
+//-define(SHOP_EXPLOIT,                   5).     %%功勋
+//-define(SHOP_CONTRIBUTE,               11).     %%贡献区
+//-define(SHOP_VESTMENT,                 12).     %%圣衣兑换
+
+// 15000 物品信息变动
+message s2c15000{
+	repeated item_struct list = 1;
+}
+
+// 15001 物品初始化列表
+message s2c15001{
+	repeated item_struct list = 1;
+} 
+
+// 15002 拆分
+message c2s15002{
+	required int64 item_id = 1;		//物品实例化ID
+	required int32 num = 2;			//拆分数目
+}
+
+// 15003 物品位置变动 包括移动、叠加、交换位置
+// 圣衣dest_cell和dest_item_id均传0
+message c2s15003{
+	required int64 item_id = 1;		//物品实例化ID
+	required int32 dest_loc = 2;	//目标位置
+	required int32 dest_cell = 3;	//目标格子
+	optional int64 dest_item_id = 4[default=0];	//对应物品实例化ID:当此字段有意义时dest_cell无效
+}
+
+// 15004 整理
+message c2s15004{
+}
+
+// 15005 丢弃
+message c2s15005{
+	repeated int64 item_id_list = 1;		//物品实例化ID
+}
+
+// 15006 开启背包格子
+message c2s15006{
+	required int32 loc = 1;				//指定位置
+	required int32 cell = 2;			//增加格子数
+	optional int32 flag = 3[default=0];	//使用方式 0 免费 1消费	
+}
+
+// 15007 购买物品
+message c2s15007{
+	required int32 shop_type = 1;		            //商品类型
+	required int32 item_tpl_id = 2;		            //物品模板ID
+	required int32 buy_num = 3;			            //购买数量
+	optional int32 shop_subtype = 4[default=0];     //商品子类型
+}
+
+// 15007 购买物品
+message s2c15007{
+	required int32 result = 1;					//1成功 2失败
+}
+
+// 15008 装备升级/进阶/神器
+message c2s15008{
+	required int64 item_id = 1;					      //源物品实例化ID//使用规则1升级时 item_id优先身上的装备
+	required int32 bind = 2;					      //1优先非绑 2优先绑定
+	required int32 flag = 3;					      //使用规则1 升级(合成表:同类型物品兑换) 2升级(消耗) 3进阶 4神器
+	repeated int64 cost_id_list = 4;                  //规则1所需消耗装备ID<按序>
+	optional int32 compose_tpl_id = 5[default=0];     //规则1合成目标ID
+	optional int32 auto_buy = 6[default=0];		      //是否自动购买 1 自动购买
+}
+
+// 15008 装备升级/进阶/神器
+message s2c15008{
+	required int64 item_id = 1;					//源物品实例化ID
+	required int32 result = 2;					//进化结果 1成功 2失败
+	required int32 flag = 3;					//使用规则1 升级(使用同类型装备兑换) 2升级(消耗) 3进阶 4神器
+}
+
+// 15009 装备强化
+message c2s15009{
+	required int64 item_id = 1;						//物品实例化ID
+	required int32 bind = 2;						//1优先非绑 2优先绑定 多种消耗方式 都需要指定绑定类型
+	optional int32 is_protect = 3[default=0];		//是否使用幸运符 0不使用 1使用
+	optional int32 stren_tpl_id = 4[default=0];		//直接飙级的强化石模板ID
+	optional int32 auto_buy = 5[default=0];			//是否自动购买 1 自动购买
+}
+
+// 15009 装备强化
+message s2c15009{
+	required int64 item_id = 1;						//物品实例化ID
+	required int32 result = 2;						//强化结果 1成功 2失败
+	required int32 stren_lv = 3;					//最新强化等级
+	optional int32 feed_type = 4[default=0];		//反馈类型 1失败+加经验 2失败+下一次强化成功率 3失败+金币返还 4失败+材料返还 5失败+不掉级
+	optional int32 feed_succ_rate = 5[default=0];	//失败所增加的下一级强化成功率(千分比)
+	repeated item_list_struct item_list = 6;		//强化返还
+}
+
+// 返还列表
+message item_list_struct{
+	required int32 item_tpl_id = 1;			//物品模板ID
+	required int32 num = 2;					//物品数量
+}
+
+//15010 装备继承
+message c2s15010{
+	required int64 item_id = 1;						//辅源装备物品实例化ID
+	required int64 dest_item_id = 2;				//主装备物品实例化ID
+	optional int32 auto_buy = 3[default=0];         //是否自动购买 1 自动购买
+}
+
+message s2c15010{
+    required int32 result = 1;                      //成功 1 失败 2
+}
+
+// 15011 神兵强化
+message c2s15011{
+	required int64 item_id = 1;						//物品实例化ID
+	required int32 bind = 2;						//1优先非绑 2优先绑定
+}
+
+// 15011 神兵强化
+message s2c15011{
+    required int32 result = 1;                      //成功 1 失败 2
+}
+
+// 15012 元素类型刷新
+message c2s15012{
+	required int64 item_id = 1;						//物品实例化ID
+	required int32 bind = 2;						//1优先非绑 2优先绑定
+	optional int32 auto_buy = 3[default=0];         //是否自动购买 1 自动购买
+}
+
+message s2c15012{
+    required int32 result = 1;                      //成功 1 失败 2
+}
+
+// 15013 元素属性值刷新
+message c2s15013{
+	required int64 item_id = 1;						//物品实例化ID
+	required int32 bind = 2;						//1优先非绑 2优先绑定
+	optional int32 auto_buy = 3[default=0];         //是否自动购买 1 自动购买
+}
+
+message s2c15013{
+    required int32 result = 1;                      //成功 1 失败 2
+}
+
+// 15014 物品使用
+message c2s15014{
+	required int64 item_id = 1;						//物品实例化ID
+	required int32 num = 2;							//使用数量
+}
+
+// 15014 物品使用
+message s2c15014{
+	required int32 result = 1;						//1成功 2失败 3背包格子不足 4重复使用
+	required int64 item_id = 2;						//物品实例化ID
+}
+
+// 15015 物品合成
+message c2s15015{
+	required int32 compose_tpl_id = 1;				//合成目标ID
+	required int32 compose_num = 2;					//合成数量
+	required int32 auto_buy = 3;                    //是否自动购买 1 自动购买
+	required int32 bind = 4;						//1优先非绑 2优先绑定
+}
+
+message s2c15015{
+    required int32 compose_tpl_id = 1;              //合成目标ID
+    required int32 compose_num = 2;                 //合成数量
+}
+
+// 15016 宝符镶嵌
+message c2s15016{
+	required int64 inlay_item_id = 1;		//镶嵌物实例化ID
+	required int32 inlay_index = 2;			//镶嵌位置
+	required int32 tpl_id = 4;				//未实例化部位模板ID
+	required int32 loc = 5;					//未实例化所属LOC
+	optional int64 item_id = 3[default=0];	//目标位置实例化ID
+}
+
+
+// 15017 宝符拆卸
+message c2s15017{
+	required int64 item_id = 1;						//物品实例化ID
+	required int32 inlay_index = 2;					//拆卸嵌位置
+}
+
+// 15018 宝符升级
+message c2s15018{
+	required int64 item_id = 1;						//物品实例化ID
+	required int32 inlay_index = 2;					//升级宝石位置
+}
+
+//15018 宝符升级
+message s2c15018{
+	repeated cost_tpl_struct cost_tpl = 1;			//消耗列表
+}
+
+message cost_tpl_struct{
+	required int32 tpl_id = 1;						//物品ID
+	required int32 num = 2;							//物品数量
+}
+
+//15019 装备熔炼
+message c2s15019{
+    repeated int64 id_list = 1;                     //需要熔炼的物品ID列表
+}
+
+//15019 装备熔炼
+message s2c15019{
+    required int32 value = 1;                       //本次增加熔炼值
+} 
+
+//15020 选择时装
+message c2s15020{
+    required int32 fashion_id = 1;                  //时装模板ID
+    required int32 is_select = 2;                   //是否选择 1换装 0卸下
+}
+
+//15021 获得记录通知
+message s2c15021{
+    required int32 event_type = 1;
+    repeated key_value list = 2;                    //key:tpl_id value:num
+    required int32 type = 3;                        //1 add 2 del
+}
+
+//15022 激活时装
+message c2s15022{
+    required int32 fashion_id = 1;                  //时装模板ID
+}
+
+//15024 收集时装
+message c2s15024{
+    required int32 fashion_id = 1;                 //时装模板ID
+    required int32 num = 2;                        //使用数目 
+}
+
+//15025 开礼包返回
+message s2c15025{
+    required int32 tpl_id = 1;                      //礼包模板ID
+    required int32 num = 2;                         //礼包数量
+    repeated key_value list = 3;                    //key:tpl_id value:num
+}
+
+// 15026 抢购
+message c2s15026{
+    required int32 type = 1;                        //活动类型
+    required int32 subtype = 2;                     //活动子类型
+    required int32 activity_id = 3;                 //活动ID
+    required int32 item_tpl_id = 4;                 //物品模板ID
+    required int32 buy_num = 5;                     //购买数量
+}
+
+// 15026 抢购
+message s2c15026{
+    required int32 result = 1;                      //1成功 2失败
+}
+
+// 15027 分解
+message c2s15027{
+    repeated id_num_struct list = 1;                //实例化列表
+}
+
+message id_num_struct{
+    required int64 item_id = 1;                     //实例化ID
+    required int32 num = 2;
+}
+
+// 15027 分解返回
+message s2c15027{
+    required int32 result = 1;                      //成功 1 失败 2
+    }
+
+// 15028 使用改名卡
+message c2s15028{
+    required int64 item_id = 1;                     // 实例化id
+    required string name = 2;                       // 名字
+}
+message s2c15028{
+    required int32 result = 1;                      // 结果：0、失败，1、成功，2、重名
+}
+
+//15100 物品展示
+message c2s15100{
+    repeated int64 item_id_list = 1;                //实例化ID列表
+}
+
+//15100 物品展示
+message s2c15100{
+    repeated show_struct list = 1;
+}
+
+message show_struct{
+    required int32 show_id = 1;                     //查询ID
+    required int64 item_id = 2;                     //物品ID
+}
+
+//15101 物品查询
+message c2s15101{
+    required int32 show_id = 1;                     //查询ID
+    }
+
+//15101 物品查询
+message s2c15101{
+    required int32 result = 1;                      //查询结果 1成功 2信息不存在
+    repeated item_struct list = 2;                  //物品信息
+    }
+
+message market_struct{
+    required int32 market_id = 1;
+    required int64 user_id = 2;
+    required string user_name = 3;
+    required int32 type = 4;
+    required int32 subtype = 5;
+    required int32 price = 6;
+    required item_form item = 7;
+    required int32 mtime = 8;
+}
+
+//15110 我的寄售
+message c2s15110{
+}
+
+message s2c15110{
+    repeated market_struct list = 1;
+}
+
+//15111 市场上架
+message c2s15111{
+    required int64 item_id = 1;         //出售物品ID
+    required int32 item_num = 2;        //出售物品数目
+    required int32 price = 3;           //出售价格
+}
+
+//15111
+message s2c15111{
+    required int32 result = 1;      //1成功 2失败 3上架上限
+    repeated market_struct list = 2;
+}
+
+//15112 市场下架
+message c2s15112{
+    required int32 market_id = 1;
+}
+
+message s2c15112{
+    required int32 market_id = 1;   //ID
+    required int32 result = 2;      //1 成功 2 其他失败 3 背包满  4 已下架(or被购买)
+}
+
+//15113 市场购买
+message c2s15113{
+    required int32 market_id = 1;
+}
+
+//15113
+message s2c15113{
+    required int32 result = 1;          //1成功 2失败 3已下架(or被购买)
+}
+
+//15114 市场查询
+message c2s15114{
+    required int32 page = 1;                    //页码
+    repeated int32 list = 2;                    //搜索列表
+    optional int32 type = 3[default=0];         //类型
+    optional int32 subtype = 4[default=0];      //子类型
+    optional int32 order_type = 5[default=0];   //排序类型 0默认为上架时间 1 单价 2 总价
+    optional int32 order = 6[default=0];        //0 降序 1 升序
+}
+
+//15114
+message s2c15114{
+    required int32 page = 1;            //页码
+    required int32 page_total = 2;      //页码总数
+    required int32 type = 3;            //类型
+    required int32 subtype = 4;         //子类型
+    repeated market_struct list = 5;    //信息列表
+}
+
+//15115 市场吆喝
+message c2s15115{
+    required int32 market_id = 1;       //ID
+}
+
+message s2c15115{
+    required int32 market_id = 1;       //ID
+    required int32 result = 2;          //1 成功 2 其他失败 3 已下架(or被购买) 4 CD中
+    }
+    
+//15116 市场出售
+message s2c15116{
+    required int32 market_id = 1;       //ID
+    }
+
+//15117 市场单个信息
+message c2s15117{
+    required int32 market_id = 1;       //ID
+    }
+
+//15117
+message s2c15117{
+    required market_struct info = 1;    //信息列表
+    }
+
+
+//15200 英灵系统信息
+message s2c15200{
+    repeated key_value servant_list = 1;                //存在数据激活
+    required int32 total_online_time = 2;               //当前累计在线时长
+    optional int32 skill_servant_id = 3[default=0];     //当前选择技能
+    }
+
+//15201 英灵系统升级
+message c2s15201{
+    required int32 servant_id = 1;
+    }
+    
+//15201 英灵系统升级    
+message s2c15201{
+    required int32 servant_id = 1;
+    required int32 servant_lv = 2;
+    }
+    
+//15202 英灵技能选择
+message c2s15202{
+    required int32 servant_id = 1;
+}
+
+//15202 英灵技能选择
+message s2c15202{
+    required int32 servant_id = 1;
+}

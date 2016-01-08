@@ -1,0 +1,107 @@
+// 登陆模块
+package login;
+
+// 10000 登陆 
+message c2s10000 {
+	required string acct_name = 1;		// 账号
+	required int32 infant = 2;			// 防沉迷
+	required int32 time_stamp = 3;		// 时间戳
+	required string sign = 4;			// 加密串
+	required string server_no = 5;		// "S1"
+	optional int32 micro_flag = 6[default = 0];
+	optional string open_key = 7[default = ""];		// QQ平台专用
+	optional string pf = 8[default = ""];			// QQ平台专用
+	optional string pf_key = 9[default = ""];		// QQ平台专用
+	optional string zone_id = 10[default = ""];		// QQ平台专用(qq_server_id)
+	optional int32 is_hook = 11[default = 0];		// 是否挂机 0 否 1 是
+	optional string via = 12[default = ""];			// Q平台专用
+}
+
+message s2c10000 {
+	required int32 result = 1;			// 1-成功 2-登陆校验失败 3-防沉迷 4-账号封禁 5-ip封禁 6-入口关闭 7-服务器编号   8-账号非法 其他-失败
+	required string msg = 2;
+	required string session_key = 3;	// 动态KEY
+	repeated simple_user users = 4;		// 角色列表
+}
+
+// 10003 创建角色
+message c2s10003 {
+	required string user_name = 1;
+	required int32 career_id = 2;
+}
+
+message s2c10003 {
+	required int32 result = 1;         //0 失败 1成功 2名字已存在
+	required string msg = 2;
+	required int64 create_user_id = 3;
+	repeated simple_user users = 4;
+}
+
+
+// 10004 进入游戏
+message c2s10004 {
+	required string acct_name = 1;
+	required int64 user_id = 2;
+}
+
+message s2c10004 {
+	required int32 result = 1;
+	required string session_key = 2;
+    required int32 freshman_flag = 3;	// 新手副本标志(0-结束 1-进行中) 	
+}
+
+
+// 10005 断线提示
+message s2c10005 {
+	required int32 result = 1;		// 0-正常断线 1-其他地方上线 2-管理后台踢下线 3-系统维护踢人下线 4-防沉迷 5-其他原因 6-前端发包速度过快 7-浏览器加速 8-客户端时间戳异常
+}
+
+// 10006 断线重连
+message c2s10006 {
+	required string acct_name = 1;		// 账号
+	required string server_no = 2;		// "S1"
+	required int32 infant = 3;			// 防沉迷
+	required int64 user_id = 4;
+	required string session_key = 5;	// 加密串				
+}
+
+message s2c10006 {
+	required int32 result = 1;			// 1-成功 其他-失败
+}
+
+// 场景socket连接
+message c2s10007 {
+	required int64 user_id = 1;
+	required string session_key = 2;	
+}
+
+message s2c10007 {
+	required int32 result = 1;
+}
+
+// 选择服务器端口
+// 1、client针对默认游戏IP及游戏PORT(8001)发送10008协议,server返回客户端应该连接的游戏IP及游戏PORT;client发送12005后,server返回场景IP和场景PORT
+// 2、登陆成功后,后续涉及到切换地图时,server通过12005协议返回客户端应该连接的场景IP及场景PORT,此时游戏IP和游戏PORT保持不变
+// 3、登陆成功后,如果需要断线重连时,游戏IP/游戏PORT和场景IP/场景PORT均为此刻内存中保存的数据
+// 4、玩家F5刷新后,默认数据清空,走第1步
+message c2s10008 {
+	required string acct_name = 1;
+	required string server_no = 2;
+}
+
+message s2c10008 {
+	required string ip = 1;
+	required int32 port = 2;
+}
+
+//步骤日志
+message c2s10009 {
+	required int32 step = 1; //2 创角界面  3 点击创角
+}
+
+message simple_user {
+    required int64 user_id = 1;
+    required string user_name = 2;
+    required int32 career_id = 3;
+    required int32 level = 4;
+}

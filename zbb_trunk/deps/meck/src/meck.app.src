@@ -1,0 +1,8 @@
+%% -*- mode: erlang; -*-
+{application, meck,
+ [{description, "A mocking framework for Erlang"},
+  {vsn, "1.0"},
+  {modules, []},
+  {registered, []},
+  {applications, [kernel, stdlib]},
+  {env, []}]}.

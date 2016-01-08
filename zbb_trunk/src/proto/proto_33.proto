@@ -1,0 +1,59 @@
+// 寻宝
+package treasure;
+
+// 33001 寻宝
+message c2s33001 {
+    required int32 box_type=1;      // 宝箱类型
+    required int32 num_type=2;      // 数量类型
+}
+message s2c33001 {
+	repeated struct_treasure treasure_list=1;   // 寻得道具列表
+}
+
+// 33002 寻宝秘闻消息
+message s2c33002 {
+    repeated struct_treasure_msg msg_list=1;     // 消息列表
+}
+
+message struct_treasure_msg {
+    required int64 user_id=1;           // 玩家id
+    required string name=2;             // 玩家名
+    required struct_treasure item=3;    // 道具
+}
+
+// 33003 提取道具到背包
+message c2s33003 {
+    repeated int64 id_list=1;            // 道具唯一id(空列表即全部取出来，否则为对应的道具)
+}
+
+// 33004 统一消耗道具开宝箱
+message c2s33004 {
+    required int32 id=1;                // 开宝箱id
+}
+
+// 33005 幸运大转盘抽奖
+message c2s33005 {
+    required int32 type=1;              // 抽奖类型 类型1：抽1次，类型2：抽10次
+}
+message s2c33005 {
+    repeated struct_treasure roulette_list=1;   // 寻得道具列表
+}
+
+// 33006 幸运大转盘信息
+message s2c33006 {
+    required int32 jackpots=1;                  // 奖池数
+    repeated struct_roulette_msg msg_list=2;    // 历史信息
+}
+
+message struct_roulette_msg {
+    required int64 user_id=1;           // 玩家id
+    required int32 server_no=2;         // 服务器id
+    required string name=3;             // 玩家名
+    required struct_treasure item=4;    // 道具
+}
+
+message struct_treasure {
+    required int32 item_id=1;           // 道具id
+    required int32 num=2;               // 数量
+}
+
