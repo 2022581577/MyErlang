@@ -21,7 +21,7 @@
 -export([start_link/0,stop/1]).
 
 -record(state,{socket,	        %% 控制权转交后需测试socket为 undefined
-			   packet_len =  0
+			   packet_len =  0  %% 初始packet长度为0，从消息头接收到数据后重置packet长度
 			   }).
 
 start_link() ->
@@ -35,22 +35,9 @@ do_init([]) ->
 	packet_encode:init_packet_index(),
 	{ok,#state{}}.
 
-do_terminate(_Reason, #state{socket=Socket}) ->
-	%% ?INFO("~w stop...",[?MODULE]),
-	case is_port(Socket) of
-		true ->
-			gen_tcp:close(Socket);
-		false ->
-			skip
-	end,
-    ok.
-
-do_call(Info, _From, State) -> 
-    ?WARNING("Not done do_call:~w",[Info]),
-	{reply, ok, State}.
-
 do_cast({set_socket,Socket},State) ->    
     ?INFO("Set Socket:~w",[Socket]),    
+    %% 开始接收消息头长度为4的消息
     async_recv(Socket,?HEADER_LENGTH,?HEART_TIMEOUT),    
     %lib_login:save_reader_info(#reader_info{socket = Socket}),    
     {noreply,State#state{socket = Socket}};
@@ -59,25 +46,34 @@ do_cast(Info, State) ->
     ?WARNING("Not done do_cast:~w",[Info]),
 	{noreply, State}.
 
-%% 接收数据
+do_call(Info, _From, State) -> 
+    ?WARNING("Not done do_call:~w",[Info]),
+	{reply, ok, State}.
+
+%%% inet_async,接收prim_inet:async_recv的反馈
+%% 接收安全沙箱信息
 do_info({inet_async,Socket,_Ref,{ok,?FLASH_POLICY_REQ}},#state{socket = Socket} = State) ->
     %?INFO("++++++++++++++++++ Send Prolicy ++++++++++++++++",[]),
     gen_tcp:send(Socket,?FLASH_POLICY_FILE),
-	async_recv(Socket,?FLASH_POLICY_REQ_LEN,?HEART_TIMEOUT),
-    %% 关闭连接
+	% async_recv(Socket,?FLASH_POLICY_REQ_LEN,?HEART_TIMEOUT),
+    %% 5s后关闭连接，立刻关可能会导致消息没发出就关闭socket
     erlang:send_after(5000,self(),stop),
     {noreply,State};
-%% 上行数据包不能大于 2^16(64K)
+
+%% 数据包不能大于 2^16(64K)
 do_info({inet_async,Socket,_Ref,{ok,<<0:16,Len:16>>}},#state{socket = Socket,packet_len = 0} = State) ->
     %% _NewRef = async_recv(Socket,Len - ?HEADER_LENGTH ,?HEART_TIMEOUT),
-    _NewRef = async_recv(Socket,Len,?HEART_TIMEOUT),
+    %% Len约定是已经去掉了消息头信息的长度
+    _NewRef = async_recv(Socket, Len, ?HEART_TIMEOUT),  
     {noreply,State#state{packet_len = Len}};
 
 do_info({inet_async,Socket,_Ref,{ok,Bin}},#state{socket = Socket,packet_len = 0} = State) ->
     ?INFO("Recevie Packet Length ~w,Bin:~w",[size(Bin),Bin]),
+    %% 匹配不成功，在packet为0时收到非{ok,<<0:16,Len:16>>}的数据，继续接收消息头长度为4的消息
     _NewRef = async_recv(Socket,?HEADER_LENGTH,?HEART_TIMEOUT),
     {noreply,State#state{packet_len = 0}};
 
+%% 接收协议体数据
 do_info({inet_async,Socket,_Ref,{ok,Bin}},#state{socket = Socket} = State) ->
 	case packet_encode:decode(Bin) of
 		{Cmd,Data} ->
@@ -114,6 +110,15 @@ do_info(Info, State) ->
     ?WARNING("Not done do_info:~w",[Info]),
 	{noreply, State}.
 
+do_terminate(_Reason, #state{socket=Socket}) ->
+	%% ?INFO("~w stop...",[?MODULE]),
+	case is_port(Socket) of
+		true ->
+			gen_tcp:close(Socket);
+		false ->
+			skip
+	end,
+    ok.
 
 async_recv(Sock, Length, Timeout) when is_port(Sock) ->
     case prim_inet:async_recv(Sock, Length, Timeout) of

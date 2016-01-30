@@ -24,6 +24,8 @@
         ,bitstring_to_term/1
         ]).
 
+-export([socket_to_ip/1]).
+
 %% 游戏输出日志文件名
 log_filename(BaseDir) ->
     log_filename(lists:concat([BaseDir,?CONFIG(server_type),"_",?CONFIG(platform),"_",?CONFIG(prefix),?CONFIG(server_id),"_"]), ".log").
@@ -129,3 +131,12 @@ to_list(Msg) when is_integer(Msg) ->
 to_list(Msg) when is_float(Msg) -> f2s(Msg);
 to_list(Msg) when is_tuple(Msg) -> tuple_to_list(Msg);
 to_list(_) -> throw(other_value).
+
+socket_to_ip(Socket) ->
+    case inet:peername(Socket) of
+        {ok,{{A,B,C,D}, _Port}} ->
+            lists:concat([A,".",B,".",C,".",D]);
+        {error,Reason} ->
+            ?WARNING("get_ip fail,Socket:~w,Reason:~w",[Socket,Reason]),
+            ""
+    end.

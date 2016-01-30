@@ -162,6 +162,10 @@ do_cast(Info, State) ->
     Mod = get_callback_mod(),
     Mod:do_cast(Info,State).
 
+do_info({mfa_apply,Mod,Fun,Args},State) when Mod =/= os ->
+	erlang:apply(Mod,Fun,Args),
+	{noreply,State};	
+
 do_info(stop,State) ->
 	{stop,normal,State};
 

@@ -1,0 +1,46 @@
+%%%---------------------------------------------------------------------
+%%% @author : zhongbinbin <binbinjnu@163.com>
+%%% @date   : 2016.01.30
+%%% @desc   : 玩家模块
+%%%----------------------------------------------------------------------
+
+-module(lib_user).
+-include("common.hrl").
+-include("user.hrl").
+
+-export([get_user_pid/1
+        ,is_online/1
+        ,get_process_name/1
+    ]).
+
+%% 玩家进程注册的名字只能本节点使用，
+%% 不能确保是同节点的进程不能使用，
+%% 需要把玩家PID带到对应进程中使用
+%% @doc 获取玩家进程PID
+get_user_pid(UserID) ->
+    ProcessName = get_process_name(UserID),
+    case whereis(ProcessName) of
+        undefined ->
+            false;
+        Pid ->
+            case is_process_alive(Pid) of
+                true ->
+                    Pid;
+                false ->
+                    false
+            end 
+    end.
+
+%% @doc 玩家是否在线
+is_online(UserID) ->
+    ProcessName = get_process_name(UserID),
+    case whereis(ProcessName) of
+        undefined ->
+            false;
+        Pid ->
+            is_process_alive(Pid)
+    end.
+
+%% @doc 玩家进程名
+get_process_name(UserID) ->
+    util:to_atom(lists:concat(["user_",UserID])).

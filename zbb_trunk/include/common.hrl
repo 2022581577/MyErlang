@@ -1,9 +1,3 @@
-%%-----------------------------------------------------
-%% @Author: zhongbinbin
-%% @Email : zhongbinbin@yy.com
-%% @Create: 2015-5-20
-%% @Desc  : 公共模块头文件
-%%-----------------------------------------------------
 
 -define(CONFIG(Key), game_config:get_config(Key)).
 
