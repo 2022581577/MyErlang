@@ -54,14 +54,12 @@ start_mysql_pool()->
     ok.
 
 stop() ->
-    catch mysql:stop(),
-    supervisor:terminate_child(server_sup,mysql),
-    supervisor:delete_child(server_sup,mysql),
-    lists:foreach(fun(N) ->
-                    ConnectChild = util:to_atom("mysql_" ++ util:to_list(N)),
-                    supervisor:terminate_child(server_sup,ConnectChild),
-                    supervisor:delete_child(server_sup,ConnectChild)
-            end,lists:seq(1,?MYSQL_CONNECT_COUNT)),
+    %% 关掉进程池
+	ok = lists:foreach(
+		fun (Pool) -> emysql:remove_pool(Pool#pool.pool_id) end,
+		emysql_conn_mgr:pools()),
+    supervisor:terminate_child(server_sup, emysql_sup),
+    supervisor:delete_child(server_sup, emysql_sup),
     ok.
 
 %% 检查数据库

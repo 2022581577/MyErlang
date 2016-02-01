@@ -47,8 +47,9 @@ do_init([UserID]) ->
 %    lib_send:send(Socket,lists:reverse(L)),
 %    {noreply,User};
 
-%do_cast(stop_user, User) ->
-%    ?INFO("cast stop user!"),
+do_cast({stop_user, Type}, User) ->
+    ?INFO("cast stop user!"),
+    {stop, normal, User#user{logout_type = Type]};
 %    case lib_user:get_login_state() of
 %        true -> %% 在顶号中退出
 %            Ref = erlang:send_after(3000, self(), stop),
@@ -101,6 +102,10 @@ do_cast(Info, User) ->
     ?WARNING("Not done do_cast:~w",[Info]),
 	{noreply, User}.
 
+do_call({stop_user, Type}, _From, User) ->
+    ?INFO("call stop user!"),
+    {stop, normal, User#user{logout_type = Type}};
+
 do_call(Info, _From, User) -> 
     ?WARNING("Not done do_call:~w",[Info]),
 	{reply, ok, User}.
@@ -129,28 +134,23 @@ do_info({inet_async,Socket,_Ref,{ok,Bin}},#user{user_id = UserID, other_data = #
 			end;
 		Error ->
             ?WARNING("Receive Data Error:~w,UserID:~w,Ip:~p,Bin:~w",[Error,UserID,lib_user:get_ip(),Bin]),
-            %?RCD_LOGOUT_TYPE(UserID, ?LOGOUT_TYPE_PACKAGE_ERR),
-            stop(self()),
+            stop(self(), data_error),
             {noreply,User}
-			%{stop,normal,User}
 	end;
 
 do_info({inet_async,Socket,_Ref,{ok,Bin}},#user{user_id = UserID, acc_name = AccName, other_data = #user_other{socket = UserSocket}} = User) ->
     %% Socket 不匹配
-    ?WARNING("Recevie Error Data,UserID:~w,AccName:~w,Socket:~w,UserSocket:~w,Bin:~w",[UserID,AccName,Socket,UserSocket,Bin]),
-    %%?RCD_LOGOUT_TYPE(UserID, ?LOGOUT_TYPE_PACKAGE_ERR),
-    stop(self()),
+    ?WARNING("Socket not match, UserID:~w,AccName:~w,Socket:~w,UserSocket:~w,Bin:~w",[UserID,AccName,Socket,UserSocket,Bin]),
+    stop(self(), socket_not_match),
     {noreply,User};
-    %{stop,normal,User};
 
 %% 接收出错处理
 do_info({inet_async,Socket,_Ref,{error,closed}},#user{user_id = UserID, other_data = #user_other{socket = UserSocket} = UserOther} = User) ->
     case Socket of
         UserSocket ->
             ?INFO("UserID:~w Socket Close...",[UserID]),
-            %?RCD_LOGOUT_TYPE(UserID, ?LOGOUT_TYPE_SOCKET_CLOSE),
             NewSocket = close_socket(Socket),
-            stop(self()),
+            stop(self(), socket_close),
             {noreply,User#user{other_data = UserOther#user_other{socket = NewSocket}}};
         _ ->
             ?INFO("Invalue Socket:~w,UserSocket:~w Closed",[Socket,UserSocket]),
@@ -162,9 +162,8 @@ do_info({inet_async,Socket,_Ref,{error,Reason}},#user{user_id = UserID, other_da
     case Socket of
         UserSocket ->
             ?WARNING("UserID:~w Socket Error, Reason:~w",[UserID, Reason]),
-            %?RCD_LOGOUT_TYPE(UserID, ?LOGOUT_TYPE_SOCKET_ERR),
             NewSocket = close_socket(Socket),
-            stop(self()),
+            stop(self(), socket_error),
             {noreply,User#user{other_data = UserOther#user_other{socket = NewSocket}}};
         _ ->
             ?INFO("Invalue Socket:~w,UserSocket:~w,Reason:~w",[Socket,UserSocket,Reason]),
@@ -179,7 +178,7 @@ do_info({inet_reply,Socket,{error,Reason}},#user{user_id = UserID, other_data = 
     ?WARNING("UserID:~w Newwork Error,Reason:~w",[UserID,Reason]),
     %?RCD_LOGOUT_TYPE(UserID, ?LOGOUT_TYPE_SOCKET_ERR),
     NewSocket = close_socket(Socket),
-    stop(self()),
+    stop(self(), netword_error),
     {noreply,User#user{other_data = UserOther#user_other{socket = NewSocket}}};
 
 %do_info({send,Bin},#user{other_data = #user_other{socket = Socket}} = User) ->
@@ -212,11 +211,14 @@ do_terminate(Reason, #user{user_id = UserID} = User) ->
     %lib_logout:logout(User),
     ok.
 
+%%% ----------------------
+%%%     socket相关
+%%% ----------------------
 async_recv(Sock, Length, Timeout) when is_port(Sock) ->
     case prim_inet:async_recv(Sock, Length, Timeout) of
         {error, Reason} -> 
             ?WARNING("asyn_recv Error,Reasion:~w",[Reason]),
-            stop(self());
+            stop(self(), asyn_recv_error);
         {ok, Res} -> 
             Res
     end.
@@ -226,18 +228,21 @@ close_socket(Socket) ->
     NewSocket = undefined,
     catch gen_tcp:close(Socket),
     NewSocket.
+%%% ----------------------
+%%%     socket相关
+%%% ----------------------
 
 
 %%% -------------------------------------------
 %%%             -----API-----
 %%% -------------------------------------------
 %% @doc 停止进程 cast 方式
-stop(ID) ->
-	cast(ID, stop_user).
+stop(ID, Type) ->
+	cast(ID, {stop_user, Type}).
 	
 %% @doc 同步停止进程
-sync_stop(ID) ->
-	call(ID, stop).
+sync_stop(ID, Type) ->
+	call(ID, {stop_user, Type}).
 
 %% @doc cast 接口调用
 cast(UserID,Msg) when is_integer(UserID) -> 
@@ -296,12 +301,12 @@ p(ID) ->
 			io:format("~p~n",[lib_record:fields_value(Status)])
 	end.
 
+%% @doc 踢出所有玩家
 %stop_all() ->
 %    OnlineL = lib_user_online:online_list(),
 %    do_stop_all(OnlineL).
 %do_stop_all([#user_online{user_id = UserID, pid = Pid} | T]) ->
-%    ?RCD_LOGOUT_TYPE(UserID, ?LOGOUT_TYPE_STOP_SERVER),
-%    catch gen_server2:sync_stop(Pid),
+%    catch gen_server2:sync_stop(Pid, kick_out),
 %    do_stop_all(T);
 %do_stop_all([]) ->
 %    ok.

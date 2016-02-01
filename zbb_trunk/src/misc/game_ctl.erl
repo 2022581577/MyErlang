@@ -64,7 +64,6 @@ process(["status"]) ->
 	node_interface:status();
 
 process(["stop",_Time]) ->
-    %%ejabberd_cover:stop(),
     timer:apply_after(10,main,stop,[]),
     ?GAME_STATUS_SUCCESS;
 

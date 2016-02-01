@@ -71,11 +71,12 @@
 
               ,reg_time = 0
               ,is_online = 0 
-              ,online_time = 0                %%  在线时间
-              ,total_online_time = 0          %%  累计在线时间
+              ,online_time = 0                %% 在线时间
+              ,total_online_time = 0          %% 累计在线时间
               ,login_time = 0 
               ,last_online_time = 0 
-              ,last_update_time = 0           %%  save db time
+              ,last_update_time = 0           %% save db time
+              ,logout_type               %% 下线类型
 
               ,recharge_gold = 0    
               ,gold = 0 
