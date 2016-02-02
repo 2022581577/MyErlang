@@ -6,8 +6,9 @@
 
 -module(edb_util).
 
--export([ execute/1,
-        execute/2]).
+-export([execute/1
+        ,execute/2
+        ,execute/3]).
 
 -export([
           get_all/1,
@@ -41,12 +42,18 @@
 -define(MYSQL_LAST_CONNECTION_TIME,mysql_last_connection_time). %% mysql上次重连时间
 
 %% 执行sql 语句
+%% 后续加上注册prepare
 execute(Sql) ->
     execute(?MYSQL_POOL, Sql).
 
-execute(Pool, Sql) ->
+execute(Pool, Sql) when is_atom(Pool) ->
+    execute(Pool, Sql, []);
+execute(Sql, Args) ->
+    execute(?MYSQL_POOL, Sql, []);
+
+execute(Pool, Sql, Args) ->
     %% ?INFO("Sql:~s",[Sql]),
-    case emysql:execute(Pool, Sql) of
+    case emysql:execute(Pool, Sql, Args) of
         #result_packet{rows = Rows} ->  Rows;
         #ok_packet{affected_rows = AffectedRows} -> AffectedRows;
         #error_packet{msg = Msg} ->
@@ -188,16 +195,6 @@ make_update_sql([],_Join,UpdateSql)->
 make_update_sql([{Field,Val} | T],Join,UpdateSql) ->
     NewUpdateSql = lists:concat([UpdateSql,Join,"`",Field,"`=",mysql:encode(Val)]),
     make_update_sql(T,",",NewUpdateSql).
-
-%make_value_sql(Value) ->
-%    [[_ | F] | T] = [[$, | mysql:encode(H)] || H <- Value],
-%    lists:concat([F | T]).
-%    make_value_sql(Value, "", "").
-%make_value_sql([], _, ValueSql) ->
-%    ValueSql;
-%make_value_sql([H | T], Join, ValueSql) ->
-%    NewValueSql = lists:concat([ValueSql, Join, mysql:encode(H)]),
-%    make_value_sql(T, ",", NewValueSql).
 
 make_value_sql(Value) ->
     NewValue = lists:reverse(Value),

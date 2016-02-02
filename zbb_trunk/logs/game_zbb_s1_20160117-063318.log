@@ -1,0 +1,73 @@
+
+=INFO REPORT==== 2016-01-17 06:33:18 ===
+I(<0.63.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2522> +++++++++++
+
+=INFO REPORT==== 2016-01-17 06:33:18 ===
+I(<0.64.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2522> +++++++++++
+
+=INFO REPORT==== 2016-01-17 06:33:18 ===
+I(<0.65.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2522> +++++++++++
+
+=INFO REPORT==== 2016-01-17 06:33:18 ===
+I(<0.66.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2522> +++++++++++
+
+=INFO REPORT==== 2016-01-17 06:33:18 ===
+I(<0.67.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2522> +++++++++++
+
+=INFO REPORT==== 2016-01-17 06:33:18 ===
+I(<0.68.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2522> +++++++++++
+
+=INFO REPORT==== 2016-01-17 06:33:18 ===
+I(<0.69.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2522> +++++++++++
+
+=INFO REPORT==== 2016-01-17 06:33:18 ===
+I(<0.70.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2522> +++++++++++
+
+=INFO REPORT==== 2016-01-17 06:33:18 ===
+I(<0.71.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2522> +++++++++++
+
+=INFO REPORT==== 2016-01-17 06:33:18 ===
+I(<0.72.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2522> +++++++++++
+
+=INFO REPORT==== 2016-01-17 06:33:18 ===
+I(<0.74.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2525> +++++++++++
+
+=INFO REPORT==== 2016-01-17 06:33:18 ===
+I(<0.75.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2525> +++++++++++
+
+=INFO REPORT==== 2016-01-17 06:33:18 ===
+I(<0.76.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2525> +++++++++++
+
+=INFO REPORT==== 2016-01-17 06:33:18 ===
+I(<0.77.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2525> +++++++++++
+
+=INFO REPORT==== 2016-01-17 06:33:18 ===
+I(<0.78.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2525> +++++++++++
+
+=INFO REPORT==== 2016-01-17 06:33:18 ===
+I(<0.79.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2525> +++++++++++
+
+=INFO REPORT==== 2016-01-17 06:33:18 ===
+I(<0.80.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2525> +++++++++++
+
+=INFO REPORT==== 2016-01-17 06:33:18 ===
+I(<0.81.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2525> +++++++++++
+
+=INFO REPORT==== 2016-01-17 06:33:18 ===
+I(<0.82.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2525> +++++++++++
+
+=INFO REPORT==== 2016-01-17 06:33:18 ===
+I(<0.83.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2525> +++++++++++
+
+=ERROR REPORT==== 2016-01-17 06:33:18 ===
+W(<0.52.0>:edb:36) : Host:[49,50,55,46,48,46,48,46,49], User:[114,111,111,116], Password:[49,50,51,52,53,54], Encode:utf8, DbName:undefined, Port:3306
+
+=ERROR REPORT==== 2016-01-17 06:33:19 ===
+W(<0.52.0>:edb:76) : have database db_name:"zbb_1"
+
+=ERROR REPORT==== 2016-01-17 06:33:20 ===
+W(<0.52.0>:edb:86) : change database res:0
+
+=ERROR REPORT==== 2016-01-17 06:56:10 ===
+Error in process <0.113.0> on node 'game_zbb_s1_38001@192.168.31.120' with exit value: {badarg,[{erlang,byte_size,[{error,{unrecognized_value,{user_id,1}}}],[]},{emysql_conn,'-set_params_packet/2-lc$^2/1-2-',1,[{file,"src/emysql/emysql_conn.erl"},{line,368}]},{emysql_conn,set_params_packet,2,[{file,"src/emy... 
+

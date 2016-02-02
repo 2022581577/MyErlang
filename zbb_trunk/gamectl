@@ -57,7 +57,7 @@ warn() {
 
 # 获取内网ip
 getip() {
-    echo `LANG=en_US; ifconfig | grep 'inet addr:' | grep -v '127.0.0.1' | grep '172.*' | cut -d: -f 2 | awk '{print $1}'`
+    echo `LANG=en_US; ifconfig | grep 'inet addr:' | grep -v '127.0.0.1' | grep '192.*' | cut -d: -f 2 | awk '{print $1}'`
 }
 
 # 使用说明
