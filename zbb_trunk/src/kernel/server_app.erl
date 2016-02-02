@@ -21,7 +21,7 @@ start(normal, []) ->
     {ok, Sup} = server_sup:start_link(),
     %% 加载配置
     game_config:init(),
-    ok = start(Sup),
+    ok = lib_server:start(Sup),
     {ok, Sup}.
 
 stop(_) ->

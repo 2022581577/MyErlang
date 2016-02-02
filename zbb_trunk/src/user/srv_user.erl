@@ -4,16 +4,37 @@
 %%% @desc   : 人物主进程
 %%%----------------------------------------------------------------------
 
--module(mod_user).
+-module(srv_user).
 -author('kongqingquan <kqqsysu@gmail.com>').
 -behaviour(gen_server2).
 -compile(inline).
 
--export([do_init/1, do_call/3, do_cast/2,do_info/2, do_terminate/2]).
--export([start/1,start_link/1,cast/2,call/2]).
-%-export([stop/1,sync_stop/1,stop_all/0]).
--export([sync_apply/2,sync_mfa/4,sync_status/4,i/1,p/1]).		%% call 接口
--export([apply/2,status_apply/2,mfa_apply/4,mfa_status/4]).	%% cast接口
+-export([do_init/1
+        ,do_call/3
+        ,do_cast/2
+        ,do_info/2
+        ,do_terminate/2]).
+
+-export([start/1
+        ,start_link/1
+        ,cast/2
+        ,call/2]).
+
+%% cast接口
+-export([apply/2
+        ,status_apply/2
+        ,mfa_apply/4
+        ,mfa_status/4]).
+%% call 接口
+-export([sync_apply/2
+        ,sync_mfa/4
+        ,sync_status/4
+        ,i/1
+        ,p/1]).	
+
+%% API
+-export([stop/2
+        ,sync_stop/2]).
 
 -include("common.hrl").
 -include("user.hrl").
@@ -48,8 +69,8 @@ do_init([UserID]) ->
 %    {noreply,User};
 
 do_cast({stop_user, Type}, User) ->
-    ?INFO("cast stop user!"),
-    {stop, normal, User#user{logout_type = Type]};
+    ?WARNING("cast stop user!"),
+    {stop, normal, User#user{logout_type = Type}};
 %    case lib_user:get_login_state() of
 %        true -> %% 在顶号中退出
 %            Ref = erlang:send_after(3000, self(), stop),
@@ -60,7 +81,7 @@ do_cast({stop_user, Type}, User) ->
 %    end;
 
 %% Socket 控制转移
-do_cast({set_socket,Socket,Time,Index},#user{user_id = UserID, other_data = #user_other{socket = UserSocket} = UserOther} = User) ->
+do_cast({set_socket,Socket,Time,Index},#user{user_id = _UserID, other_data = #user_other{socket = UserSocket} = UserOther} = User) ->
     %% 判断顶号退出
     %lib_user:set_login_state(false),
     %OldRef = lib_user:get_logout_ref(),
@@ -103,7 +124,7 @@ do_cast(Info, User) ->
 	{noreply, User}.
 
 do_call({stop_user, Type}, _From, User) ->
-    ?INFO("call stop user!"),
+    ?WARNING("call stop user!"),
     {stop, normal, User#user{logout_type = Type}};
 
 do_call(Info, _From, User) -> 
@@ -148,12 +169,12 @@ do_info({inet_async,Socket,_Ref,{ok,Bin}},#user{user_id = UserID, acc_name = Acc
 do_info({inet_async,Socket,_Ref,{error,closed}},#user{user_id = UserID, other_data = #user_other{socket = UserSocket} = UserOther} = User) ->
     case Socket of
         UserSocket ->
-            ?INFO("UserID:~w Socket Close...",[UserID]),
+            ?WARNING("UserID:~w Socket Close...",[UserID]),
             NewSocket = close_socket(Socket),
             stop(self(), socket_close),
             {noreply,User#user{other_data = UserOther#user_other{socket = NewSocket}}};
         _ ->
-            ?INFO("Invalue Socket:~w,UserSocket:~w Closed",[Socket,UserSocket]),
+            ?WARNING("Invalue Socket:~w,UserSocket:~w Closed",[Socket,UserSocket]),
             {noreply,User}
     end;
 
@@ -205,7 +226,7 @@ do_info(Info, User) ->
     ?WARNING("Not done do_info:~w",[Info]),
 	{noreply, User}.
 
-do_terminate(Reason, #user{user_id = UserID} = User) ->   
+do_terminate(Reason, #user{user_id = UserID} = _User) ->   
     ?INFO("~w stop,UserID:~w,Reason:~w",[?MODULE,UserID,Reason]),
     %% 玩家下线处理
     %lib_logout:logout(User),

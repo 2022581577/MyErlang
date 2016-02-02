@@ -1,0 +1,145 @@
+
+=INFO REPORT==== 2016-02-02 19:37:42 ===
+I(<0.68.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2450> +++++++++++
+
+=INFO REPORT==== 2016-02-02 19:37:42 ===
+I(<0.69.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2450> +++++++++++
+
+=INFO REPORT==== 2016-02-02 19:37:42 ===
+I(<0.70.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2450> +++++++++++
+
+=INFO REPORT==== 2016-02-02 19:37:42 ===
+I(<0.71.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2450> +++++++++++
+
+=INFO REPORT==== 2016-02-02 19:37:42 ===
+I(<0.72.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2450> +++++++++++
+
+=INFO REPORT==== 2016-02-02 19:37:42 ===
+I(<0.73.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2450> +++++++++++
+
+=INFO REPORT==== 2016-02-02 19:37:42 ===
+I(<0.74.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2450> +++++++++++
+
+=INFO REPORT==== 2016-02-02 19:37:42 ===
+I(<0.75.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2450> +++++++++++
+
+=INFO REPORT==== 2016-02-02 19:37:42 ===
+I(<0.76.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2450> +++++++++++
+
+=INFO REPORT==== 2016-02-02 19:37:42 ===
+I(<0.77.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2450> +++++++++++
+
+=INFO REPORT==== 2016-02-02 19:37:42 ===
+I(<0.79.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2453> +++++++++++
+
+=INFO REPORT==== 2016-02-02 19:37:42 ===
+I(<0.80.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2453> +++++++++++
+
+=INFO REPORT==== 2016-02-02 19:37:42 ===
+I(<0.81.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2453> +++++++++++
+
+=INFO REPORT==== 2016-02-02 19:37:42 ===
+I(<0.82.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2453> +++++++++++
+
+=INFO REPORT==== 2016-02-02 19:37:42 ===
+I(<0.83.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2453> +++++++++++
+
+=INFO REPORT==== 2016-02-02 19:37:42 ===
+I(<0.84.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2453> +++++++++++
+
+=INFO REPORT==== 2016-02-02 19:37:42 ===
+I(<0.85.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2453> +++++++++++
+
+=INFO REPORT==== 2016-02-02 19:37:42 ===
+I(<0.86.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2453> +++++++++++
+
+=INFO REPORT==== 2016-02-02 19:37:42 ===
+I(<0.87.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2453> +++++++++++
+
+=INFO REPORT==== 2016-02-02 19:37:42 ===
+I(<0.88.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2453> +++++++++++
+
+=ERROR REPORT==== 2016-02-02 19:37:43 ===
+W(<0.48.0>:edb:36) : Host:[49,50,55,46,48,46,48,46,49], User:[114,111,111,116], Password:[49,50,51,52,53,54], Encode:utf8, DbName:undefined, Port:3306
+
+=ERROR REPORT==== 2016-02-02 19:37:44 ===
+W(<0.48.0>:edb:76) : have database db_name:"zbb_1"
+
+=ERROR REPORT==== 2016-02-02 19:37:45 ===
+W(<0.48.0>:edb:86) : change database res:0
+
+=INFO REPORT==== 2016-02-02 22:38:37 ===
+    application: sasl
+    exited: stopped
+    type: temporary
+
+=ERROR REPORT==== 2016-02-02 22:38:38 ===
+W(<0.78.0>:tcp_listener:50) : Socket:#Port<0.2453> close,Reason:shutdown
+
+=ERROR REPORT==== 2016-02-02 22:38:38 ===
+W(<0.79.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2453>
+
+=ERROR REPORT==== 2016-02-02 22:38:38 ===
+W(<0.80.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2453>
+
+=ERROR REPORT==== 2016-02-02 22:38:38 ===
+W(<0.81.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2453>
+
+=ERROR REPORT==== 2016-02-02 22:38:38 ===
+W(<0.82.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2453>
+
+=ERROR REPORT==== 2016-02-02 22:38:38 ===
+W(<0.83.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2453>
+
+=ERROR REPORT==== 2016-02-02 22:38:38 ===
+W(<0.84.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2453>
+
+=ERROR REPORT==== 2016-02-02 22:38:38 ===
+W(<0.85.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2453>
+
+=ERROR REPORT==== 2016-02-02 22:38:38 ===
+W(<0.86.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2453>
+
+=ERROR REPORT==== 2016-02-02 22:38:38 ===
+W(<0.87.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2453>
+
+=ERROR REPORT==== 2016-02-02 22:38:38 ===
+W(<0.88.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2453>
+
+=ERROR REPORT==== 2016-02-02 22:38:38 ===
+W(<0.67.0>:tcp_listener:50) : Socket:#Port<0.2450> close,Reason:shutdown
+
+=ERROR REPORT==== 2016-02-02 22:38:38 ===
+W(<0.69.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2450>
+
+=ERROR REPORT==== 2016-02-02 22:38:38 ===
+W(<0.70.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2450>
+
+=ERROR REPORT==== 2016-02-02 22:38:38 ===
+W(<0.71.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2450>
+
+=ERROR REPORT==== 2016-02-02 22:38:38 ===
+W(<0.72.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2450>
+
+=ERROR REPORT==== 2016-02-02 22:38:38 ===
+W(<0.73.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2450>
+
+=ERROR REPORT==== 2016-02-02 22:38:38 ===
+W(<0.74.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2450>
+
+=ERROR REPORT==== 2016-02-02 22:38:38 ===
+W(<0.75.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2450>
+
+=ERROR REPORT==== 2016-02-02 22:38:38 ===
+W(<0.76.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2450>
+
+=ERROR REPORT==== 2016-02-02 22:38:38 ===
+W(<0.77.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2450>
+
+=ERROR REPORT==== 2016-02-02 22:38:38 ===
+W(<0.68.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2450>
+
+=INFO REPORT==== 2016-02-02 22:38:38 ===
+    application: server
+    exited: stopped
+    type: temporary

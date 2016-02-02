@@ -67,3 +67,79 @@ W(<0.51.0>:edb:76) : have database db_name:"zbb_1"
 
 =ERROR REPORT==== 2016-02-01 23:08:01 ===
 W(<0.51.0>:edb:86) : change database res:0
+
+=INFO REPORT==== 2016-02-02 00:30:43 ===
+    application: sasl
+    exited: stopped
+    type: temporary
+
+=ERROR REPORT==== 2016-02-02 00:30:43 ===
+W(<0.72.0>:tcp_listener:50) : Socket:#Port<0.2451> close,Reason:shutdown
+
+=ERROR REPORT==== 2016-02-02 00:30:43 ===
+W(<0.73.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2451>
+
+=ERROR REPORT==== 2016-02-02 00:30:43 ===
+W(<0.74.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2451>
+
+=ERROR REPORT==== 2016-02-02 00:30:43 ===
+W(<0.75.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2451>
+
+=ERROR REPORT==== 2016-02-02 00:30:43 ===
+W(<0.76.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2451>
+
+=ERROR REPORT==== 2016-02-02 00:30:43 ===
+W(<0.77.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2451>
+
+=ERROR REPORT==== 2016-02-02 00:30:43 ===
+W(<0.78.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2451>
+
+=ERROR REPORT==== 2016-02-02 00:30:43 ===
+W(<0.79.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2451>
+
+=ERROR REPORT==== 2016-02-02 00:30:43 ===
+W(<0.80.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2451>
+
+=ERROR REPORT==== 2016-02-02 00:30:43 ===
+W(<0.81.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2451>
+
+=ERROR REPORT==== 2016-02-02 00:30:43 ===
+W(<0.82.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2451>
+
+=ERROR REPORT==== 2016-02-02 00:30:43 ===
+W(<0.61.0>:tcp_listener:50) : Socket:#Port<0.2448> close,Reason:shutdown
+
+=ERROR REPORT==== 2016-02-02 00:30:43 ===
+W(<0.62.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2448>
+
+=ERROR REPORT==== 2016-02-02 00:30:43 ===
+W(<0.64.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2448>
+
+=ERROR REPORT==== 2016-02-02 00:30:43 ===
+W(<0.63.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2448>
+
+=ERROR REPORT==== 2016-02-02 00:30:43 ===
+W(<0.65.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2448>
+
+=ERROR REPORT==== 2016-02-02 00:30:43 ===
+W(<0.66.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2448>
+
+=ERROR REPORT==== 2016-02-02 00:30:43 ===
+W(<0.67.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2448>
+
+=ERROR REPORT==== 2016-02-02 00:30:43 ===
+W(<0.68.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2448>
+
+=ERROR REPORT==== 2016-02-02 00:30:43 ===
+W(<0.69.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2448>
+
+=ERROR REPORT==== 2016-02-02 00:30:43 ===
+W(<0.70.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2448>
+
+=ERROR REPORT==== 2016-02-02 00:30:43 ===
+W(<0.71.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2448>
+
+=INFO REPORT==== 2016-02-02 00:30:43 ===
+    application: server
+    exited: stopped
+    type: temporary

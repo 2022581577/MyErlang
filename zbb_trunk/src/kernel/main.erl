@@ -14,7 +14,7 @@ start() ->
     ok = start_applications([sasl, server]).
 
 stop() ->
-    server_app:prep_stop(),
+    lib_server:stop(),
     ok = stop_applications([sasl, server]),
     timer:sleep(5000),
     erlang:halt(0, [{flush, false}]).

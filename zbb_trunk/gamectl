@@ -73,7 +73,6 @@ usage ()
     echo "  status          获取后台运行状态"
     echo "  attach          通过Erlang shell连接后台运行节点"
     echo "  stop            立即停止节点(同步)"
-    echo "  restart         重启节点"
     echo "  reload          重新加载数据或代码"
     echo "  count           获取在线人数"
     echo "  version         获取版本信息"
@@ -258,26 +257,46 @@ attach ()
 # 停止节点
 stop ()
 {
-    if rpc stop $@; then
-        echo2 "停止"
-    else
-        print_rpc_return $?
-    fi  
-}
-
-# 重启节点
-restart ()
-{
-    if rpc restart; then
-        echo2 "重启成功"
-    else
-        print_rpc_return $?
-    fi  
+    PID=`ps aux | grep "name $ERLANG_NODE" | grep -v "grep" | awk '{print $2}'`
+    if [ "$PID" != '' ] ; then
+        if rpc stop $@; then
+            echo2_n "正在关服."
+        else
+            print_rpc_return $?
+        fi  
+        RETRY=0
+        while true; do
+            sleep 1
+            PID=`ps aux | grep "name $ERLANG_NODE" | grep -v "grep" | awk '{print $2}'`
+            if [ $RETRY -ge 60 ]; then
+                echo ""
+                echo2 "关服失败，强制关闭进程"
+                ARRAY=($PID)
+                for data in ${ARRAY[@]}
+                do
+                    kill -9 ${data}
+                done
+                return 0
+            else
+                let RETRY++
+                if [ "$PID" != '' ]; then
+                    echo -n "."
+                else
+                    echo ""
+                    echo2 "关服成功"
+                    return 0
+                fi
+            fi
+        done
+    else 
+        echo2 "已停止"
+    fi
 }
 
 # 重新加载
 reload ()
 {
+    echo ${RELOAD_TYPE}
     if rpc reload ${RELOAD_TYPE}; then
         echo2 "重新加载${RELOAD_TYPE}成功"
     else
@@ -410,12 +429,11 @@ case $ARGS in
     ' status') status;;
     ' attach') attach;;
     ' stop') stop 0;;
-    ' restart') restart;;
     ' count') count;;
     ' reload') reload;;
     ' version') version;;
     ' switch_db') switch_db;;
     ' check_db') check_db;;
-    *) usage; exit 1
+    *) usage; exit 1;;
 esac
 

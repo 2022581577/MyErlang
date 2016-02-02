@@ -67,20 +67,14 @@ process(["stop",_Time]) ->
     timer:apply_after(10,main,stop,[]),
     ?GAME_STATUS_SUCCESS;
 
-%process(["reload","config"]) ->
-%    game_config:reload(),
-%    ?GAME_STATUS_SUCCESS;
-%
-%process(["reload" | Mods]) ->
-%    erlang:group_leader(erlang:whereis(user),self()),
-%    case reloader:reload_modules(Mods) of
-%        [] ->
-%            ?WARNING("Reload:~p,success",[Mods]),
-%            ?GAME_STATUS_SUCCESS;
-%        L ->
-%            ?WARNING("Reload Mod:~p fail,Miss Mods:~p",[Mods,L]),
-%            ?GAME_STATUS_BADRPC
-%    end;
+process(["reload", "code"]) ->
+    game_reloader:reload(),
+    ?GAME_STATUS_SUCCESS;
+
+process(["reload", "config"]) ->
+    game_config:reload(),
+    ?GAME_STATUS_SUCCESS;
+
 %
 %process(["count"]) ->
 %    Count = lib_user_online:count(),

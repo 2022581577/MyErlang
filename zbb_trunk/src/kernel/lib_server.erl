@@ -27,6 +27,10 @@ start(Sup) ->
     %% 数据库相关
     mysql_service(Sup),
 
+    %% 数据库启动后开启GLOBAL_DATA_DISK
+    ?GLOBAL_DATA_DISK:init(),
+
+
     node_interface:set_server_running(),
     ok.
 
@@ -60,4 +64,8 @@ mysql_service(Sup) ->
 stop() ->
     node_interface:set_server_stoping(),
     %% 踢掉玩家
+
+    ?GLOBAL_DATA_DISK:stop(),
+
+    %% 最后关闭
     ok.

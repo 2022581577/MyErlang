@@ -4,7 +4,7 @@
 %%% @desc   : 网络处理层
 %%%----------------------------------------------------------------------
 
--module(mod_reader).
+-module(srv_reader).
 -author('kongqingquan <kqqsysu@gmail.com>').
 -behaviour(gen_server2).
 -compile(inline).

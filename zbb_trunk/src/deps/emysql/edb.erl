@@ -6,6 +6,7 @@
 
 -module(edb).
 
+-include("emysql.hrl").
 -include("common.hrl").
 
 -export([init/1

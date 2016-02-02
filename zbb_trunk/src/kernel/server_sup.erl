@@ -52,13 +52,13 @@ init([]) ->
 	{ok, {{one_for_one, 3, 10}, []}};
 init(user) -> 
 	{ok, {{simple_one_for_one, 3, 10},
-			[{mod_user, {mod_user, start_link, []},temporary, 5000, worker, [mod_user]}]
+			[{srv_user, {srv_user, start_link, []},temporary, 5000, worker, [srv_user]}]
 		}};
 init(map) -> 
 	{ok, {{simple_one_for_one, 3, 10}, 
-		  [{mod_map, {mod_map, start_link, []},temporary, 5000, worker, [mod_map]}]
+		  [{srv_map, {srv_map, start_link, []},temporary, 5000, worker, [srv_map]}]
 		 }};
 init(send) -> 
 	{ok, {{simple_one_for_one, 3, 10}, 
-		  [{mod_send, {mod_send, start_link, []},permanent, 5000, worker, [mod_send]}]
+		  [{srv_send, {srv_send, start_link, []},permanent, 5000, worker, [srv_send]}]
 		 }}.

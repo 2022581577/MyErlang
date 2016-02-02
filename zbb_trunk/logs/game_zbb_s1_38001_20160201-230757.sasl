@@ -278,3 +278,12 @@
 =PROGRESS REPORT==== 1-Feb-2016::23:08:01 ===
          application: server
           started_at: 'game_zbb_s1_38001@172.19.17.102'
+
+=PROGRESS REPORT==== 2-Feb-2016::00:30:43 ===
+          supervisor: {local,kernel_safe_sup}
+             started: [{pid,<0.136.0>},
+                       {name,timer_server},
+                       {mfargs,{timer,start_link,[]}},
+                       {restart_type,permanent},
+                       {shutdown,1000},
+                       {child_type,worker}]

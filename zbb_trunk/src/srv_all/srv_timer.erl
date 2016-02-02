@@ -14,17 +14,18 @@
             reset_timer/0
         ]).
 
-
+-define(ETS_TIMER, ets_timer).
+-define(TIMER, timer).
 -define(CLOCK, 100).
 
 -record(timer_state, {diff = 0}).
 
 now() -> 
-	[{timer, {Now, _}}] = ets:lookup(ets_timer, timer),
+	[{?TIMER, {Now, _}}] = ets:lookup(?ETS_TIMER, ?TIMER),
 	Now.
 
 now_seconds()->
-	[{timer, {Now, _}}] = ets:lookup(ets_timer, timer),
+	[{?TIMER, {Now, _}}] = ets:lookup(?ETS_TIMER, ?TIMER),
 	{MegaSecs, Secs, _MicroSecs} = Now,	
 	MegaSecs * 1000000 + Secs.
 
@@ -34,13 +35,13 @@ now_milseconds() ->
     (M * 1000000000000 + S * 1000000 + Ms) div 1000.
 
 cpu_time() -> 
-	[{timer, {_, Wallclock_Time_Since_Last_Call}}] = ets:lookup(ets_timer, timer),
+	[{?TIMER, {_, Wallclock_Time_Since_Last_Call}}] = ets:lookup(?ETS_TIMER, ?TIMER),
 	Wallclock_Time_Since_Last_Call.
 
 info() ->
 	[
-            ets:info(ets_timer),
-            ets:tab2list(ets_timer)
+            ets:info(?ETS_TIMER),
+            ets:tab2list(?ETS_TIMER)
     ].
 
 start_link() ->
@@ -61,8 +62,8 @@ reset_timer() ->
 %%          {stop, Reason}
 %% --------------------------------------------------------------------
 init([]) ->
-	ets:new(ets_timer, [set, protected, named_table]),
-	ets:insert(ets_timer, {timer, {erlang:now(), 0}}),
+	ets:new(?ETS_TIMER, [set, protected, named_table]),
+	ets:insert(?ETS_TIMER, {?TIMER, {erlang:now(), 0}}),
 	erlang:send_after(?CLOCK, self(), {event, clock}),
     {ok, #timer_state{}}.
 
@@ -106,7 +107,7 @@ handle_cast(_Msg, State) ->
 %% --------------------------------------------------------------------
 handle_info({event, clock}, #timer_state{diff = Diff} = State) ->
  	{_Total_Run_Time, Time_Since_Last_Call} = statistics(runtime),
-	ets:insert(ets_timer, {timer, {get_now(Diff), Time_Since_Last_Call}}),
+	ets:insert(?ETS_TIMER, {?TIMER, {get_now(Diff), Time_Since_Last_Call}}),
 	erlang:send_after(?CLOCK, self(), {event, clock}),
 	{noreply, State};
 
