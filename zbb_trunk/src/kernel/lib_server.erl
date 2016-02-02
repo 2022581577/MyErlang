@@ -11,7 +11,8 @@
 
 %% @doc 开启服务
 start(Sup) ->
-
+    %% 时间管理进程
+    server_sup:start_child(srv_timer),
     %% 错误日志相关
     error_logger_service(Sup),
     io:format("error_logger_service finish!~n"),

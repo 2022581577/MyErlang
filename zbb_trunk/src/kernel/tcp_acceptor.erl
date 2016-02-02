@@ -62,7 +62,7 @@ handle_info({inet_async, LSock, Ref, {error, Reason}},State=#state{sock=LSock, r
 handle_info(_Info, State) ->
     {noreply, State}.
 
-terminate(Reason, #state{sock = LSock}) ->
+terminate(_Reason, _State) ->
     ok.
 
 code_change(_OldVsn, State, _Extra) ->

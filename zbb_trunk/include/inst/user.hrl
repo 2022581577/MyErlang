@@ -1,3 +1,5 @@
+-ifndef(USER_HRL).
+-define(USER_HRL,"user.hrl").
 
 %% 玩家在进程中的零时数据
 -record(user_other, {pid
@@ -102,3 +104,5 @@
 
               ,other_data = #user_other{}    %% 存库时该字段清空
          }).
+
+-endif.
