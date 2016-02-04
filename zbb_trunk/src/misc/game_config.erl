@@ -11,11 +11,15 @@
 -define(GAME_CONFIG_FILE, "./config/game.config").
 
 -export([init/0
+        ,reload/0
         ,get_config/1
         ,get_config/2
         ,list_config/0]).
 
 init() ->
+    load_game_config().
+
+reload() ->
     load_game_config().
 
 get_config(Key) ->

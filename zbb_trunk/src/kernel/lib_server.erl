@@ -30,7 +30,8 @@ start(Sup) ->
 
     %% 数据库启动后开启GLOBAL_DATA_DISK
     ?GLOBAL_DATA_DISK:init(),
-
+    %% 自增id计数器模块
+    counter:init(), 
 
     node_interface:set_server_running(),
     ok.

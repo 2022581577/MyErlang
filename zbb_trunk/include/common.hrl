@@ -2,6 +2,10 @@
 -define(CONFIG(Key), game_config:get_config(Key)).
 
 -include("logger.hrl").
+-include("ets.hrl").
+
+-define(TRUE, true).
+-define(FALSE, false).
 
 -define(TCP_OPT,[
                 binary

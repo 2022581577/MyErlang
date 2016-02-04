@@ -24,7 +24,8 @@
         ,bitstring_to_term/1
         ]).
 
--export([socket_to_ip/1]).
+-export([socket_to_ip/1
+        ,md5/1]).
 
 %% 时间函数
 -export([
@@ -355,3 +356,6 @@ socket_to_ip(Socket) ->
             ?WARNING("get_ip fail,Socket:~w,Reason:~w",[Socket,Reason]),
             ""
     end.
+
+md5(S) ->
+    lists:flatten([io_lib:format("~2.16.0b", [N]) || N <- binary_to_list(erlang:md5(S))]).
