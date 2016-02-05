@@ -32,6 +32,8 @@ start(Sup) ->
     ?GLOBAL_DATA_DISK:init(),
     %% 自增id计数器模块
     counter:init(), 
+    %% 统计日志模块
+    server_sup:start_child(srv_log),
 
     node_interface:set_server_running(),
     ok.

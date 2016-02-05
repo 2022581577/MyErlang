@@ -19,7 +19,6 @@
 init() ->
     ets:new(?TABLE, [{keypos, #global_data.key}, named_table, public, set, {read_concurrency, true}]),
     SysGlobalList = get_all(),
-    ?WARNING("global_data_disk init, DbInfoList:~w", [SysGlobalList]),
     ets:insert(?TABLE, SysGlobalList),
 	%% 后台连移到Global模块处理
 	timer:apply_interval(?SYNC_INTERVAL, global_data_disk, sync, []),

@@ -39,7 +39,7 @@
 -include("common.hrl").
 -include("user.hrl").
 
--define(PLAYER_LOOP_TICK,5000).		%% 玩家循环时间5秒
+-define(MODULE_LOOP_TICK,5000).		%% 玩家循环时间5秒
 %% 玩家每次循环的增数
 -define(PLAYER_LOOP_INCREACE, 5).   
 
@@ -54,7 +54,7 @@ do_init([UserID]) ->
         false ->
             process_flag(trap_exit,true),
             %% loop最好在前端请求了玩家初始化协议后开启（需要注意重连时loop的处理）
-            %erlang:send_after(?PLAYER_LOOP_TICK, self(), {loop, ?PLAYER_LOOP_INCREACE}),
+            %erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, ?PLAYER_LOOP_INCREACE}),
             ProcessName = lib_user:get_process_name(UserID),
             erlang:register(ProcessName,self()),
             %% 在init的时候就load data 还是 发送一条消息给自己load data  
@@ -218,7 +218,7 @@ do_info({inet_reply,Socket,{error,Reason}},#user{user_id = UserID, other_data = 
 	
 do_info({loop,Time},User) ->
     %% 加个判断，判断是否在socket断掉的时候，考虑是否需要断掉loop
-	erlang:send_after(?PLAYER_LOOP_TICK,self(),{loop,Time + ?PLAYER_LOOP_INCREACE}),
+	erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, Time + ?PLAYER_LOOP_INCREACE}),
     NewUser = lib_user_loop:loop(User,Time),
 	{noreply,NewUser};
 
