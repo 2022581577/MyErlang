@@ -1,11 +1,11 @@
 %%%----------------------------------------------------------------------
-%%% @author : kongqingquan <kqqsysu@gmail.com>
+%%% @author : zhongbinbin <binbinjnu@163.com>
 %%% @date   : 2013.06.20
 %%% @desc   : 计数器模块
 %%%----------------------------------------------------------------------
 
 -module(lib_counter).
--author('kongqingquan <kqqsysu@gmail.com>').
+-author('zhongbinbin <binbinjnu@163.com>').
 -include("common.hrl").
 -include("record.hrl").
 

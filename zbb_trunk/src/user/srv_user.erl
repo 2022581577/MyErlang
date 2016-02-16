@@ -1,13 +1,16 @@
 %%%----------------------------------------------------------------------
-%%% @author : kongqingquan <kqqsysu@gmail.com>
+%%% @author : zhongbinbin <binbinjnu@163.com>
 %%% @date   : 2013.06.15.
 %%% @desc   : 人物主进程
 %%%----------------------------------------------------------------------
 
 -module(srv_user).
--author('kongqingquan <kqqsysu@gmail.com>').
+-author('zhongbinbin <binbinjnu@163.com>').
 -behaviour(gen_server2).
 -compile(inline).
+
+-include("common.hrl").
+-include("record.hrl").
 
 -export([do_init/1
         ,do_call/3
@@ -33,11 +36,9 @@
         ,p/1]).	
 
 %% API
--export([stop/2
+-export([stop_all/0
+        ,stop/2
         ,sync_stop/2]).
-
--include("common.hrl").
--include("user.hrl").
 
 -define(MODULE_LOOP_TICK,5000).		%% 玩家循环时间5秒
 %% 玩家每次循环的增数
@@ -56,8 +57,9 @@ do_init([UserID]) ->
             %% loop最好在前端请求了玩家初始化协议后开启（需要注意重连时loop的处理）
             %erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, ?PLAYER_LOOP_INCREACE}),
             ProcessName = lib_user:get_process_name(UserID),
-            erlang:register(ProcessName,self()),
+            erlang:register(ProcessName, self()),
             %% 在init的时候就load data 还是 发送一条消息给自己load data  
+            user_online:add(#user_online{user_id = UserID, pid = self()}),
             {ok,#user{user_id = UserID}};
         Pid ->  
             ?WARNING("User Has been Started,UserID:~w,Pid:~w",[UserID,Pid]),
@@ -106,7 +108,6 @@ do_cast({set_socket,Socket,Time,Index},#user{user_id = _UserID, other_data = #us
     %% 消息处理
 	async_recv(Socket,?HEADER_LENGTH,?HEART_TIMEOUT),
 
-    %lib_user_online:add_ip_online(OldIP,IP,UserID),
 
     %%% 重置心跳包错误时间
     %lib_packet_monitor:set_heartbeat_error(0),
@@ -323,14 +324,14 @@ p(ID) ->
 	end.
 
 %% @doc 踢出所有玩家
-%stop_all() ->
-%    OnlineL = lib_user_online:online_list(),
-%    do_stop_all(OnlineL).
-%do_stop_all([#user_online{user_id = UserID, pid = Pid} | T]) ->
-%    catch gen_server2:sync_stop(Pid, kick_out),
-%    do_stop_all(T);
-%do_stop_all([]) ->
-%    ok.
+stop_all() ->
+    OnlineL = user_online:online_list(),
+    do_stop_all(OnlineL).
+do_stop_all([#user_online{user_id = UserID, pid = Pid} | T]) ->
+    catch gen_server2:sync_stop(Pid, kick_out),
+    do_stop_all(T);
+do_stop_all([]) ->
+    ok.
 %%% -------------------------------------------
 %%%             -----API-----
 %%% -------------------------------------------

@@ -6,7 +6,7 @@
 
 -module(lib_user).
 -include("common.hrl").
--include("user.hrl").
+-include("record.hrl").
 
 -export([get_user_pid/1
         ,is_online/1

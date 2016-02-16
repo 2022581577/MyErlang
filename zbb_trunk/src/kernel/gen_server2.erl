@@ -1,11 +1,11 @@
 %%%----------------------------------------------------------------------
-%%% @author : kongqingquan <kqqsysu@gmail.com>
+%%% @author : zhongbinbin <binbinjnu@163.com>
 %%% @date   : 2013.06.15.
 %%% @desc   : gen_server 自定义模板
 %%%----------------------------------------------------------------------
 
 -module(gen_server2).
--author('kongqingquan <kqqsysu@gmail.com>').
+-author('zhongbinbin <binbinjnu@163.com>').
 -behaviour(gen_server).
 -compile(inline).
 

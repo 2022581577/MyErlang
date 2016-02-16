@@ -1,11 +1,11 @@
 %%%----------------------------------------------------------------------
-%%% @author : kongqingquan <kqqsysu@gmail.com>
+%%% @author : zhongbinbin <binbinjnu@163.com>
 %%% @date   : 2013.06.15.
 %%% @desc   : 网络处理层
 %%%----------------------------------------------------------------------
 
 -module(srv_reader).
--author('kongqingquan <kqqsysu@gmail.com>').
+-author('zhongbinbin <binbinjnu@163.com>').
 -behaviour(gen_server2).
 -compile(inline).
 

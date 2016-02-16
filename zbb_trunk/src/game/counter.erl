@@ -1,16 +1,17 @@
 %%%----------------------------------------------------------------------
-%%% @author : kongqingquan <kqqsysu@gmail.com>
+%%% @author : zhongbinbin <binbinjnu@163.com>
 %%% @date   : 2013.06.20
 %%% @desc   : 计数器模块
 %%%----------------------------------------------------------------------
 
 -module(counter).
--author('kongqingquan <kqqsysu@gmail.com>').
+-author('zhongbinbin <binbinjnu@163.com>').
 -include("common.hrl").
 
 -export([init/0]).
 
--export([get_user_id/0]).
+-export([get_user_id/0
+        ,get_map_index_id/1]).
 
 %% ID宏定义
 -define(COUNTER_USER_ID,counter_user_id).
@@ -21,6 +22,7 @@
 -define(COUNTER_GUILD_ID, counter_guild_id).
 -define(COUNTER_MAIL_ID, counter_mail_id).
 -define(COUNTER_TEAM_ID, counter_team_id).
+-define(COUNTER_MAP_INDEX_ID, counter_map_index_id).
 
 -define(COUNTER_COMMON_LIST, 
         [?COUNTER_NPC_ID
@@ -67,4 +69,12 @@ bit_move(_BitN, BslN) ->
 get_user_id() ->
     ets:update_counter(?ETS_COUNTER, ?COUNTER_USER_ID, 1).
 
-
+%% @doc 根据map_id获取地图index_id
+get_map_index_id(MapID) ->
+    case ets:lookup(?ETS_COUNTER, {?COUNTER_MAP_INDEX_ID, MapID}) of
+        [] ->   
+            ets:insert(?ETS_COUNTER,{{?COUNTER_MAP_INDEX_ID, MapID}, 1}),
+            1;
+        _ ->
+            ets:update_counter(?ETS_COUNTER, {?COUNTER_MAP_INDEX_ID, MapID}, 1)
+    end.

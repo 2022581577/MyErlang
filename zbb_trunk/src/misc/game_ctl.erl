@@ -1,11 +1,11 @@
 %%%----------------------------------------------------------------------
-%%% @author : kongqingquan <kqqsysu@gmail.com>
+%%% @author : zhongbinbin <binbinjnu@163.com>
 %%% @date   : 2013.06.15.
 %%% @desc   : 控制模块
 %%%----------------------------------------------------------------------
 
 -module(game_ctl).
--author('kongqingquan <kqqsysu@gmail.com>').
+-author('zhongbinbin <binbinjnu@163.com>').
 
 -export([start/0,
 		 init/0,
@@ -75,12 +75,11 @@ process(["reload", "config"]) ->
     game_config:reload(),
     ?GAME_STATUS_SUCCESS;
 
-%
-%process(["count"]) ->
-%    Count = lib_user_online:count(),
-%    ?PRINT("~w~n",[Count]),
-%    Count;
-%
+process(["count"]) ->
+    Count = user_online:count(),
+    ?PRINT("~w~n",[Count]),
+    Count;
+
 %process(["version"]) ->
 %    ?PRINT("Server:~p Client:~p~n",[?SERVER_VERSION,?CLIENT_VERSION]),
 %    ?GAME_STATUS_SUCCESS;

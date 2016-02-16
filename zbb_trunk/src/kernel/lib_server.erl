@@ -30,10 +30,17 @@ start(Sup) ->
 
     %% 数据库启动后开启GLOBAL_DATA_DISK
     ?GLOBAL_DATA_DISK:init(),
+
+    %% 各种ets初始化
+    ets_init:init(),
+
     %% 自增id计数器模块
     counter:init(), 
     %% 统计日志模块
     server_sup:start_child(srv_log),
+    
+    %% 地图管理进程
+    server_sup:start_child(srv_map_manager),
 
     node_interface:set_server_running(),
     ok.

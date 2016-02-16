@@ -1,8 +1,13 @@
+-ifndef(COMMON_HRL).
+-define(COMMON_HRL,"common.hrl").
+
 
 -define(CONFIG(Key), game_config:get_config(Key)).
 
 -include("logger.hrl").
 -include("ets.hrl").
+-include("user.hrl").
+-include("map.hrl").
 
 -define(TRUE, true).
 -define(FALSE, false).
@@ -52,3 +57,6 @@
 -define(TIMER_THIRTY_MIN_SEC,   1800).  %% 30分钟
 -define(TIMER_ONE_HOUR_SEC,     3600).
 -define(TIMER_ONE_DAY_SEC,      86400).
+
+
+-endif.
