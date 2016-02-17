@@ -6,7 +6,7 @@
 
 -module(srv_user).
 -author('zhongbinbin <binbinjnu@163.com>').
--behaviour(gen_server2).
+-behaviour(game_gen_server).
 -compile(inline).
 
 -include("common.hrl").
@@ -19,26 +19,20 @@
         ,do_terminate/2]).
 
 -export([start/1
-        ,start_link/1
-        ,cast/2
-        ,call/2]).
+        ,start_link/1]).
 
 %% cast接口
--export([apply/2
-        ,status_apply/2
-        ,mfa_apply/4
-        ,mfa_status/4]).
+-export([cast/2
+        ,cast_stop/2
+        ,cast_apply/2
+        ,cast_state_apply/2]).
 %% call 接口
--export([sync_apply/2
-        ,sync_mfa/4
-        ,sync_status/4
+-export([call/2
+        ,call_stop/2
+        ,call_apply/2
+        ,call_state_apply/2
         ,i/1
         ,p/1]).	
-
-%% API
--export([stop_all/0
-        ,stop/2
-        ,sync_stop/2]).
 
 -define(MODULE_LOOP_TICK,5000).		%% 玩家循环时间5秒
 %% 玩家每次循环的增数
@@ -47,7 +41,7 @@
 start(UserID) ->
 	server_sup:start_user([UserID]).
 start_link(UserID) ->
-    gen_server2:start_link(?MODULE, [UserID], []).
+    game_gen_server:start_link(?MODULE, [UserID], []).
 
 
 do_init([UserID]) ->
@@ -56,7 +50,7 @@ do_init([UserID]) ->
             process_flag(trap_exit,true),
             %% loop最好在前端请求了玩家初始化协议后开启（需要注意重连时loop的处理）
             %erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, ?PLAYER_LOOP_INCREACE}),
-            ProcessName = lib_user:get_process_name(UserID),
+            ProcessName = lib_user:get_user_process_name(UserID),
             erlang:register(ProcessName, self()),
             %% 在init的时候就load data 还是 发送一条消息给自己load data  
             user_online:add(#user_online{user_id = UserID, pid = self()}),
@@ -156,14 +150,14 @@ do_info({inet_async,Socket,_Ref,{ok,Bin}},#user{user_id = UserID, other_data = #
 			end;
 		Error ->
             ?WARNING("Receive Data Error:~w,UserID:~w,Ip:~p,Bin:~w",[Error,UserID,lib_user:get_ip(),Bin]),
-            stop(self(), data_error),
+            cast_stop(self(), data_error),
             {noreply,User}
 	end;
 
 do_info({inet_async,Socket,_Ref,{ok,Bin}},#user{user_id = UserID, acc_name = AccName, other_data = #user_other{socket = UserSocket}} = User) ->
     %% Socket 不匹配
     ?WARNING("Socket not match, UserID:~w,AccName:~w,Socket:~w,UserSocket:~w,Bin:~w",[UserID,AccName,Socket,UserSocket,Bin]),
-    stop(self(), socket_not_match),
+    cast_stop(self(), socket_not_match),
     {noreply,User};
 
 %% 接收出错处理
@@ -172,7 +166,7 @@ do_info({inet_async,Socket,_Ref,{error,closed}},#user{user_id = UserID, other_da
         UserSocket ->
             ?WARNING("UserID:~w Socket Close...",[UserID]),
             NewSocket = close_socket(Socket),
-            stop(self(), socket_close),
+            cast_stop(self(), socket_close),
             {noreply,User#user{other_data = UserOther#user_other{socket = NewSocket}}};
         _ ->
             ?WARNING("Invalue Socket:~w,UserSocket:~w Closed",[Socket,UserSocket]),
@@ -185,7 +179,7 @@ do_info({inet_async,Socket,_Ref,{error,Reason}},#user{user_id = UserID, other_da
         UserSocket ->
             ?WARNING("UserID:~w Socket Error, Reason:~w",[UserID, Reason]),
             NewSocket = close_socket(Socket),
-            stop(self(), socket_error),
+            cast_stop(self(), socket_error),
             {noreply,User#user{other_data = UserOther#user_other{socket = NewSocket}}};
         _ ->
             ?INFO("Invalue Socket:~w,UserSocket:~w,Reason:~w",[Socket,UserSocket,Reason]),
@@ -200,7 +194,7 @@ do_info({inet_reply,Socket,{error,Reason}},#user{user_id = UserID, other_data = 
     ?WARNING("UserID:~w Newwork Error,Reason:~w",[UserID,Reason]),
     %?RCD_LOGOUT_TYPE(UserID, ?LOGOUT_TYPE_SOCKET_ERR),
     NewSocket = close_socket(Socket),
-    stop(self(), netword_error),
+    cast_stop(self(), netword_error),
     {noreply,User#user{other_data = UserOther#user_other{socket = NewSocket}}};
 
 %do_info({send,Bin},#user{other_data = #user_other{socket = Socket}} = User) ->
@@ -240,7 +234,7 @@ async_recv(Sock, Length, Timeout) when is_port(Sock) ->
     case prim_inet:async_recv(Sock, Length, Timeout) of
         {error, Reason} -> 
             ?WARNING("asyn_recv Error,Reasion:~w",[Reason]),
-            stop(self(), asyn_recv_error);
+            cast_stop(self(), asyn_recv_error);
         {ok, Res} -> 
             Res
     end.
@@ -258,80 +252,133 @@ close_socket(Socket) ->
 %%% -------------------------------------------
 %%%             -----API-----
 %%% -------------------------------------------
-%% @doc 停止进程 cast 方式
-stop(ID, Type) ->
-	cast(ID, {stop_user, Type}).
-	
-%% @doc 同步停止进程
-sync_stop(ID, Type) ->
-	call(ID, {stop_user, Type}).
-
-%% @doc cast 接口调用
-cast(UserID,Msg) when is_integer(UserID) -> 
-	case lib_user:get_user_pid(UserID) of
-		false ->
-			offline;
-		Pid ->
-			cast(Pid,Msg)
-	end;
-cast(Pid,Msg) ->
-	gen_server:cast(Pid,Msg).
-
-%% @doc call接口调用
-call(UserID,Msg) when is_integer(UserID) ->
-	case lib_user:get_user_pid(UserID) of
-		false ->
-			offline;
-		Pid ->
-			call(Pid,Msg)
-	end;
-call(Pid,Msg) ->
-	gen_server:call(Pid,Msg).
-
-%% @doc 函数调用
-sync_apply(ID,Fun) ->
-	call(ID,{apply,Fun}).
-
-%% @doc MFA函数调用
-sync_mfa(ID,Mod,Fun,Args) ->
-	call(ID,{mfa_apply,Mod,Fun,Args}).
-
-sync_status(ID, Mod, Fun, Args) ->
-    call(ID, {mfa_status,Mod,Fun,Args}).
-
-%% @doc fun 调用
-apply(ID,Fun) ->
-	cast(ID,{apply,Fun}).
-%% @doc Fun(Status)函数调用 Status将加在,更新函数修改后的Status
-status_apply(ID,Fun) ->
-	cast(ID,{status_apply,Fun}).
-%% @doc MFA函数调用
-mfa_apply(ID,Mod,Fun,Args) ->
-	cast(ID,{mfa_apply,Mod,Fun,Args}).
-%% @doc MFA + Status函数调用 Status将加在 Args前面调用,更新函数修改后的Status
-mfa_status(ID,Mod,Fun,Args) ->
-	cast(ID,{mfa_status,Mod,Fun,Args}).
-
-%% @doc 调试接口,获取状态
-i(ID) ->
-	call(ID,get_status).
-p(ID) ->
-	case i(ID) of
-		offline ->
-			offline;
-		Status ->
-			io:format("~p~n",[lib_record:fields_value(Status)])
-	end.
-
 %% @doc 踢出所有玩家
 stop_all() ->
     OnlineL = user_online:online_list(),
-    do_stop_all(OnlineL).
-do_stop_all([#user_online{user_id = UserID, pid = Pid} | T]) ->
-    catch gen_server2:sync_stop(Pid, kick_out),
-    do_stop_all(T);
-do_stop_all([]) ->
+    stop_all(OnlineL).
+stop_all([#user_online{pid = Pid} | T]) ->
+    catch call_stop(Pid, kick_out),
+    stop_all(T);
+stop_all([]) ->
     ok.
+
+%% @doc 停止进程 cast 方式
+cast_stop(UserX, Type) ->
+    case analyze_user_x(UserX) of
+        {false, R} ->   
+            ?WARNING("cast stop user false, UserX:~w, Type:~w, R:~w", [UserX, Type, R]);
+        UserPid ->
+            game_gen_server:cast(UserPid, {stop_user, Type})
+    end.
+	
+%% @doc 同步停止进程
+call_stop(UserX, Type) ->
+    case analyze_user_x(UserX) of
+        {false, R} ->   
+            ?WARNING("call stop user false, UserX:~w, Type:~w, R:~w", [UserX, Type, R]);
+        UserPid ->
+            game_gen_server:call(UserPid, {stop_user, Type})
+    end.
+
+
+%% @param UserX: User | UserPid | UserID
+%% @param Callback {M, F, A} | {F, A} | F
+%% @return ok | {false, Res}
+%% 如果是#user{}和UserID，需要在玩家进程所在节点调用，Pid可在任意节点调用
+cast_state_apply(UserX, Callback) ->      
+    case analyze_user_x(UserX) of
+        {false, R} ->
+            ?WARNING("cast state apply user false, UserX:~w, Callback:~w, R:~w", [UserX, Callback, R]),
+            {false, R};
+        UserPid ->
+            {M, F, A} = util:transform_callback(Callback),
+            game_gen_server:cast_state_apply(UserPid, M, F, A)
+    end.
+cast_apply(UserX, Callback) ->      
+    case analyze_user_x(UserX) of
+        {false, R} ->
+            ?WARNING("cast apply user false, UserX:~w, Callback:~w, R:~w", [UserX, Callback, R]),
+            {false, R};
+        UserPid ->
+            {M, F, A} = util:transform_callback(Callback),
+            game_gen_server:cast_apply(UserPid, M, F, A)
+    end.
+
+%% @param UserX: User | UserPid | UserID
+%% @param msg
+%% @return ok | {false, Res}
+%% 如果是#user{}和UserID，需要在玩家进程所在节点调用，Pid可在任意节点调用
+cast(UserX, Msg) ->
+    case analyze_user_x(UserX) of
+        {false, R} ->
+            ?WARNING("cast user false, UserX:~w, Msg:~w, R:~w", [UserX, Msg, R]),
+            {false, R};
+        UserPid ->
+            game_gen_server:cast(UserPid, Msg)
+    end.
+
+
+%% @param UserX: User | UserPid | UserID
+%% @param Callback {M, F, A} | {F, A} | F
+%% @return ok | {false, Res}
+%% 如果是#user{}和UserID，需要在玩家进程所在节点调用，Pid可在任意节点调用
+call_state_apply(UserX, Callback) ->      
+    case analyze_user_x(UserX) of
+        {false, R} ->
+            ?WARNING("call state apply user false, UserX:~w, Callback:~w, R:~w", [UserX, Callback, R]),
+            {false, R};
+        UserPid ->
+            {M, F, A} = util:transform_callback(Callback),
+            game_gen_server:call_state_apply(UserPid, M, F, A)
+    end.
+call_apply(UserX, Callback) ->      
+    case analyze_user_x(UserX) of
+        {false, R} ->
+            ?WARNING("call apply user false, UserX:~w, Callback:~w, R:~w", [UserX, Callback, R]),
+            {false, R};
+        UserPid ->
+            {M, F, A} = util:transform_callback(Callback),
+            game_gen_server:call_apply(UserPid, M, F, A)
+    end.
+
+%% @param UserX: User | UserPid | UserID
+%% @param msg
+%% @return ok | {false, Res}
+%% 如果是#user{}和UserID，需要在玩家进程所在节点调用，Pid可在任意节点调用
+call(UserX, Msg) ->
+    case analyze_user_x(UserX) of
+        {false, R} ->
+            ?WARNING("call user false, UserX:~w, Msg:~w, R:~w", [UserX, Msg, R]),
+            {false, R};
+        UserPid ->
+            game_gen_server:call(UserPid, Msg)
+    end.
+
+
+%% @doc 调试接口,获取状态
+i(ID) ->
+	call(ID, get_state).
+p(ID) ->
+	case i(ID) of
+        #user{} = User ->
+            lib_record:print_record(User);
+        R ->
+            R
+    end.
+
+%% user_x解析UserPid
+analyze_user_x(#user{other_data = #user_other{pid = UserPid}}) ->
+    UserPid;
+analyze_user_x(UserID) when is_integer(UserID) ->
+    case lib_user:get_user_pid(UserID) of
+        false ->    {false, offline};
+        UserPid ->  UserPid
+    end;
+analyze_user_x(UserPid) when is_pid(UserPid) ->
+    UserPid;
+analyze_user_x(_) ->
+    {false, error_arg}.
+
 %%% -------------------------------------------
 %%%             -----API-----
 %%% -------------------------------------------

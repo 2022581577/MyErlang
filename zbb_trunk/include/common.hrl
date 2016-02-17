@@ -49,6 +49,7 @@
 -define(GAME_STATUS_RUNNING,6).
 -define(GAME_STATUS_STOPING,7).
 
+%% Game Timer
 -define(DIFF_SECONDS_1970_1900, 2208988800).
 -define(DIFF_SECONDS_0000_1900, 62167219200).
 -define(TIMER_TEN_SEC,          10).    %% 10秒    
@@ -58,5 +59,7 @@
 -define(TIMER_ONE_HOUR_SEC,     3600).
 -define(TIMER_ONE_DAY_SEC,      86400).
 
+%% Game Function
+-define(RECORD_FIELDS(Record),record_info(fields,Record)).
 
 -endif.

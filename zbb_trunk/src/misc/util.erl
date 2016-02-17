@@ -59,6 +59,8 @@
         %,server_merge_days/0
 		]).
 
+-export([transform_callback/1]).
+
 %%
 %% 时间函数
 %%
@@ -359,3 +361,13 @@ socket_to_ip(Socket) ->
 
 md5(S) ->
     lists:flatten([io_lib:format("~2.16.0b", [N]) || N <- binary_to_list(erlang:md5(S))]).
+
+%% @doc 回调函数参数解析
+transform_callback({M, F, A}) ->
+    {M, F, A};
+transform_callback({F, A}) ->
+    {undefined, F, A};
+transform_callback(F) when is_function(F) ->
+    {undefined, F, []};
+transform_callback(_) ->
+    erlang:error(badargs).

@@ -1,19 +1,33 @@
 %%%----------------------------------------------------------------------
-%%% @author : zhongbinbin <binbinjnu@163.com>
+%%% @author :
 %%% @date   : 2013.06.15.
 %%% @desc   : gen_server 自定义模板
 %%%----------------------------------------------------------------------
 
--module(gen_server2).
--author('zhongbinbin <binbinjnu@163.com>').
+-module(game_gen_server).
 -behaviour(gen_server).
 -compile(inline).
 
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
 -export([start/3,start/4,start_link/3,start_link/4]).
--export([stop/1,sync_stop/1,cast/2,call/2,sync_apply/2,i/1,p/1,sync_mfa/4,sync_status/4]).		                    %% call 接口
--export([apply/2,status_apply/2,mfa_apply/4,mfa_status/4]).	%% cast接口
+
+%% info接口
+-export([info/2
+        ,info/4
+        ,state_info/4]).
+%% cast接口
+-export([cast_stop/1
+        ,cast/2
+        ,cast_apply/4
+        ,cast_state_apply/4]).
+%% call接口
+-export([call_stop/1
+        ,call/2
+        ,call_apply/4
+        ,call_state_apply/4
+        ,i/1
+        ,p/1]).
 
 -include("common.hrl").
 
@@ -64,7 +78,7 @@ init([Mod,Args]) ->
 		Mod:do_init(Args)
 	catch 
 		_:Reason ->
-			?WARNING2("start ~w fail,Reason:~w",[Mod,Reason]),
+			?ERROR("start ~w fail,Reason:~w",[Mod,Reason]),
             util:sleep(1000),
             start_fail
     end.
@@ -74,7 +88,7 @@ handle_call(Info, From, State) ->
 		do_call(Info, From, State) 
 	catch
 		_:Reason ->
-            ?WARNING2("~w error reason of do_call,Reason:~w,From:~w,Info:~w", [get_callback_mod(), Reason,From,Info]),
+            ?ERROR("~w error reason of do_call,Reason:~w,From:~w,Info:~w", [get_callback_mod(), Reason,From,Info]),
 		    {reply, ok, State}
     end.
 
@@ -83,7 +97,7 @@ handle_cast(Info, State) ->
 		do_cast(Info, State) 
 	catch
 		_:Reason ->
-            ?WARNING2("~w error reason of do_cast,Reason:~w,Info:~w", [get_callback_mod(), Reason,Info]),
+            ?ERROR("~w error reason of do_cast,Reason:~w,Info:~w", [get_callback_mod(), Reason,Info]),
 			{noreply, State}
     end.
 
@@ -92,7 +106,7 @@ handle_info(Info, State) ->
 		do_info(Info, State) 
 	catch
 		_:Reason ->
-            ?WARNING2("~w error reason of do_info,Reason:~w,Info:~w", [get_callback_mod(), Reason,Info]),
+            ?ERROR("~w error reason of do_info,Reason:~w,Info:~w", [get_callback_mod(), Reason,Info]),
 		 	{noreply, State}
     end.
 
@@ -104,55 +118,72 @@ terminate(Reason, State) ->
 code_change(_OldVsn, State, _Extra) -> 
 	{ok, State}.
 	
-do_call({apply,Fun},_From,State) ->
-	Reply = Fun(),
-	{reply,Reply,State};
 
-do_call({mfa_apply,Mod,Fun,Args},_From,State) when Mod =/= os ->
-	Reply = erlang:apply(Mod,Fun,Args),
-	{reply,Reply,State};	
-
-do_call({mfa_status,Mod,Fun,Args},_From,State) when Mod =/= os ->
-	case erlang:apply(Mod,Fun,[State | Args]) of
-        {ok, Reply, NewState} ->
-            {reply,Reply,NewState};
-        Reply ->
-        	{reply,Reply,State}
+do_call({apply, M, F, A}, _From, State) when M =/= os ->
+    case 
+        case M of
+            undefined ->
+                erlang:apply(F, A);
+            _ ->
+                erlang:apply(M, F, A)
+        end 
+    of
+        {ok, Reply} ->
+            {reply, Reply, State};
+        Reply ->     
+            {reply, Reply, State}
     end;
 
-do_call(get_status,_From,State) ->
+do_call({state_apply, M, F, A}, _From, State) when M =/= os ->
+    case 
+        case M of
+            undefined ->
+                erlang:apply(F, [State | A]);
+            _ ->
+                erlang:apply(M, F, [State | A])
+        end 
+    of
+        {ok, Reply, NewState} ->   
+            {reply, Reply, NewState};
+        {ok, Reply} ->              
+            {reply, Reply, State};
+        Reply ->
+            {reply, Reply, State}
+    end;
+
+do_call(get_state,_From,State) ->
 	{reply,State,State};
 	
 do_call(stop,_From,State) ->
-	io:format("SYNC STOP"),
 	{stop,normal,ok,State};
 
 do_call(Info, From, State) ->
     Mod = get_callback_mod(),
     Mod:do_call(Info,From,State).
 
-do_cast({mfa_apply,Mod,Fun,Args},State) when Mod =/= os ->
-	erlang:apply(Mod,Fun,Args),
-	{noreply,State};	
 
-do_cast({mfa_status,Mod,Fun,Args},State) when Mod =/= os ->
-	case erlang:apply(Mod,Fun,[State | Args]) of
-		{ok,NewState} ->
-			{noreply,NewState};
-		_ ->
-			{noreply,State}
-	end;	
+do_cast({apply, M, F, A}, State) when M =/= os ->
+    case M of
+        undefined ->
+            erlang:apply(F, A);
+        _ ->
+            erlang:apply(M, F, A)
+    end,
+    {noreply, State};
 
-do_cast({apply,Fun},State) ->
-	Fun(),
-	{noreply,State};
-
-do_cast({status_apply,Fun},State) ->
-	case Fun(State) of
-		{ok,NewState} ->
-			{noreply,NewState};
-		_ ->
-			{noreply,State}
+do_cast({state_apply, M, F, A}, State) when M =/= os ->
+    case 
+        case M of
+            undefined ->
+                erlang:apply(F, [State | A]);
+            _ ->
+                erlang:apply(M, F, [State | A])
+        end 
+    of
+        {ok, NewState} ->
+            {noreply, NewState};
+        _ ->
+            {noreply, State}
 	end;	
 
 do_cast(stop,State) ->
@@ -162,9 +193,30 @@ do_cast(Info, State) ->
     Mod = get_callback_mod(),
     Mod:do_cast(Info,State).
 
-do_info({mfa_apply,Mod,Fun,Args},State) when Mod =/= os ->
-	erlang:apply(Mod,Fun,Args),
-	{noreply,State};	
+
+do_info({apply, M, F, A}, State) when M =/= os ->
+    case M of
+        undefined ->
+            erlang:apply(F, A);
+        _ ->
+            erlang:apply(M, F, A)
+    end,
+    {noreply, State};
+
+do_info({state_apply, M, F, A}, State) when M =/= os ->
+    case 
+        case M of
+            undefined ->
+                erlang:apply(F, [State | A]);
+            _ ->
+                erlang:apply(M, F, [State | A])
+        end 
+    of
+        {ok, NewState} ->
+            {noreply, NewState};
+        _ ->
+            {noreply, State}
+	end;	
 
 do_info(stop,State) ->
 	{stop,normal,State};
@@ -177,46 +229,42 @@ get_callback_mod() ->
     get(?CALLBACK_MODULE).
 
 
+%% @doc info接口调用
+state_info(Pid, M, F, A) ->
+    Pid ! {state_apply, M, F, A}.
+info(Pid, M, F, A) ->
+    Pid ! {apply, M, F, A}.
+info(Pid, Msg) ->
+	Pid ! Msg.
+
 %% @doc cast 接口调用
+cast_state_apply(Pid, M, F, A) ->
+    cast(Pid,{state_apply, M, F, A}).
+cast_apply(Pid, M, F, A) ->
+    cast(Pid,{apply, M, F, A}).
 cast(Pid,Msg) ->
 	gen_server:cast(Pid,Msg).
+
+%% @doc call 接口调用
+call_state_apply(Pid, M, F, A) ->
+    call(Pid, {state_apply, M, F, A}).
+call_apply(Pid, M, F, A) ->
+    call(Pid, {apply, M, F, A}).
 call(Pid,Msg) ->
 	gen_server:call(Pid,Msg).
 
 %% @doc 停止进程 cast 方式
-stop(Pid) ->
+cast_stop(Pid) ->
 	cast(Pid,stop).
 	
 %% @doc 同步停止进程
-sync_stop(Pid) ->
+call_stop(Pid) ->
 	call(Pid,stop).
 
-%% @doc 函数调用
-sync_apply(Pid,Fun) ->
-	call(Pid,{apply,Fun}).
-
-%% @doc MFA函数调用
-sync_mfa(Pid,Mod,Fun,Args) ->
-	call(Pid,{mfa_apply,Mod,Fun,Args}).
-sync_status(Pid,Mod,Fun,Args) ->
-    call(Pid,{mfa_status,Mod,Fun,Args}).
-
-%% @doc fun 调用
-apply(Pid,Fun) ->
-	cast(Pid,{apply,Fun}).
-%% @doc Fun(State)函数调用 State,更新函数修改后的Status
-status_apply(Pid,Fun) ->
-	cast(Pid,{status_apply,Fun}).
-%% @doc MFA函数调用
-mfa_apply(Pid,Mod,Fun,Args) ->
-	cast(Pid,{mfa_apply,Mod,Fun,Args}).
-%% @doc MFA + State 函数调用 State 将加在 Args前面调用,更新函数修改后的Status
-mfa_status(Pid,Mod,Fun,Args) ->
-	cast(Pid,{mfa_status,Mod,Fun,Args}).
 
 %% @doc 调试接口,获取状态
 i(Pid) ->
-	call(Pid,get_status).
+	call(Pid, get_state).
 p(Pid) ->
 	case i(Pid) of
 		undefined ->

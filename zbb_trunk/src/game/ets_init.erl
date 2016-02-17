@@ -9,13 +9,13 @@
 -include("common.hrl").
 -include("record.hrl").
 
--export([init/1]).
+-export([init/0]).
 
-init(_GameType) ->
+init() ->
     ets:new(?ETS_USER_ONLINE,[{keypos,#user_online.user_id},named_table,public,set,{read_concurrency,true}]),   %% 玩家在线
 
     ets:new(?ETS_MAP_ID_LIST,[{keypos,1},named_table,public,set,{read_concurrency,true}]),                      %% 地图MapID,IndexIDList映射
-    ets:new(?ETS_MAP_INFO,[{keypos,#map_state.map_inst_id},named_table,public,set,{read_concurrency,true}]),    %% 地图MapInstID:{map_id, index_id}信息映射
+    ets:new(?ETS_MAP_INFO,[{keypos,#map_info.map_inst_id},named_table,public,set,{read_concurrency,true}]),    %% 地图MapInstID:{map_id, index_id}信息映射
 
 
     %ets:new(?ETS_WALK_POINT,[{keypos,#map_walk_point.map_id},named_table,public,set,{read_concurrency,true}]),                       %% 阻挡点信息

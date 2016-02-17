@@ -6,7 +6,7 @@
 
 -module(srv_reader).
 -author('zhongbinbin <binbinjnu@163.com>').
--behaviour(gen_server2).
+-behaviour(game_gen_server).
 -compile(inline).
 
 -include("common.hrl").
@@ -25,7 +25,7 @@
 			   }).
 
 start_link() ->
-    gen_server2:start_link(?MODULE, [], []).
+    game_gen_server:start_link(?MODULE, [], []).
 
 stop(Pid) ->
     gen_server:cast(Pid,stop).

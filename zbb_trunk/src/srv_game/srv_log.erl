@@ -6,7 +6,7 @@
 
 
 -module(srv_log).
--behaviour(gen_server2).
+-behaviour(game_gen_server).
 
 -export([do_init/1
         ,do_call/3
@@ -32,11 +32,11 @@
 
 %% @doc 日志
 add_log(Operation, TableName, Value) ->
-    gen_server2:cast(?MODULE, {add_log, Operation, TableName, Value}).
+    game_gen_server:cast(?MODULE, {add_log, Operation, TableName, Value}).
 
 
 start_link() ->
-    gen_server2:start_link({local, ?MODULE}, ?MODULE, [], []).
+    game_gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 
 do_init([]) ->

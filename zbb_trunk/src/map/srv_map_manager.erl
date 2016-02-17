@@ -1,19 +1,22 @@
 %%%----------------------------------------------------------------------
 %%% @author :
 %%% @date   : 2016.02.16
-%%% @desc   : 统一分配地图ID
+%%% @desc   : 统一分配地图ID(只是保证在单一进程执行，数据存在ets中，进程重启不影响数据)
 %%%           跨服中，活动与对应活动地图需要在一致的跨服节点上
 %%%----------------------------------------------------------------------
 
 -module(srv_map_manager).
--behaviour(gen_server2).
+-behaviour(game_gen_server).
 -compile(inline).
 
 -export([do_init/1, do_call/3, do_cast/2, do_info/2, do_terminate/2]).
 -export([start_link/0]).
--export([apply/1,mfa_apply/3]).	                %% cast接口
 
--export([get_map_index_id/1, start_map/2]).
+-export([start_map/1, del_map/2]).
+
+%% 进程内接口
+-export([do_start_map/1
+        ,do_del_map/2]).
 
 -include("common.hrl").
 -include("record.hrl").
@@ -21,17 +24,17 @@
 
 -record(state,{}).
 
-get_map_index_id(MapID) ->
-    gen_server:call(?MODULE, {get_map_index_id,MapID}).
-
 %% TODO 后期需要添加跨服处理，到对应的跨服节点获取
 %% 根据地图跨服类型活动对应的节点
 start_map(MapID) ->
-    gen_server:call(?MODULE, {start_map, MapID}).
+    game_gen_server:call_apply(?MODULE, ?MODULE, do_start_map, [MapID]).
 
+%% 删除映射关系
+del_map(MapID, MapIndexID) ->
+    game_gen_server:cast_apply(?MODULE, ?MODULE, do_del_map, [MapID, MapIndexID]).
 
 start_link() ->
-	gen_server2:start_link({local,?MODULE},?MODULE,[],[]).
+	game_gen_server:start_link({local,?MODULE},?MODULE,[],[]).
 
 do_init([]) ->
     process_flag(trap_exit,true),
@@ -41,14 +44,6 @@ do_init([]) ->
 do_cast(Info, State) -> 
     ?WARNING("Not done do_cast:~w",[Info]),
 	{noreply, State}.
-
-do_call({get_map_index_id, MapID},_From,State) ->
-    MapOnlyID = lib_map_counter:get_map_index_id(MapID),
-    {reply, {MapID, MapOnlyID}, State};
-
-do_call({start_map, MapID},_From,State) ->
-    Reply = do_start_map(MapID),
-    {reply,Reply,State};
 
 do_call(Info, _From, State) -> 
     ?WARNING("Not done do_call:~w",[Info]),
@@ -61,26 +56,12 @@ do_info(Info, State) ->
 do_terminate(_Reason, _State) ->
     ok.
 
-	
-%% @doc FUn函数调用
-apply(Fun) ->
-	gen_server:cast(?MODULE,{apply,Fun}).
-%% @doc MFA函数调用
-mfa_apply(Mod,Fun,Args) ->
-	gen_server:cast(?MODULE,{mfa_apply,Mod,Fun,Args}).
 
+%% @doc 开启地图
 do_start_map(MapID) ->
-    MapOnlyID = get_map_index_id(MapID),
-    ProcessName = map_api:get_map_process_name(MapID, MapIndexID),
-    case erlang:whereis(ProcessName) of
-        undefined ->
-            ?D("============ MapID:~w,MapOnlyID:~w,IsPvp:~w ==========",[MapID,MapOnlyID,IsPvP]),
-            {ok, MapPid} = srv_map:start(MapID, MapIndexID),
-            {MapID, MapIndexID, MapPid};
-        MapPid ->
-            % mod_map:mfa_apply(Pid,mod_map,set_last_active,[]),    %% TODO 需重新激活地图
-            {MapID, MapIndexID, MapPid}
-    end.
+    MapIndexID = get_map_index_id(MapID),
+    {ok, MapPid} = srv_map:start(MapID, MapIndexID),
+    {MapID, MapIndexID, MapPid}.
 
 
 %% @doc 创建地图index_id
@@ -111,8 +92,8 @@ get_map_index_id(MapID) ->
 %% 不限制人数上限的地图
 get_map_counter(MapID, 0) ->
     case ets:lookup(?ETS_MAP_ID_LIST, MapID) of
-        [{_,[ID |_]}] ->
-            ID;
+        [{_,[IndexID |_]}] ->
+            IndexID;
         [] ->
             IndexID = counter:get_map_index_id(MapID),
             ets:insert(?ETS_MAP_ID_LIST, {MapID, [IndexID]}),
@@ -135,7 +116,7 @@ get_map_counter(MapID, MaxUser) ->
             ?WARNING("Open First Index! MapID:~w, MaxUser:~w",[MapID, MaxUser]),
             IndexID = counter:get_map_index_id(MapID),
             ets:insert(?ETS_MAP_ID_LIST, {MapID, [IndexID]}),
-            IndexID;
+            IndexID
     end.
 
 
@@ -148,4 +129,18 @@ check_map_max_user(MapID, [H |T], MaxUser) ->
             H;
         _ ->
             check_map_max_user(MapID, T, MaxUser)
+    end.
+
+%% @doc 删除地图
+do_del_map(MapID, MapIndexID) ->
+    case ets:lookup(?ETS_MAP_ID_LIST, MapID) of
+        [{MapID, L}] when is_list(L) ->
+            case lists:delete(MapIndexID, L) of
+                [] ->
+                    ets:delete(?ETS_MAP_ID_LIST, MapID);
+                L1 ->
+                    ets:insert(?ETS_MAP_ID_LIST, {MapID, L1})
+            end;
+        _ ->
+            skip
     end.
