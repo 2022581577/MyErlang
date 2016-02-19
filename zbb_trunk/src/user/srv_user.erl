@@ -31,6 +31,7 @@
         ,call_stop/2
         ,call_apply/2
         ,call_state_apply/2
+        ,stop_all/0
         ,i/1
         ,p/1]).	
 

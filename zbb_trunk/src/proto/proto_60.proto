@@ -43,7 +43,7 @@ message c2s60002 {
 		repeated item list = 1;	
 	}
 	
-	required int32 map_id = 1;				//地图id
+	required int32 source_id = 1;		    //地图资源id
 	required int32 map_type = 2;	 		//地图类型号 1-等级 2-野外 3-副本 4-活动
 	required int32 width = 3;				//地图宽度
 	required int32 height = 4;				//地图高度

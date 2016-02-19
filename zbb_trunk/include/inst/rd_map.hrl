@@ -11,8 +11,7 @@
                 }). 
 
 %% 地图装备
--record(map, {
-             map_id
+-record(map, {map_id
              ,map_index_id
              ,map_type
              ,map_sub_type
@@ -28,8 +27,8 @@
              ,create_mon_list = []   %%  要创建的怪物列表
              ,block_list = []        %%  阻挡区[#polygon{},....]
              ,interval_timer         %%  map timer:当怪物进入AI行为或玩家有BUFF效果时有效
-             ,mon_dict = dict:new()
              ,user_dict = dict:new()
+             ,mon_dict = dict:new()
              ,drop_dict = dict:new()
              ,mon_seq = 1            %%  怪物实例ID最大值
              ,parent_pid = undefined %%  父进程(副本进程/活动进程)
@@ -42,5 +41,45 @@
              ,chest_info = []
          }).
 
+%% 由地图编辑器生成的数据
+-record(tpl_map_config, {source_id                  %% 资源id，不同地图id，可能对应相同的地图资源
+                        ,map_type
+                        ,map_sub_type = 0
+                        ,map_name
+                        ,min_level = 1
+                        ,width
+                        ,height
+                        ,relive_point = []          %% 重生点 [{PosX,PosY},....]  
+                        ,mon_list = []              %% 怪物列表 [{MonTplId,PosX,PosY},....]
+                        ,dup_mon_list = []          %% 副本怪物列表 [[{MonTplId,PosX,PosY},....],....]   
+                        ,door_list = []             %% 传送门 [{DoorId,PosX,PosY,TargetX,TargetY},....]
+                        ,npc_list = []              %% npc列表 [{NpcId,PosX,PosY},....]
+                        ,collect_list = []          %% 采集列表 [{MonTplId,PosX,PosY},....]
+                        ,col_num = 0                %% 横线格子数
+                        ,row_num = 0                %% 纵向格子数
+                    }).
+
+%%% --------------- 地图网格信息相关 ---------------
+%% 地图网格信息
+-record(aoi_map, {top_left                  %% 左上角坐标
+                 ,bottom_right              %% 右下角坐标
+                 ,x_count                   %% x轴grid的数量
+                 ,y_count                   %% y轴grid的数量
+                 ,grid_dict = dict:new()    %% key={grid_index_x,grid_index_y} value= #aoi_grid{}
+             }).
+     
+%% 大格子信息
+-record(aoi_grid, {key                      
+                  ,grid_index_x = 0 
+                  ,grid_index_y = 0 
+                  ,obj_dict = dict:new()   %% Key:MAP_OBJ_TYPE_XX Value:[#aoi_obj{},....]    
+              }).
+%% 地图内对象信息
+-record(aoi_obj, {key                         %% {Id,Type}
+                 ,id 
+                 ,obj_type = 0               %% MAP_OBJ_TYPE_XX
+                 ,sender
+             }).
+%%% --------------- 地图网格信息相关 ---------------
 
 -endif.
