@@ -18,7 +18,7 @@
 -ifndef(C2S60002_PB_H).
 -define(C2S60002_PB_H, true).
 -record(c2s60002, {
-    map_id = erlang:error({required, map_id}),
+    source_id = erlang:error({required, source_id}),
     map_type = erlang:error({required, map_type}),
     width = erlang:error({required, width}),
     height = erlang:error({required, height}),

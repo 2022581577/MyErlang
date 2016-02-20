@@ -10,6 +10,7 @@
 
 -include("common.hrl").
 -include("record.hrl").
+-include("tpl_map.hrl").
 -include("proto_60_pb.hrl").
 
 
@@ -22,22 +23,12 @@
         ,get_map_config/1
     ]).
 
--export([
-        get_seq/3
-		,get_seq_by_index/3
-		,is_walkable/3
-		,is_walkable_by_index/3
-		,is_walkable_by_seq/2
-		,is_normal_map/1
-		,is_safe/3
-		]).
-
 %% @doc 加载所有地图配置
 load_map_config() ->
     MapIDList = data_map:get_list(),
     SourceIDList = [begin
                         #tpl_map{source_id = SourceID} = data_map:get(E),
-                        load_map(SourceID)
+                        SourceID
                     end || E <- MapIDList],
     SourceIDList1 = lists:usort(SourceIDList),
     [load_map_config(E) || E <- SourceIDList1].

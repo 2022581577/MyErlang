@@ -8,19 +8,21 @@
 
 -include("common.hrl").
 -include("record.hrl").
+-include("tpl_map.hrl").
 
 -export([load_map_block/2
         ,ets_map_block_name_list/0
         ,is_walkable_by_pos/3
         ,is_walkable_by_seq/2
-        ,is_walkable_by_index/3]).
+        ,is_walkable_by_index/3
+        ,is_safe/3]).
 
 %% @doc 获取地图资源ets_map_block_name的列表
 ets_map_block_name_list() ->
     MapIDList = data_map:get_list(),
     SourceIDList = [begin
                         #tpl_map{source_id = SourceID} = data_map:get(E),
-                        load_map(SourceID)
+                        SourceID
                     end || E <- MapIDList],
     SourceIDList1 = lists:usort(SourceIDList),
     [ets_map_block_name(E) || E <- SourceIDList1].
@@ -55,7 +57,7 @@ is_walkable_by_index(#tpl_map_config{} = MapConfig, IndexX, IndexY) ->
 is_walkable_by_index(MapID, IndexX, IndexY) ->
     is_walkable_by_index(map_config:get_map_config(MapID), IndexX, IndexY).
 
-is_walkable_by_seq(#tpl_map_config{source_id = SourceID} = MapConfig, Seq) ->
+is_walkable_by_seq(#tpl_map_config{source_id = SourceID}, Seq) ->
 	EtsName = ets_map_block_name(SourceID),
 	case ets:lookup(EtsName, Seq) of
 		[{Seq, Flag}] ->
@@ -78,7 +80,7 @@ is_safe(#tpl_map_config{source_id = SourceID} = MapConfig, PosX, PosY) ->
 			Safe == 1;
 		_ ->
 			false
-	end.
+	end;
 is_safe(MapID, PosX, PosY) ->
     is_safe(map_config:get_map_config(MapID), PosX, PosY).
 

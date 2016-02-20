@@ -26,7 +26,7 @@
 
 %% ---------- 地图掩码等配置相关 -----------
 
--define(MAP_LOOP_TICK, 50).               %% 地图循环时间
+-define(MAP_LOOP_TICK, 50).               %% 地图循环时间 50ms
 
 %% 地图类型
 -define(MAP_TYPE_NORMAL,    1).     %% 普通地图 

@@ -22,6 +22,8 @@
         ,term_to_bitstring/1
         ,string_to_term/1
         ,bitstring_to_term/1
+
+        ,prefix_server_id_str2server_id/1
         ]).
 
 -export([socket_to_ip/1
@@ -371,3 +373,6 @@ transform_callback(F) when is_function(F) ->
     {undefined, F, []};
 transform_callback(_) ->
     erlang:error(badargs).
+
+prefix_server_id_str2server_id(PrefixServerIDStr) ->
+    util:to_integer(PrefixServerIDStr -- util:to_list(?CONFIG(prefix))).
