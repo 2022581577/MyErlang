@@ -29,10 +29,10 @@ start_link() ->
 
 init([]) ->
     ChildSpec = 
-        {mod_reader
-         ,{mod_reader, start_link, []}
+        {srv_reader
+         ,{srv_reader, start_link, []}
          ,temporary
          ,brutal_kill
          ,worker
-         ,[mod_reader]},
+         ,[srv_reader]},
     {ok, {{simple_one_for_one, 10, 10}, [ChildSpec]}}.

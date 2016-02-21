@@ -24,6 +24,223 @@
         ,bitstring_to_term/1
         ]).
 
+-export([socket_to_ip/1]).
+
+%% 时间函数
+-export([
+	    unixtime/0
+		,longunixtime/0
+        ,unixdays/0
+        ,date/0
+	    ,seconds_to_localtime/1
+	    ,localtime_to_seconds/1
+        ,days_to_unixtime/1
+	    ,get_day_of_the_week/0
+	    ,is_same_date/2
+	    ,is_same_week/2
+        ,is_same_month/2
+	    ,get_midnight_seconds/1
+	    ,get_next_day_seconds/1
+	    ,get_diff_days/2
+	    ,get_today_current_second/0
+		,diff_hours/2
+		,get_next_day_diff_seconds/0				 
+        ,check_cd/2
+        ,reset_cd/1
+        ,reset_cd/2
+        ,erase_cd/1
+		,get_month_days/2
+        %,server_open_time/0
+        %,server_open_date/0
+        %,server_open_days/0
+        %,server_merge_time/0
+        %,server_merge_date/0
+        %,server_merge_days/0
+		]).
+
+%%
+%% 时间函数
+%%
+%% 取得当前的unix时间戳，单位为s
+unixtime() ->
+    srv_timer:now_seconds().
+
+%% 取得当前的unix时间戳，单位为ms
+longunixtime() ->
+    srv_timer:now_milseconds().
+
+%% @doc 获取1970年以来的天数
+unixdays() ->
+    {{Year, Month, Day}, _} = seconds_to_localtime(unixtime()),
+    calendar:date_to_gregorian_days(Year, Month, Day).
+
+%% 获取当前的unix日期
+date() ->
+    seconds_to_localtime(srv_timer:now_seconds()).
+
+%% @doc 根据1970年以来的秒数获得日期
+seconds_to_localtime(Seconds) ->
+    DateTime = calendar:gregorian_seconds_to_datetime(Seconds + ?DIFF_SECONDS_0000_1900),
+    calendar:universal_time_to_local_time(DateTime).
+
+%% 根据日期和时间获得1979年以来的秒数
+%% LocalTime::datetime1970()
+localtime_to_seconds(LocalTime) ->
+    calendar:datetime_to_gregorian_seconds(erlang:localtime_to_universaltime(LocalTime)) - ?DIFF_SECONDS_0000_1900.
+
+%% 根据1970年以来的天数获得对应时间戳
+days_to_unixtime(Days) ->
+    Date = calendar:gregorian_days_to_date(Days),
+    localtime_to_seconds({Date, {0,0,0}}).
+
+%% @doc 判断是星期几
+%% @return (1 = 周一, ..., 6 = 周六, 7 = 周日)
+get_day_of_the_week() ->
+    UnixTime = unixtime(),
+    {Date, _Time} = seconds_to_localtime(UnixTime),
+    %% {Date, _Time} = erlang:localtime(),
+    % 星期几
+    calendar:day_of_the_week(Date).
+
+
+%% @doc 判断是否同一天
+is_same_date(Seconds1, Seconds2) ->
+    {{Year1, Month1, Day1}, _Time1} = seconds_to_localtime(Seconds1),
+    {{Year2, Month2, Day2}, _Time2} = seconds_to_localtime(Seconds2),
+    Year1 == Year2 andalso Month1 == Month2 andalso Day1 == Day2.
+
+
+%% @doc 判断是否同一星期
+is_same_week(Seconds1, Seconds2) ->
+    {{Year1, Month1, Day1}, Time1} = seconds_to_localtime(Seconds1),
+    % 星期几
+    Week1  = calendar:day_of_the_week(Year1, Month1, Day1),
+    % 从午夜到现在的秒数
+    Diff1  = calendar:time_to_seconds(Time1),
+    Monday = Seconds1 - Diff1 - (Week1-1) * ?TIMER_ONE_DAY_SEC,
+    Sunday = Seconds1 + (?TIMER_ONE_DAY_SEC - Diff1) + (7 - Week1) * ?TIMER_ONE_DAY_SEC,
+    Seconds2 >= Monday andalso Seconds2 < Sunday.
+
+%% @doc 判断是否同一个月
+is_same_month(Seconds1, Seconds2) ->
+    {{Year1, Month1, _Day1}, _Time1} = seconds_to_localtime(Seconds1),
+    {{Year2, Month2, _Day2}, _Time2} = seconds_to_localtime(Seconds2),
+    Year1 == Year2 andalso Month1 == Month2.
+
+%% @doc 相差XX小时
+diff_hours(Seconds1,Seconds2) when Seconds1 > Seconds2 ->
+	diff_hours(Seconds2,Seconds1);
+diff_hours(Seconds1,Seconds2) ->
+	{{Year1, Month1, Day1}, {Hour1,_,_}} = seconds_to_localtime(Seconds1),
+	{{Year2, Month2, Day2}, {Hour2,_,_}} = seconds_to_localtime(Seconds2),
+    Days1 = calendar:date_to_gregorian_days(Year1, Month1, Day1),
+    Days2 = calendar:date_to_gregorian_days(Year2, Month2, Day2),
+	DiffDay = Days2 - Days1,
+	DiffDay*24 + (Hour2 - Hour1).
+
+%% @doc 获取当天0点和第二天0点
+%% return {Today, NextDay}
+get_midnight_seconds(Seconds) ->
+    {{_Year, _Month, _Day}, Time} = seconds_to_localtime(Seconds),
+    % 从午夜到现在的秒数
+    Diff   = calendar:time_to_seconds(Time),
+    % 获取当天0点
+    Today  = Seconds - Diff,
+    % 获取第二天0点
+    NextDay = Seconds + (?TIMER_ONE_DAY_SEC - Diff),
+    {Today, NextDay}.
+
+%% @doc 获取下一天开始的时间
+get_next_day_seconds(Now) ->
+	{{_Year, _Month, _Day}, Time} = seconds_to_localtime(Now),
+    % 从午夜到现在的秒数
+   	Diff = calendar:time_to_seconds(Time),
+	Now + (?TIMER_ONE_DAY_SEC - Diff).
+
+%% @doc 获取现在距离下一天0点相隔的时间(S)
+get_next_day_diff_seconds() ->
+	Now = unixtime(),
+	Next0 = get_next_day_seconds(Now),
+	Next0 - Now.
+
+
+%% @doc 计算相差的天数
+get_diff_days(Seconds1, Seconds2) ->
+    {{Year1, Month1, Day1}, _} = seconds_to_localtime(Seconds1),
+    {{Year2, Month2, Day2}, _} = seconds_to_localtime(Seconds2),
+    Days1 = calendar:date_to_gregorian_days(Year1, Month1, Day1),
+    Days2 = calendar:date_to_gregorian_days(Year2, Month2, Day2),
+    abs(Days2-Days1).
+
+%% @doc 获取从午夜到现在的秒数
+get_today_current_second() ->
+    {_, Time} = calendar:now_to_local_time(unixtime()),
+    NowSec = calendar:time_to_seconds(Time),
+    NowSec.
+
+%% @doc获取设置CD
+-define(CD,cd).
+check_cd(Key,CdTime) ->
+    case get({?CD,Key}) of
+        undefined ->
+            true;
+        T ->
+            LongUnixTime = longunixtime(),
+            T + CdTime =< LongUnixTime
+    end.
+reset_cd(Key) ->
+    LongUnixTime = longunixtime(),
+    put({?CD,Key},LongUnixTime).
+reset_cd(Key,LongUnixTime) ->
+    put({?CD,Key},LongUnixTime).
+erase_cd(Key) ->
+    put({?CD,Key},0).
+
+%% @doc 获取某年某月的天数
+get_month_days(Year, Month) ->
+	case lists:member(Month, [1,3,5,7,8,10,12]) of
+		true ->	31;
+		_ when Month == 2 ->
+			case Year rem 100 of
+				0 when Year rem 400 == 0 ->	%% 闰年
+					29;
+				0 ->	28;
+				_ when Year rem 4 == 0 ->	%% 闰年
+					29;
+				_ ->	28
+			end;
+		_ ->	30
+	end.
+
+%%%% @doc 开服时间
+%%server_open_time() ->
+%%    srv_param:get_value(?ETS_GLOBAL_PARAM, service_start_time).
+%%%% @doc 开服日期
+%%server_open_date() ->
+%%    Time = server_open_time(),
+%%    seconds_to_localtime(Time).
+%%%% @doc 开服天数
+%%server_open_days() ->
+%%    {{Year, Month, Day}, _} = util:server_open_date(),
+%%    OpenDays = calendar:date_to_gregorian_days(Year, Month, Day),
+%%    UnixDays = unixdays(),
+%%    UnixDays - OpenDays + 1.
+
+%%%% @doc 合服时间
+%%server_merge_time() ->
+%%    #server_config{merge_time = MergeTime} = srv_param:get_value(?ETS_GLOBAL_PARAM, server_config),
+%%    NowTime = unixtime(),
+%%    ?IF(MergeTime > NowTime, 0, MergeTime).
+%%%% @doc 合服日期
+%%server_merge_date() ->
+%%    seconds_to_localtime(server_merge_time()).
+%%server_merge_days() ->
+%%    {{Year, Month, Day}, _} = util:server_merge_date(),
+%%    OpenDays = calendar:date_to_gregorian_days(Year, Month, Day),
+%%    UnixDays = unixdays(),
+%%    UnixDays - OpenDays + 1.
+
+
 %% 游戏输出日志文件名
 log_filename(BaseDir) ->
     log_filename(lists:concat([BaseDir,?CONFIG(server_type),"_",?CONFIG(platform),"_",?CONFIG(prefix),?CONFIG(server_id),"_"]), ".log").
@@ -129,3 +346,12 @@ to_list(Msg) when is_integer(Msg) ->
 to_list(Msg) when is_float(Msg) -> f2s(Msg);
 to_list(Msg) when is_tuple(Msg) -> tuple_to_list(Msg);
 to_list(_) -> throw(other_value).
+
+socket_to_ip(Socket) ->
+    case inet:peername(Socket) of
+        {ok,{{A,B,C,D}, _Port}} ->
+            lists:concat([A,".",B,".",C,".",D]);
+        {error,Reason} ->
+            ?WARNING("get_ip fail,Socket:~w,Reason:~w",[Socket,Reason]),
+            ""
+    end.

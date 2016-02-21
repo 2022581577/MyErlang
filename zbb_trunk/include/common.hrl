@@ -1,9 +1,3 @@
-%%-----------------------------------------------------
-%% @Author: zhongbinbin
-%% @Email : zhongbinbin@yy.com
-%% @Create: 2015-5-20
-%% @Desc  : 公共模块头文件
-%%-----------------------------------------------------
 
 -define(CONFIG(Key), game_config:get_config(Key)).
 
@@ -45,3 +39,12 @@
 -define(GAME_STATUS_STARTING,5).
 -define(GAME_STATUS_RUNNING,6).
 -define(GAME_STATUS_STOPING,7).
+
+-define(DIFF_SECONDS_1970_1900, 2208988800).
+-define(DIFF_SECONDS_0000_1900, 62167219200).
+-define(TIMER_TEN_SEC,          10).    %% 10秒    
+-define(TIMER_ONE_MIN_SEC,      60).    %% 一分钟
+-define(TIMER_FIFTEEN_MIN_SEC,  900).   %% 15分钟
+-define(TIMER_THIRTY_MIN_SEC,   1800).  %% 30分钟
+-define(TIMER_ONE_HOUR_SEC,     3600).
+-define(TIMER_ONE_DAY_SEC,      86400).

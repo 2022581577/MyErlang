@@ -1,13 +1,17 @@
 {
-	[
-		'src/*'
-		,'src/*/*'
-		,'src/*/*/*'
-	]
-	,[
-		{i, "include/"},
-		{outdir, "ebin"},
-		inline,
-		warnings_as_errors
-	]
+	[   
+	'src/*',    
+	'src/*/*',    
+	'src/*/*/*',
+	'src/*/*/*/*'
+	]   
+	,[  
+	{i, "include/"},
+	{i, "include/inst/"},
+	{i, "include/deps/"},
+	{i, "src/deps/protobuffs/include"},
+	{outdir, "ebin"},
+	inline
+	]   
 }.
+

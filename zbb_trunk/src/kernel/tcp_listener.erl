@@ -24,7 +24,7 @@ start_link(IPAddress, Port, SocketOpts) ->
 %%--------------------------------------------------------------------
 
 init({IPAddress, Port, SocketOpts}) ->
-    process_flag(trap_exit, true),
+    process_flag(trap_exit, true),  %% 需要在进程关闭时调用terminate来关闭LSock
     case gen_tcp:listen(Port, SocketOpts) of
         {ok, LSock} ->
             lists:foreach(fun (_) ->
