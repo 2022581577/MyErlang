@@ -22,9 +22,12 @@
         ,term_to_bitstring/1
         ,string_to_term/1
         ,bitstring_to_term/1
+
+        ,prefix_server_id_str2server_id/1
         ]).
 
--export([socket_to_ip/1]).
+-export([socket_to_ip/1
+        ,md5/1]).
 
 %% 时间函数
 -export([
@@ -57,6 +60,8 @@
         %,server_merge_date/0
         %,server_merge_days/0
 		]).
+
+-export([transform_callback/1]).
 
 %%
 %% 时间函数
@@ -355,3 +360,19 @@ socket_to_ip(Socket) ->
             ?WARNING("get_ip fail,Socket:~w,Reason:~w",[Socket,Reason]),
             ""
     end.
+
+md5(S) ->
+    lists:flatten([io_lib:format("~2.16.0b", [N]) || N <- binary_to_list(erlang:md5(S))]).
+
+%% @doc 回调函数参数解析
+transform_callback({M, F, A}) ->
+    {M, F, A};
+transform_callback({F, A}) ->
+    {undefined, F, A};
+transform_callback(F) when is_function(F) ->
+    {undefined, F, []};
+transform_callback(_) ->
+    erlang:error(badargs).
+
+prefix_server_id_str2server_id(PrefixServerIDStr) ->
+    util:to_integer(PrefixServerIDStr -- util:to_list(?CONFIG(prefix))).

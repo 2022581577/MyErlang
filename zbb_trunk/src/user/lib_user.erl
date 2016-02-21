@@ -6,11 +6,11 @@
 
 -module(lib_user).
 -include("common.hrl").
--include("user.hrl").
+-include("record.hrl").
 
 -export([get_user_pid/1
         ,is_online/1
-        ,get_process_name/1
+        ,get_user_process_name/1
     ]).
 
 %% 玩家进程注册的名字只能本节点使用，
@@ -18,7 +18,7 @@
 %% 需要把玩家PID带到对应进程中使用
 %% @doc 获取玩家进程PID
 get_user_pid(UserID) ->
-    ProcessName = get_process_name(UserID),
+    ProcessName = get_user_process_name(UserID),
     case whereis(ProcessName) of
         undefined ->
             false;
@@ -33,7 +33,7 @@ get_user_pid(UserID) ->
 
 %% @doc 玩家是否在线
 is_online(UserID) ->
-    ProcessName = get_process_name(UserID),
+    ProcessName = get_user_process_name(UserID),
     case whereis(ProcessName) of
         undefined ->
             false;
@@ -42,5 +42,5 @@ is_online(UserID) ->
     end.
 
 %% @doc 玩家进程名
-get_process_name(UserID) ->
+get_user_process_name(UserID) ->
     util:to_atom(lists:concat(["user_",UserID])).

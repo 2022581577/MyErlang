@@ -1,11 +1,11 @@
 %%%----------------------------------------------------------------------
-%%% @author : kongqingquan <kqqsysu@gmail.com>
+%%% @author : zhongbinbin <binbinjnu@163.com>
 %%% @date   : 2013.06.15.
 %%% @desc   : listner 
 %%%----------------------------------------------------------------------
 
 -module(tcp_listener).
--author('kongqingquan <kqqsysu@gmail.com>').
+-author('zhongbinbin <binbinjnu@163.com>').
 -behaviour(gen_server).
 
 -include("common.hrl").

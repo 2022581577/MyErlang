@@ -12,7 +12,7 @@ test(N) ->
 
 
 test1(N) when N > 0 ->
-    [A, _, _] = L = shuffle_list([1,0,0]),
+    [_A, _, _] = L = shuffle_list([1,0,0]),
     R = lists:nth(rand(1, 3), L),
     Rc = get(rc),
     Ru = get(ru),

@@ -1,10 +1,10 @@
 %%%----------------------------------------------------------------------
-%%% @author : kongqingquan <kqqsysu@gmail.com>
+%%% @author : zhongbinbin <binbinjnu@163.com>
 %%% @date   : 2013.06.18
 %%% @desc   : 协议包解密处理
 %%%----------------------------------------------------------------------
 -module(packet_encode).
--author('kongqingquan <kqqsysu@gmail.com>').
+-author('zhongbinbin <binbinjnu@163.com>').
 -include("common.hrl").
 
 -define(PACKET_KEY,<<16#E1A8C7A63CDC721C:64>>).	%% 定义密钥

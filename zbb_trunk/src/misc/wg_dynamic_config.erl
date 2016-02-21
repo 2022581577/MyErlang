@@ -1,11 +1,10 @@
 %%%----------------------------------------------------------------------
-%%% @author : kongqingquan <kqqsysu@gmail.com>
+%%% @author : zhongbinbin <binbinjnu@163.com>
 %%% @date   : 2013.06.15.
 %%% @desc   : 动态编译模块,由 mochiweb mochiglobal.erl 修改
 %%%----------------------------------------------------------------------
 
 -module(wg_dynamic_config).
--author("kongqq <kqqsysu@gmail.com>").
 -export([get/2, get/3, list/1]).
 -export([compile/2,compile_kv/2,compile_record/2,compile/4,compile/5]).
 
