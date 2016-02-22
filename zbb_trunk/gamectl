@@ -57,7 +57,7 @@ warn() {
 
 # 获取内网ip
 getip() {
-    echo `LANG=en_US; ifconfig | grep 'inet addr:' | grep -v '127.0.0.1' | grep '192.*' | cut -d: -f 2 | awk '{print $1}'`
+    echo `LANG=en_US; ifconfig | grep 'inet addr:' | grep -v '127.0.0.1' | cut -d: -f 2 | awk '{print $1}'`
 }
 
 # 使用说明
@@ -407,9 +407,9 @@ CTL_NAME=${NAME}"_"${TIMESTAMP}
 NAME_FLAG=-name
 
 LOCAL_IP=$(getip)
-if [ "$NAME_FLAG" = "-name" -a "$HOST" !=  "$LOCAL_IP" ]; then 
-    error "节点名称:$ERLANG_NODE与本机ip:$LOCAL_IP不相符"
-fi
+#if [ "$NAME_FLAG" = "-name" -a "$HOST" !=  "$LOCAL_IP" ]; then 
+#    error "节点名称:$ERLANG_NODE与本机ip:$LOCAL_IP不相符"
+#fi
 
 if [ "$SMP" = "false" ]; then
     SMP=disable
