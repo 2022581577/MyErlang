@@ -15,31 +15,36 @@
              ,map_index_id
              ,map_type
              ,map_sub_type
-             ,user_count = 0         %%  场景玩家数
-             ,create_time = 0        %%  地图创建时间(ms)
-             ,aoi_map                %%  场景AOI数据
-             ,loop_count = 0         %%  地图当前帧
-             ,loop_time = 0          %%  当前帧时间
-             ,last_loop_count = 0    %%  上次同步时的帧数
-             ,last_user_count = 0    %%  上次同步时的场景玩家数
-             ,ai_mon_list = []       %%  进入AI行为的怪物实例ID列表
-             ,loop_user_list = []    %%  需要帧处理的玩家ID列表
-             ,create_mon_list = []   %%  要创建的怪物列表
-             ,block_list = []        %%  阻挡区[#polygon{},....]
-             ,interval_timer         %%  map timer:当怪物进入AI行为或玩家有BUFF效果时有效
+             ,user_count = 0         %% 场景玩家数
+             ,create_time = 0        %% 地图创建时间(ms)
+             ,aoi                    %% 场景AOI数据
+             ,loop_count = 0         %% 地图当前帧
+             ,loop_time = 0          %% 当前帧时间
+             ,last_loop_count = 0    %% 上次同步时的帧数
+             ,last_user_count = 0    %% 上次同步时的场景玩家数
+             ,ai_mon_list = []       %% 进入AI行为的怪物实例ID列表
+             ,loop_user_list = []    %% 需要帧处理的玩家ID列表
+             ,create_mon_list = []   %% 要创建的怪物列表
+             ,block_list = []        %% 阻挡区[#polygon{},....]
+             ,interval_timer         %% map timer:当怪物进入AI行为或玩家有BUFF效果时有效
              ,user_dict = dict:new()
              ,mon_dict = dict:new()
              ,drop_dict = dict:new()
-             ,mon_seq = 1            %%  怪物实例ID最大值
-             ,parent_pid = undefined %%  父进程(副本进程/活动进程)
+             ,mon_seq = 1            %% 怪物实例ID最大值
+             ,parent_pid = undefined %% 父进程(副本进程/活动进程)
              ,dup = undefined
-             ,ai_flag = 0            %%  0-未激活AI 1-已激活AI
-             ,quit_timer             %%  xx毫秒退出地图的TIMER
-             ,state = 0              %%  ?MAP_STATE_QUIT
+             ,ai_flag = 0            %% 0-未激活AI 1-已激活AI
+             ,quit_timer             %% xx毫秒退出地图的TIMER
+             ,state = 0              %% ?MAP_STATE_QUIT
              ,team_info = []
              ,map_refresh
              ,chest_info = []
          }).
+
+%% 地图中玩家信息
+-record(map_user, {user_id
+                  ,user_pid
+              }).
 
 %% 由地图编辑器生成的数据
 -record(tpl_map_config, {source_id                  %% 资源id，不同地图id，可能对应相同的地图资源
@@ -61,24 +66,25 @@
 
 %%% --------------- 地图网格信息相关 ---------------
 %% 地图网格信息
--record(aoi_map, {top_left                  %% 左上角坐标
-                 ,bottom_right              %% 右下角坐标
-                 ,x_count                   %% x轴grid的数量
-                 ,y_count                   %% y轴grid的数量
-                 ,grid_dict = dict:new()    %% key={grid_index_x,grid_index_y} value= #aoi_grid{}
+-record(aoi, {top_left                  %% 左上角坐标
+             ,bottom_right              %% 右下角坐标
+             ,x_count                   %% x轴grid的数量
+             ,y_count                   %% y轴grid的数量
+             ,grid_dict = dict:new()    %% key={grid_index_x,grid_index_y} value= #aoi_grid{}
              }).
      
 %% 大格子信息
 -record(aoi_grid, {key                      
                   ,grid_index_x = 0 
                   ,grid_index_y = 0 
-                  ,obj_dict = dict:new()   %% Key:MAP_OBJ_TYPE_XX Value:[#aoi_obj{},....]    
+                  ,obj_user_list = []   %% #aoi_obj{obj_type = ?AOI_OBJ_TYPE_USER}
+                  ,obj_mon_list = []    %% #aoi_obj{obj_type = ?AOI_OBJ_TYPE_MON}
               }).
+
 %% 地图内对象信息
--record(aoi_obj, {key                         %% {Id,Type}
-                 ,id 
+-record(aoi_obj, {id 
                  ,obj_type = 0               %% MAP_OBJ_TYPE_XX
-                 ,sender
+                 ,pid
              }).
 %%% --------------- 地图网格信息相关 ---------------
 

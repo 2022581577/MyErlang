@@ -50,7 +50,7 @@ do_init([UserID]) ->
         false ->
             process_flag(trap_exit,true),
             %% loop最好在前端请求了玩家初始化协议后开启（需要注意重连时loop的处理）
-            %erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, ?PLAYER_LOOP_INCREACE}),
+            erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, ?PLAYER_LOOP_INCREACE}),
             ProcessName = lib_user:get_user_process_name(UserID),
             erlang:register(ProcessName, self()),
             %% 在init的时候就load data 还是 发送一条消息给自己load data  
@@ -212,7 +212,10 @@ do_info({inet_reply,Socket,{error,Reason}},#user{user_id = UserID, other_data = 
 %    lib_user_send:set_timer_ref(?NOT_TIMER_REF),
 %    {noreply,User};
 	
-do_info({loop,Time},User) ->
+do_info({loop, _Time}, #user{other_data = #user_other{is_loop = 0}} = User) ->
+	erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, Time}),
+    {noreply, User};
+do_info({loop, Time}, User) ->  %% 前端确认登录完成后才进行loop
     %% 加个判断，判断是否在socket断掉的时候，考虑是否需要断掉loop
 	erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, Time + ?PLAYER_LOOP_INCREACE}),
     NewUser = lib_user_loop:loop(User,Time),

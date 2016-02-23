@@ -2,7 +2,8 @@
 -define(RD_USER_HRL,"rd_user.hrl").
 
 %% 玩家在进程中的临时数据
--record(user_other, {pid
+-record(user_other, {is_loop = 0        %% 前端发送协议确认正式登录完成后，才开始loop
+                    ,pid
                     ,socket
                     ,map_id
                     ,map_index_id

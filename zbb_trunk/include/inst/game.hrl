@@ -54,6 +54,6 @@
 
 %% Game Function
 -define(RECORD_FIELDS(Record),record_info(fields,Record)).
-
+-define(IF(A,B,C), case A of true -> B;_ -> C end).
 
 -endif.

@@ -21,8 +21,8 @@
 -define(GRID_WIDTH,     720).
 -define(GRID_HEIGHT,    480).
 
--define(AOI_OBJ_TYPE_USER,    0).
--define(AOI_OBJ_TYPE_MONSTER, 1).
+-define(AOI_OBJ_TYPE_USER,  0).
+-define(AOI_OBJ_TYPE_MON,   1).
 
 %% ---------- 地图掩码等配置相关 -----------
 

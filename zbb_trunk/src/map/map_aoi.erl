@@ -21,7 +21,12 @@
 %
 %-export([get_aoi/4]).
 
+%% 网格对象管理
+-export([get_grids_object/3
+        ,get_grids_object/4
+        ]).
 
+%% 网格管理
 -export([create_map_aoi/2
         ,get_aoi_grid/3
         ,get_grids/2
@@ -30,14 +35,58 @@
         ,get_grid_index_by_pos/2
         ]).
 
+%%% ---------------------------------
+%%%         网格对象管理
+%%% ---------------------------------
+%% @doc 直接获取大格子内所有type的对象信息
+get_grids_object(Aoi, GridsList, Type) ->
+	get_grids_object(Aoi, GridsList, Type, undefined).
+
+%% @doc 根据CheckFun过滤获取大格子内type的对象信息
+get_grids_object(#aoi{x_count = XCount, y_count = YCount} = Aoi, GridsList, Type, CheckFun) ->
+    F = fun({IndexX, IndexY}, AccIn) ->
+            case IndexX >= 0 andalso IndexX =< XCount andalso IndexY >= 0 andalso IndexY =< YCount of
+                true ->
+                    case get_aoi_grid(Aoi, IndexX, IndexY) of
+                        {ok, #aoi_grid{obj_user_list = ObjUserList, obj_mon_list = ObjMonList}} ->
+                            ObjectList = ?IF(Type == ?AOI_OBJ_TYPE_USER, ObjUserList, ObjMonList),
+                            CheckFun1 = 
+                                case CheckFun of 
+                                    undefined -> 
+                                        fun(Obj, CheckAccIn) -> 
+                                            [Obj | CheckAccIn] 
+                                        end;
+                                    _ ->
+                                        fun(Obj, CheckAccIn) -> 
+                                            ?IF(CheckFun(Obj), [Obj | CheckAccIn], CheckAccIn)
+                                        end
+                                end,
+                            lists:foldl(CheckFun1, Acc, ObjectList);
+                        _ ->
+                            Acc
+                    end;
+                false ->
+                    Acc
+            end
+        end,
+    lists:foldl(F, [], GridsList).
+
+%%% ---------------------------------
+%%%         网格对象管理
+%%% ---------------------------------
+
+
+%%% ---------------------------------
+%%%         网格管理
+%%% ---------------------------------
 %% @doc 创建地图数据
-%% @return #aoi_map{}
+%% @return #aoi{}
 create_map_aoi(TopLeft = {TopLeftX, TopLeftY}, BottomRight = {BottomRightX, BottomRightY}) ->
 	Width = abs(TopLeftX - BottomRightX),
 	Height = abs(TopLeftY - BottomRightY),
 	XCount = Width div ?GRID_WIDTH,
 	YCount = Height div ?GRID_HEIGHT,	
-	#aoi_map{
+	#aoi{
 		top_left = TopLeft
 		,bottom_right = BottomRight
 		,x_count = XCount
@@ -45,11 +94,11 @@ create_map_aoi(TopLeft = {TopLeftX, TopLeftY}, BottomRight = {BottomRightX, Bott
 	}.
 
 %% @doc 根据节点index得到节点信息
-%% @return {true, AoiGrid}|false
-get_aoi_grid(AoiMap, IndexX, IndexY) ->
-	case dict:find({IndexX, IndexY}, AoiMap#aoi_map.grid_dict) of
+%% @return {ok, AoiGrid}|false
+get_aoi_grid(#aoi{grid_dict = GridDict}, IndexX, IndexY) ->
+	case dict:find({IndexX, IndexY}, GridDict) of
 		{ok, AoiGrid} ->
-			{true, AoiGrid};
+			{ok, AoiGrid};
 		_ ->
 			false
 	end.
@@ -87,12 +136,16 @@ get_default_9_grid(IndexX, IndexY) ->
 get_grid_index_by_pos(X, Y) ->
 	{X div ?GRID_WIDTH, Y div ?GRID_HEIGHT}.
 
+%%% ---------------------------------
+%%%         网格管理
+%%% ---------------------------------
+
 
 %%% @doc 重连时更新AOI中的sender
-%%% @return false|{true,NewAoiMap,SeeMeGridsList}
-%update_sender(AoiMap, Id, Type, X, Y, NewSender) ->
+%%% @return false|{true,NewAoi,SeeMeGridsList}
+%update_sender(Aoi, Id, Type, X, Y, NewSender) ->
 %	{GridIndexX, GridIndexY} = get_grid_index_by_pos(X, Y),
-%	case get_grid(AoiMap, GridIndexX, GridIndexY) of
+%	case get_grid(Aoi, GridIndexX, GridIndexY) of
 %		false ->
 %			%% X,Y上无节点
 %			false;
@@ -112,32 +165,32 @@ get_grid_index_by_pos(X, Y) ->
 %					NewAoiGrid = AoiGrid#aoi_grid{
 %						object_dict = dict:store(Type, lists:keystore({Id,Type}, #aoi_obj.key, ObjectList, AoiObj#aoi_obj{sender = NewSender}), ObjectDict)								  
 %					},
-%					NewAoiMap = save_grid(AoiMap, NewAoiGrid),
-%					{true, NewAoiMap, get_default_9_grid(GridIndexX, GridIndexY)}
+%					NewAoi = save_grid(Aoi, NewAoiGrid),
+%					{true, NewAoi, get_default_9_grid(GridIndexX, GridIndexY)}
 %			end
 %	end.	
 %	
 %
 %%% @doc 插入obj
-%%% @return {true, NewAoiMap, SeeMeGridsList}
-%insert_actor(AoiMap, Id, Type, X, Y) ->
-%	insert_actor(AoiMap, Id, Type, X, Y, undefined).
-%insert_actor(AoiMap, Id, Type, X, Y, Sender) ->
+%%% @return {true, NewAoi, SeeMeGridsList}
+%insert_actor(Aoi, Id, Type, X, Y) ->
+%	insert_actor(Aoi, Id, Type, X, Y, undefined).
+%insert_actor(Aoi, Id, Type, X, Y, Sender) ->
 %	{GridIndexX, GridIndexY} = get_grid_index_by_pos(X, Y),
-%	{true, NewAoiMap} = local_insert_actor(AoiMap, Id, Type, X, Y, Sender),
-%	{true, NewAoiMap, get_default_9_grid(GridIndexX, GridIndexY)}.
+%	{true, NewAoi} = local_insert_actor(Aoi, Id, Type, X, Y, Sender),
+%	{true, NewAoi, get_default_9_grid(GridIndexX, GridIndexY)}.
 %
 %
 %%% @doc 批量插入obj
-%%% @return {true, NewAoiMap} 
-%batch_insert_actor(AoiMap, List) ->
+%%% @return {true, NewAoi} 
+%batch_insert_actor(Aoi, List) ->
 %	F = fun({Id,Type,X,Y},Acc) ->
 %		{true,Acc1} = local_insert_actor(Acc, Id, Type, X, Y, undefined),
 %		Acc1
 %	end,
-%	{true, lists:foldl(F, AoiMap, List)}.
+%	{true, lists:foldl(F, Aoi, List)}.
 %
-%local_insert_actor(AoiMap, Id, Type, X, Y, Sender) ->
+%local_insert_actor(Aoi, Id, Type, X, Y, Sender) ->
 %	{GridIndexX, GridIndexY} = get_grid_index_by_pos(X, Y),
 %	AoiObject = #aoi_obj{
 %		key = {Id,Type}
@@ -145,7 +198,7 @@ get_grid_index_by_pos(X, Y) ->
 %		,obj_type = Type
 %		,sender = Sender	  
 %	},	
-%	case get_grid(AoiMap, GridIndexX, GridIndexY) of
+%	case get_grid(Aoi, GridIndexX, GridIndexY) of
 %		false ->
 %			%% 无节点
 %			AoiGrid = #aoi_grid{
@@ -154,7 +207,7 @@ get_grid_index_by_pos(X, Y) ->
 %				,object_dict = dict:store(Type, [AoiObject], dict:new())	
 %			},
 %			
-%			{true, save_grid(AoiMap, AoiGrid)};
+%			{true, save_grid(Aoi, AoiGrid)};
 %		{true,AoiGrid} when is_record(AoiGrid, aoi_grid) ->
 %			ObjectDict = AoiGrid#aoi_grid.object_dict,
 %			ObjectList = 
@@ -168,14 +221,14 @@ get_grid_index_by_pos(X, Y) ->
 %			NewAoiGrid = AoiGrid#aoi_grid{
 %				object_dict = dict:store(Type, NewL, ObjectDict)								  
 %			},
-%			{true, save_grid(AoiMap, NewAoiGrid)}
+%			{true, save_grid(Aoi, NewAoiGrid)}
 %	end.
 %
 %%% @doc 删除obj
-%%% @return {true,NewAoiMap,SeeMeGridList}|false SeeMeList:obj所在九宫格的对象列表(包含自己)
-%delete_actor(AoiMap, Id, Type, X, Y) ->
+%%% @return {true,NewAoi,SeeMeGridList}|false SeeMeList:obj所在九宫格的对象列表(包含自己)
+%delete_actor(Aoi, Id, Type, X, Y) ->
 %	{GridIndexX, GridIndexY} = get_grid_index_by_pos(X, Y),
-%	case get_grid(AoiMap, GridIndexX, GridIndexY) of
+%	case get_grid(Aoi, GridIndexX, GridIndexY) of
 %		false ->
 %			%% X,Y上无节点
 %			false;
@@ -191,16 +244,16 @@ get_grid_index_by_pos(X, Y) ->
 %			NewAoiGrid = AoiGrid#aoi_grid{
 %				object_dict = dict:store(Type, lists:keydelete({Id,Type}, #aoi_obj.key, ObjectList), ObjectDict)								  
 %			},
-%			NewAoiMap = save_grid(AoiMap, NewAoiGrid),
-%			{true, NewAoiMap, get_default_9_grid(GridIndexX, GridIndexY)}
+%			NewAoi = save_grid(Aoi, NewAoiGrid),
+%			{true, NewAoi, get_default_9_grid(GridIndexX, GridIndexY)}
 %	end.
 %
 %
 %
 %
 %%% @doc 更新aoi_obj的坐标
-%%% @return {true, cross_grid, NewAoiMap, NewGridList, OldGridList}|{true, one_grid}|false
-%update_actor(AoiMap, Id, Type, OldX, OldY, NewX, NewY) ->
+%%% @return {true, cross_grid, NewAoi, NewGridList, OldGridList}|{true, one_grid}|false
+%update_actor(Aoi, Id, Type, OldX, OldY, NewX, NewY) ->
 %	{OldIndexX, OldIndexY} = get_grid_index_by_pos(OldX, OldY),
 %	{NewIndexX, NewIndexY} = get_grid_index_by_pos(NewX, NewY),
 %	case abs(OldIndexX - NewIndexX) =< 1 andalso abs(OldIndexY - NewIndexY) =< 1 of
@@ -212,12 +265,12 @@ get_grid_index_by_pos(X, Y) ->
 %				_ ->
 %%% 					io:format("Id:~w Type:~w OldX:~w, OldY:~w, NewX:~w, NewY:~w OldIndexX:~w, OldIndexY:~w NewIndexX:~w, NewIndexY:~w~n", [Id, Type, OldX, OldY, NewX, NewY, OldIndexX, OldIndexY, NewIndexX, NewIndexY]),					
 %					%% 跨越了单元格
-%					NewAoiMap = change_actor_grid_index(AoiMap, Id, Type, OldIndexX, OldIndexY, NewIndexX, NewIndexY),
+%					NewAoi = change_actor_grid_index(Aoi, Id, Type, OldIndexX, OldIndexY, NewIndexX, NewIndexY),
 %					
-%					{NewGridList, OldGridList} = compute_grid(OldIndexX, OldIndexY, NewIndexX, NewIndexY, AoiMap#aoi_map.x_count, AoiMap#aoi_map.y_count),
+%					{NewGridList, OldGridList} = compute_grid(OldIndexX, OldIndexY, NewIndexX, NewIndexY, Aoi#aoi.x_count, Aoi#aoi.y_count),
 %		%% 			io:format("NewGridList:~w, OldGridList:~w", [NewGridList, OldGridList]),
 %%% 					F = fun({IndexX, IndexY}, Acc) ->
-%%% 						case get_grid(NewAoiMap, IndexX, IndexY) of
+%%% 						case get_grid(NewAoi, IndexX, IndexY) of
 %%% 							{true, AoiGrid} ->
 %%% 								[AoiGrid#aoi_grid.object_list|Acc];
 %%% 							_ ->
@@ -226,19 +279,19 @@ get_grid_index_by_pos(X, Y) ->
 %%% 					end,
 %%% 					NewList2 = lists:flatten(lists:foldl(F, [], NewGridList)), 
 %%% 					OldList2 = lists:flatten(lists:foldl(F, [], OldGridList)),							
-%					{true, cross_one_grid, NewAoiMap, NewGridList, OldGridList}
+%					{true, cross_one_grid, NewAoi, NewGridList, OldGridList}
 %			end;
 %		false ->
 %			%% 跳格 非法操作
 %%%			io:format("Id:~w, OldIndexX:~w, OldIndexY:~w, NewIndexX:~w, NewIndexY:~w, NewX:~w, NewY:~w", [Id, OldIndexX, OldIndexY, NewIndexX, NewIndexY, NewX, NewY]),
 %			OldGridList = get_default_9_grid(OldIndexX, OldIndexY),
 %			NewGridList = get_default_9_grid(NewIndexX, NewIndexY),
-%			NewAoiMap = change_actor_grid_index(AoiMap, Id, Type, OldIndexX, OldIndexY, NewIndexX, NewIndexY),
-%			{true, cross_multi_grid, NewAoiMap, NewGridList, OldGridList}
+%			NewAoi = change_actor_grid_index(Aoi, Id, Type, OldIndexX, OldIndexY, NewIndexX, NewIndexY),
+%			{true, cross_multi_grid, NewAoi, NewGridList, OldGridList}
 %	end.
 %
-%change_actor_grid_index(AoiMap, Id, Type, OldIndexX, OldIndexY, NewIndexX, NewIndexY) ->
-%	{true, OldGrid} = get_grid(AoiMap, OldIndexX, OldIndexY),
+%change_actor_grid_index(Aoi, Id, Type, OldIndexX, OldIndexY, NewIndexX, NewIndexY) ->
+%	{true, OldGrid} = get_grid(Aoi, OldIndexX, OldIndexY),
 %	OldObjectDict = OldGrid#aoi_grid.object_dict,
 %	OldObjectList = 
 %		case dict:find(Type, OldObjectDict) of
@@ -251,8 +304,8 @@ get_grid_index_by_pos(X, Y) ->
 %	OldGrid1 = OldGrid#aoi_grid{
 %		object_dict = dict:store(Type, lists:keydelete({Id, Type}, #aoi_obj.key, OldObjectList), OldObjectDict)
 %	},
-%	AoiMap0 = save_grid(AoiMap, OldGrid1), 
-%	case get_grid(AoiMap0, NewIndexX, NewIndexY) of
+%	Aoi0 = save_grid(Aoi, OldGrid1), 
+%	case get_grid(Aoi0, NewIndexX, NewIndexY) of
 %		{true, NewGrid} ->
 %			NewObjectDict = NewGrid#aoi_grid.object_dict,
 %			NewObjectList = 
@@ -265,14 +318,14 @@ get_grid_index_by_pos(X, Y) ->
 %			NewGrid1 = NewGrid#aoi_grid{
 %				object_dict = dict:store(Type, lists:keystore({Id, Type}, #aoi_obj.key, NewObjectList, #aoi_obj{key = {Id,Type},id = Id,obj_type = Type,sender = Sender}), NewObjectDict)
 %			},
-%			save_grid(AoiMap0, NewGrid1);
+%			save_grid(Aoi0, NewGrid1);
 %		false ->
 %			NewGrid1 = #aoi_grid{
 %				grid_index_x = NewIndexX
 %				,grid_index_y = NewIndexY
 %				,object_dict = dict:store(Type, [#aoi_obj{key = {Id,Type},id = Id,obj_type = Type,sender = Sender}], dict:new())
 %			},
-%			save_grid(AoiMap0, NewGrid1)
+%			save_grid(Aoi0, NewGrid1)
 %	end.
 %
 %%% ------------------------------------------------------------------------------------------
@@ -490,27 +543,27 @@ get_grid_index_by_pos(X, Y) ->
 %%%  (-1, 1) {0, 1} {1, 1}
 %
 %
-%save_grid(AoiMap, AoiGrid = #aoi_grid{grid_index_x = X, grid_index_y = Y, object_dict = Dict}) ->
+%save_grid(Aoi, AoiGrid = #aoi_grid{grid_index_x = X, grid_index_y = Y, object_dict = Dict}) ->
 %	Data =
 %	case dict:size(Dict) == 0 of
 %		true ->
-%			dict:erase({X,Y}, AoiMap#aoi_map.dict);
+%			dict:erase({X,Y}, Aoi#aoi.dict);
 %		_ ->
-%			dict:store({X,Y}, AoiGrid, AoiMap#aoi_map.dict)
+%			dict:store({X,Y}, AoiGrid, Aoi#aoi.dict)
 %	end,
-%	AoiMap#aoi_map{
+%	Aoi#aoi{
 %		dict = Data 		   
 %	}.
 %
-%get_grids_object(AoiMap, GridsList, Type) ->
-%	get_grids_object(AoiMap, GridsList, Type, undefined).
+%get_grids_object(Aoi, GridsList, Type) ->
+%	get_grids_object(Aoi, GridsList, Type, undefined).
 %
-%get_grids_object(AoiMap, GridsList, Type, CheckFun) ->
+%get_grids_object(Aoi, GridsList, Type, CheckFun) ->
 %	lists:foldl(fun({IndexX,IndexY},Acc) ->
-%					case (IndexX >=0 andalso IndexX =< AoiMap#aoi_map.x_count 
-%						andalso IndexY >= 0 andalso IndexY =< AoiMap#aoi_map.y_count) of
+%					case (IndexX >=0 andalso IndexX =< Aoi#aoi.x_count 
+%						andalso IndexY >= 0 andalso IndexY =< Aoi#aoi.y_count) of
 %						true ->
-%							case get_grid(AoiMap,IndexX,IndexY) of
+%							case get_grid(Aoi,IndexX,IndexY) of
 %								{true,AoiGrid} ->
 %									ObjectList = 
 %										case dict:find(Type, AoiGrid#aoi_grid.object_dict) of
@@ -546,9 +599,9 @@ get_grid_index_by_pos(X, Y) ->
 %%% ------------------------------------------------------------------------------------------
 %%% Test functions
 %%% ------------------------------------------------------------------------------------------
-%get_aoi(AoiMap, X, Y, Type) ->
+%get_aoi(Aoi, X, Y, Type) ->
 %	{GridIndexX, GridIndexY} = get_grid_index_by_pos(X, Y),
-%	case get_grid(AoiMap, GridIndexX, GridIndexY) of
+%	case get_grid(Aoi, GridIndexX, GridIndexY) of
 %		false ->
 %			%% X,Y上无节点
 %			false;
