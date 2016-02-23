@@ -29,7 +29,7 @@ delay_send(#user{other_data = #user_other{socket = Socket}} = _User, Bin) ->
   			save_buffer(NewList),
             case L of
                 [] ->   
-                    erlang:send_after(?USER_SEND_BUFFER_TIME, self(), {state_apply, ?MODULE, nodelay_send, []});
+                    erlang:send_after(?USER_SEND_DELAY_TIME, self(), {state_apply, ?MODULE, nodelay_send, []});
                 _ ->
                     skip
             end

@@ -8,6 +8,7 @@
 
 -include("common.hrl").
 -include("record.hrl").
+-include("tpl_map.hrl").
 
 -export([send_to_self/2
         ,send_to_self/3
@@ -16,7 +17,7 @@
         ,nodelay_send_to_one/3
         ,send_to_map_all/3
         ,map_send_to_all/3
-
+        ,send_to_map_area/5
         ,map_send_to_area/5
     ]).
 
@@ -32,7 +33,7 @@ send_to_self(Cmd, Data) ->  %% 如果没有带上#user{},给自己进程发消�
 %% @doc 给某个玩家发送消息
 %% 如果是当前节点，可以使用user_id，如果不确定节点，只能使用user_pid
 send_to_one(UserX, Bin) ->
-    srv_user:cast_state_apply(UserX, {user_send, send_to_self, [Cmd, Data]}).
+    srv_user:cast_state_apply(UserX, {user_send, send_to_self, [Bin]}).
 send_to_one(UserX, Cmd, Data) ->
     {ok, Bin} = pack(1, Cmd, Data),
     send_to_one(UserX, Bin).
@@ -52,7 +53,7 @@ send_to_map_all(MapPid, Cmd, Data) ->
     srv_map:cast_state_apply(MapPid, {?MODULE, map_send_to_all, [Cmd, Data]}).
 
 %% @doc 在地图进程中发送消息给所有人
-map_send_to_all(#map{map_id = MapID, user_dict = UserDict} = Map, Cmd, Data) ->
+map_send_to_all(#map{map_id = MapID, user_dict = UserDict}, Cmd, Data) ->
     Size = dict:size(UserDict),
     {ok, Bin} = pack(Size, Cmd, Data),
     case data_map:get(MapID) of
@@ -68,10 +69,10 @@ send_to_map_area(MapPid, X, Y, Cmd, Data) ->
     srv_map:cast_state_apply(MapPid, {?MODULE, map_send_to_area, [X, Y, Cmd, Data]}).
 
 %% @doc 在地图进程中发送消息给某个区域的人
-map_send_to_area(#map{aoi = Aoi} = Map, X, Y, Cmd, Data) ->
+map_send_to_area(#map{map_id = MapID, aoi = Aoi}, X, Y, Cmd, Data) ->
     %% 根据x,y获取区域内9宫格
     GridList = map_aoi:get_grids(X, Y),
-    AoiObjList = map_aoi:get_grids_object(Aoi, GridsList, ?AOI_OBJ_TYPE_USER),
+    AoiObjList = map_aoi:get_grids_object(Aoi, GridList, ?AOI_OBJ_TYPE_USER),
     Len = length(AoiObjList),
     {ok, Bin} = pack(Len, Cmd, Data),
     case data_map:get(MapID) of
@@ -85,7 +86,7 @@ map_send_to_area(#map{aoi = Aoi} = Map, X, Y, Cmd, Data) ->
 %% @doc 打包
 %% @return {ok, IoList}|any
 %% TODO binary在进程之间共享内存，如果该信息是要发给多个玩家的，最好把iolist转成binary
-pack(0, Cmd, Data) ->   %% 没有需要发送的对象，不进行打包
+pack(0, _Cmd, _Data) ->   %% 没有需要发送的对象，不进行打包
     {ok, <<>>};
 pack(N, Cmd, Data) ->
     case game_protobuf:encode_package(Cmd, Data) of
@@ -95,7 +96,7 @@ pack(N, Cmd, Data) ->
             {ok, erlang:iolist_to_binary(IoList)};
         R ->
             R   
-    end;
+    end.
 
 
 

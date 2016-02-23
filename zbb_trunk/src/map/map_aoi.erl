@@ -61,12 +61,12 @@ get_grids_object(#aoi{x_count = XCount, y_count = YCount} = Aoi, GridsList, Type
                                             ?IF(CheckFun(Obj), [Obj | CheckAccIn], CheckAccIn)
                                         end
                                 end,
-                            lists:foldl(CheckFun1, Acc, ObjectList);
+                            lists:foldl(CheckFun1, AccIn, ObjectList);
                         _ ->
-                            Acc
+                            AccIn
                     end;
                 false ->
-                    Acc
+                    AccIn
             end
         end,
     lists:foldl(F, [], GridsList).

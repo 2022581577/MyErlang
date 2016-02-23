@@ -212,7 +212,7 @@ do_info({inet_reply,Socket,{error,Reason}},#user{user_id = UserID, other_data = 
 %    lib_user_send:set_timer_ref(?NOT_TIMER_REF),
 %    {noreply,User};
 	
-do_info({loop, _Time}, #user{other_data = #user_other{is_loop = 0}} = User) ->
+do_info({loop, Time}, #user{other_data = #user_other{is_loop = 0}} = User) ->
 	erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, Time}),
     {noreply, User};
 do_info({loop, Time}, User) ->  %% 前端确认登录完成后才进行loop
