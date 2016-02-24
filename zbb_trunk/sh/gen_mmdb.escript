@@ -127,8 +127,9 @@ fun_get2(#durable_record{name = Name, is_user = IsUser, keypos = KeyPos}) ->
             "\t\t\t?WARNING(\"Data:~w Not Exit\", [Key]),\n"
             "\t\t\tfalse;\n"
             "\t\t" ++ Var ++ " ->\n"
-            "\t\t\tets:insert(" ++ EtsName ++ ", " ++ Var ++ "),\n"
-            "\t\t\t" ++ Var ++ "\n"
+            "\t\t\t" ++ Var1 ++ " = util:to_tuple([" ++ RecordName ++ " | " ++ Var ++ "]),\n"
+            "\t\t\tets:insert(" ++ EtsName ++ ", " ++ Var1 ++ "),\n"
+            "\t\t\t" ++ Var1 ++ "\n"
             "\tend.\n\n";
         _ ->
             "\tcase db_agent_"++ RecordName ++":find_" ++ RecordName ++ "(Key) of\n"

@@ -37,8 +37,10 @@ load_user(Key) ->
 			?WARNING("Data:~w Not Exit", [Key]),
 			false;
 		USER ->
-			ets:insert(?ETS_USER, USER),
-			USER
+			USER1 = util:to_tuple([user | USER]),
+            io:format("~w", [is_record(USER1, user)]),
+			ets:insert(?ETS_USER, USER1),
+			USER1
 	end.
 
 get_user_item(Key) ->
