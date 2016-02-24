@@ -9,7 +9,8 @@
 	{i, "include/"},
 	{i, "include/inst/"},
 	{i, "include/deps/"},
-	{i, "src/deps/protobuffs/include"},
+	{i, "include/emysql/"},
+	{i, "include/tpl/"},
 	{outdir, "ebin"},
 	inline
 	]   

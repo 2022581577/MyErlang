@@ -15,6 +15,10 @@
         ,send_to_one/3
         ,nodelay_send_to_one/2
         ,nodelay_send_to_one/3
+        ,send_to_users/3
+        ,nodelay_send_to_users/3
+        ,send_to_all/2
+        ,cross_send_to_all/2
         ,send_to_map_all/3
         ,map_send_to_all/3
         ,send_to_map_area/5
@@ -46,6 +50,35 @@ nodelay_send_to_one(UserX, Bin) ->
 nodelay_send_to_one(UserX, Cmd, Data) ->
     {ok, Bin} = pack(1, Cmd, Data),
     nodelay_send_to_one(UserX, Bin).
+
+
+%% @doc 发送给多个玩家
+%% 如果是当前节点，可以使用user_id，如果不确定节点，只能使用user_pid
+send_to_users(UserXList, Cmd, Data) ->
+    {ok, Bin} = pack(length(UserXList), Cmd, Data),
+    [send_to_one(UserX, Bin) || UserX <- UserXList].
+
+%% @doc 给多个玩家直接发消息，一般用于地图中
+nodelay_send_to_users(UserXList, Cmd, Data) ->
+    {ok, Bin} = pack(length(UserXList), Cmd, Data),
+    [nodelay_send_to_one(UserX, Bin) || UserX <- UserXList].
+
+
+%% @doc 队伍广播
+%% @doc 公会广播
+
+
+%% @doc 当前节点给所有人发消息
+send_to_all(Cmd, Data) ->
+    {ok, Bin} = pack(2, Cmd, Data), %% 默认广播至少2个人
+    L = ets:tab2list(?ETS_USER_ONLINE),
+    [send_to_one(Pid, Bin) || #user_online{pid = Pid} <- L].
+
+%% @doc 在跨服节点给所有节点广播
+cross_send_to_all(Cmd, Data) ->
+    %% TODO 获取所有连接节点
+    NodeList = [],  
+    [rpc:cast(Node, ?MODULE, send_to_all, [Cmd, Data]) || Node <- NodeList].
 
 
 %% @doc 非地图进程发消息给所有人
@@ -82,6 +115,8 @@ map_send_to_area(#map{map_id = MapID, aoi = Aoi}, X, Y, Cmd, Data) ->
             [nodelay_send_to_one(E, Bin) || #aoi_obj{pid = E} <- AoiObjList]
     end.
 
+
+%% @doc TODO 地图中阵营广播(涉及到地图的阵营)
 
 %% @doc 打包
 %% @return {ok, IoList}|any

@@ -14,6 +14,7 @@
         ,to_binary/1
         ,to_float/1
         ,to_atom/1
+        ,to_tuple/1
         ,to_list/1
         ,f2s/1
         ,one_to_two/1
@@ -342,6 +343,12 @@ list_to_atom2(List) when is_list(List) ->
       {'EXIT', _} -> erlang:list_to_atom(List);
       Atom when is_atom(Atom) -> Atom
     end.
+
+%% @doc convert other type to tuple
+to_tuple(T) when is_tuple(T) -> T;
+to_tuple(T) when is_list(T) -> 
+	list_to_tuple(T);
+to_tuple(T) -> {T}.
 
 to_list(Msg) when is_list(Msg) -> Msg;
 to_list(Msg) when is_atom(Msg) -> atom_to_list(Msg);

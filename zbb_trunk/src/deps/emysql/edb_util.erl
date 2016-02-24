@@ -12,6 +12,7 @@
 
 -export([
           get_all/1,
+          get_all/2,
           get_all/3,
           get_all/4,
           get_all/5,
@@ -19,6 +20,7 @@
           get_limit/4,
           get_limit/5,
           get_row/1,
+          get_row/2,
           get_row/3,
           get_one/3]).
 
@@ -49,7 +51,7 @@ execute(Sql) ->
 execute(Pool, Sql) when is_atom(Pool) ->
     execute(Pool, Sql, []);
 execute(Sql, Args) ->
-    execute(?MYSQL_POOL, Sql, []).
+    execute(?MYSQL_POOL, Sql, Args).
 
 execute(Pool, Sql, Args) ->
     %% ?INFO("Sql:~s",[Sql]),
@@ -67,7 +69,10 @@ execute(Pool, Sql, Args) ->
 get_all(Sql) ->
     execute(Sql).
 
-%% spec get_all(Table::atom(),Fields::[atom,atom..],WhereFields::[{field,Val} or {field,= < > ,Val}])
+get_all(Table, WhereFields) ->
+    get_all(Table, [], WhereFields).
+
+%% spec get_all(Table::atom(),Fields::[atom,atom..](如果为[]，即 * ),WhereFields::[{field,Val} or {field,= < > ,Val}])
 get_all(Table,Fields,WhereFields) ->
     get_all(make_query_sql(Table,Fields,WhereFields)).
 
@@ -95,6 +100,8 @@ get_row(Sql) ->
             []
     end.
 
+get_row(Table,WhereFields)->
+    get_row(Table,[],WhereFields).
 get_row(Table,Fields,WhereFields)->
     case get_limit(Table,Fields,WhereFields,[0,1]) of
         [H | _T] ->
@@ -145,6 +152,8 @@ make_query_sql(Table,Fields,WhereFields,OrderFields,Limit)->
     LimitSql = make_limit_sql(Limit),
     lists:concat(["SELECT ",FieldsSql," FROM `",Table,"`",WhereSql,OrderSql,LimitSql]).
 
+make_fields_sql([]) ->
+    " * ";
 make_fields_sql(Fields) ->
     make_fields_sql(Fields,"","").
 make_fields_sql([],_Jion,FieldsSql) ->
@@ -303,9 +312,9 @@ quote([C | Rest], Acc) ->
 %%
 %% @spec asciz_binary(Data::binary(), Acc::list()) ->
 %%   {NewList::list(), Rest::binary()}
-asciz_binary(<<>>, Acc) ->
-    {lists:reverse(Acc), <<>>};
-asciz_binary(<<0:8, Rest/binary>>, Acc) ->
-    {lists:reverse(Acc), Rest};
-asciz_binary(<<C:8, Rest/binary>>, Acc) ->
-    asciz_binary(Rest, [C | Acc]).
+%asciz_binary(<<>>, Acc) ->
+%    {lists:reverse(Acc), <<>>};
+%asciz_binary(<<0:8, Rest/binary>>, Acc) ->
+%    {lists:reverse(Acc), Rest};
+%asciz_binary(<<C:8, Rest/binary>>, Acc) ->
+%    asciz_binary(Rest, [C | Acc]).

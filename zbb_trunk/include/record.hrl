@@ -9,6 +9,7 @@
 
 -include("rd_user.hrl").
 -include("rd_map.hrl").
+-include("rd_guild.hrl").
 
 %% 跨服服务器保存信息
 -record(cross_server_config, {merge_list = []               %% 合服列表[{{Platform, ServerID}, {Platform, MainServerID}} | _]，用于根据平台和服务器id获取主服务器id
