@@ -66,31 +66,31 @@ execute(Pool, Sql, Args) ->
             throw({mysql_error, Error})
     end.
 
-get_all(Sql) ->
-    execute(Sql).
+get_all(Table) ->
+    get_all(Table, []).
 
 get_all(Table, WhereFields) ->
     get_all(Table, [], WhereFields).
 
 %% spec get_all(Table::atom(),Fields::[atom,atom..](如果为[]，即 * ),WhereFields::[{field,Val} or {field,= < > ,Val}])
 get_all(Table,Fields,WhereFields) ->
-    get_all(make_query_sql(Table,Fields,WhereFields)).
+    get_all(Table,Fields,WhereFields,[]).
 
 get_all(Table,Fields,WhereFields,OrderFields) ->
-    get_all(make_query_sql(Table,Fields,WhereFields,OrderFields,[])).
+    get_all(Table,Fields,WhereFields,OrderFields,[]).
 
 get_all(Table,Fields,WhereFields,OrderFields,Limit) ->
-    get_all(make_query_sql(Table,Fields,WhereFields,OrderFields,Limit)).
+    execute(make_query_sql(Table,Fields,WhereFields,OrderFields,Limit)).
 
 get_limit(Sql,Limit) ->
     NewSql = lists:concat([Sql,make_limit_sql(Limit)]),
-    get_all(NewSql).
+    execute(NewSql).
 
 get_limit(Table,Fields,WhereFields,Limit) ->
-    get_all(make_query_sql(Table,Fields,WhereFields,[],Limit)).
+    execute(make_query_sql(Table,Fields,WhereFields,[],Limit)).
 
 get_limit(Table,Fields,WhereFields,OrderFields,Limit) ->
-    get_all(make_query_sql(Table,Fields,WhereFields,OrderFields,Limit)).
+    execute(make_query_sql(Table,Fields,WhereFields,OrderFields,Limit)).
 
 get_row(Sql) ->
     case get_limit(Sql,[0,1]) of
@@ -143,8 +143,6 @@ delete(Table,WhereFields,Limit)->
     Sql = lists:concat(["DELETE FROM `",Table,"` ",WhereSql,LimitSql]),
     execute(Sql).
 
-make_query_sql(Table,Fields,WhereFields)->
-   make_query_sql(Table,Fields,WhereFields,[],[]).
 make_query_sql(Table,Fields,WhereFields,OrderFields,Limit)->
     FieldsSql = make_fields_sql(Fields),
     WhereSql = make_where_sql(WhereFields),
@@ -162,6 +160,8 @@ make_fields_sql([H | T],Join,FieldsSql)->
     NewFieldsSql = lists:concat([FieldsSql,Join,"`",H,"`"]),
     make_fields_sql(T,",",NewFieldsSql).
 
+make_where_sql([]) ->
+    "";
 make_where_sql(Fields) ->
     make_where_sql(Fields,"WHERE ", "").
 make_where_sql([],_Join,WhereSql) ->

@@ -11,6 +11,7 @@
 %%% 内存数据库相关ets
 %% 玩家相关
 -define(ETS_USER,               ets_user).              %% 玩家数据的ets    #user{}
+-define(ETS_ACCOUNT_INFO,       ets_account_info).      %% 玩家账号数据信息
 -define(ETS_USER_ITEM,          ets_user_item).         %% 玩家道具数据的ets    {user_id, [#user_item{} | _]}
 %% 公共数据
 -define(ETS_GUILD,              ets_guild).             %% 公会数据的ets    #guild{}

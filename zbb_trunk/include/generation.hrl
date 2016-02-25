@@ -11,7 +11,7 @@
                     }).
 
 %% 内存数据库数据定义
--define(DURABLE_RECORD_LIST,[#durable_record{name = user, keypos = user_id, is_user = true}
+-define(DURABLE_RECORD_LIST,[#durable_record{name = user, keypos = user_id, is_user = true, is_preload = true}
                             ,#durable_record{name = user_item, is_user = true, record_list = true}
                             ,#durable_record{name = guild, keypos = guild_id, is_preload = true}
                             ]).

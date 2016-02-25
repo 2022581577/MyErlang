@@ -1,7 +1,7 @@
 %%%----------------------------------------------------------------------
 %%% @author : 
-%%% @date   : 2013.06.27
-%%% @desc   : 数据初始化模块
+%%% @date   : 2016.02.27
+%%% @desc   : ets初始化模块
 %%%----------------------------------------------------------------------
 
 -module(ets_init).
@@ -16,10 +16,6 @@ init() ->
     ets:new(?ETS_MAP_ID_LIST,[{keypos,1},named_table,public,set,{read_concurrency,true}]),                      %% 地图MapID,IndexIDList映射
     ets:new(?ETS_MAP_INFO,[{keypos,#map_info.map_inst_id},named_table,public,set,{read_concurrency,true}]),    %% 地图MapInstID:{map_id, index_id}信息映射
     ets:new(?ETS_MAP_CONFIG, [{keypos, #tpl_map_config.source_id}, named_table, public, set, {read_concurrency,true}]), %% 地图配置
-
-    %% 阻挡点信息，每个地图资源一个ets表
-    [ets:new(E, [{keypos,1},named_table,public,set,{read_concurrency,true}]) || E <- map_block:ets_map_block_name_list()],
-
 
     %ets:new(?ETS_WALK_POINT,[{keypos,#map_walk_point.map_id},named_table,public,set,{read_concurrency,true}]),                       %% 阻挡点信息
     %ets:new(?ETS_NPC, [{keypos, #npc.id}, named_table, public, set, {read_concurrency,true}]),                           %% NPC信息 
@@ -44,9 +40,13 @@ init() ->
     %ets:new(?ETS_ACROSS_USER_INFO,[{keypos,#across_user_info.user_id},named_table,public,set,{read_concurrency,true}]),     %% 参加跨服的玩家信息
 
     %ets:insert(?ETS_MAP_COUNTER,{?MAP_COUNTER,?INIT_MAP_ONLY_ID}),    
-    %
     %%% 数据包统计
     %ets:new(?ETS_PACKET_STAT,[{keypos,1},named_table,public,set,{read_concurrency,true}]),
+
+    %% 阻挡点信息，每个地图资源一个ets表
+    [ets:new(E, [{keypos,1},named_table,public,set,{read_concurrency,true}]) || E <- map_block:ets_map_block_name_list()],
+    %% 内存数据库ets表初始化
+    game_mmdb:init(),
     ok.
 
 

@@ -113,4 +113,8 @@
                       ,pid
                   }).
 
+-record(account_info, {acc_name = <<>>
+                      ,user_ids = []
+                  }).
+
 -endif.
