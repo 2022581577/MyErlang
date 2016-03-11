@@ -124,7 +124,7 @@ map_send_to_area(#map{map_id = MapID, aoi = Aoi}, X, Y, Cmd, Data) ->
 pack(0, _Cmd, _Data) ->   %% 没有需要发送的对象，不进行打包
     {ok, <<>>};
 pack(N, Cmd, Data) ->
-    case game_protobuf:encode_package(Cmd, Data) of
+    case protobuf_encode:encode(Cmd, Data) of
         {ok, IoList} when N == 1 ->  
             {ok, IoList};
         {ok, IoList} ->
