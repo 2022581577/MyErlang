@@ -8,7 +8,7 @@
 -module(game_config).
 
 -define(GAME_CONF, game_conf).
--define(GAME_CONFIG_FILE, "./config/game.config").
+-define(GAME_CONF_FILE, "./config/game.config").
 
 -export([init/0
         ,reload/0
@@ -32,9 +32,9 @@ list_config() ->
     wg_dynamic_config:list(?GAME_CONF).
 
 load_game_config() ->
-    case os:getenv("GAME_CONFIG_FILE") of
+    case os:getenv("GAME_CONF_FILE") of
         false ->
-            ConfigFile = ?GAME_CONFIG_FILE;
+            ConfigFile = ?GAME_CONF_FILE;
         ConfigFile ->
             ok
     end,

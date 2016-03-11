@@ -62,6 +62,7 @@ do_info({inet_async,Socket,_Ref,{ok,?FLASH_POLICY_REQ}},#state{socket = Socket} 
 
 %% 数据包不能大于 2^16-1(64K)
 do_info({inet_async,Socket,_Ref,{ok,<<0:16,Len:16>>}},#state{socket = Socket,packet_len = 0} = State) ->
+    ?WARNING("Len:~w", [Len]),
     %% _NewRef = async_recv(Socket,Len - ?HEADER_LENGTH ,?HEART_TIMEOUT),
     %% Len约定是已经去掉了消息头信息的长度
     _NewRef = async_recv(Socket, Len, ?HEART_TIMEOUT),  
@@ -75,7 +76,8 @@ do_info({inet_async,Socket,_Ref,{ok,Bin}},#state{socket = Socket,packet_len = 0}
 
 %% 接收协议体数据
 do_info({inet_async,Socket,_Ref,{ok,Bin}},#state{socket = Socket} = State) ->
-	case packet_encode:decode(Bin) of
+    ?INFO("Recevie Packet Length ~w,Bin:~w",[size(Bin),Bin]),
+	case protobuf_encode:decode(Bin) of
 		{Cmd,Data} ->
             %% lib_packet_monitor:check_packet_count(Cmd),
 			case routing(Cmd,Data,Socket) of

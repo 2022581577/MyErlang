@@ -21,6 +21,8 @@
 %         reset_packet_index/1
 		]).
 
+-export([get_tcp_opt/0]).
+
 %% @doc 客户端消息解密,返回 {Cmd,Data} 或 error_encry,error_crc32,packet_error,error_data
 %-ifdef(DEBUG).
 %%% DEBUG版本不验证，方便测试
@@ -116,4 +118,5 @@ save_packet_index(Time,Index,SetIndex,NewIndex) ->
 %            skip
 %    end.
 
-
+get_tcp_opt() ->
+    ?TCP_OPT.

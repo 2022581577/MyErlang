@@ -4,8 +4,13 @@
 ## author kongqingquan@foxmail.com
 
 FINDDIR=./logs
+SERVER=1
 
-file=$(find $FINDDIR -name "*.log" | sort -r | head -n 1)
+if [ $# -ne 0 ]; then
+    SERVER=$1
+fi
+
+file=$(find $FINDDIR -name "*s${SERVER}*.log" | sort -r | head -n 1)
 
 echo "$file"
 

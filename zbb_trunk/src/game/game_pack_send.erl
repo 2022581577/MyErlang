@@ -33,6 +33,8 @@
         ,map_send_to_area/5
     ]).
 
+-export([pack/3]).
+
 %% @doc 玩家进程内发送消息给自己socket，尽量带上#user{}调用send_to_self/3
 send_to_self(#user{} = User, Cmd, Data) ->
     {ok, Bin} = pack(1, Cmd, Data),
@@ -93,7 +95,7 @@ cross_send_to_all(Cmd, Data) ->
 
 
 %% @doc 非地图进程发消息给所有人
-send_to_map_all(MapPid, [{_Cmd, _Data} | _} = CmdDataList) ->
+send_to_map_all(MapPid, [{_Cmd, _Data} | _] = CmdDataList) ->
     srv_map:cast_state_apply(MapPid, {?MODULE, map_send_to_all, [CmdDataList]}).
 send_to_map_all(MapPid, Cmd, Data) ->
     send_to_map_all(MapPid, [{Cmd, Data}]).
@@ -109,7 +111,7 @@ map_send_to_all(#map{map_id = MapID, user_dict = UserDict}, CmdDataList) ->
         _ ->        %% TODO 跨服地图，看是否需要把不同节点的玩家区分出来，先发送到对应节点在
             [nodelay_send_to_one(E, Bin) || #map_user{user_pid = E} <- dict:to_list(UserDict)]
     end.
-map_send_to_all(#map{map_id = MapID, user_dict = UserDict}, Cmd, Data) ->
+map_send_to_all(Map, Cmd, Data) ->
     map_send_to_all(Map, [{Cmd, Data}]).
 
 
@@ -126,7 +128,7 @@ map_send_to_area(#map{map_id = MapID, aoi = Aoi}, X, Y, CmdDataList) ->
     GridList = map_aoi:get_grids(X, Y),
     AoiObjList = map_aoi:get_grids_object(Aoi, GridList, ?AOI_OBJ_TYPE_USER),
     Len = length(AoiObjList),
-    Bin = [begin {ok, PackBin} = pack(Size, Cmd, Data), PackBin end || {Cmd, Data} <- CmdDataList],
+    Bin = [begin {ok, PackBin} = pack(Len, Cmd, Data), PackBin end || {Cmd, Data} <- CmdDataList],
     case data_map:get(MapID) of
         #tpl_map{map_cross_type = 0} -> %% 非跨服地图
             [nodelay_send_to_one(E, Bin) || #aoi_obj{pid = E} <- AoiObjList];

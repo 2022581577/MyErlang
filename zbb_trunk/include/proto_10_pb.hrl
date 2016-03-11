@@ -68,6 +68,13 @@
 }).
 -endif.
 
+-ifndef(C2S10005_PB_H).
+-define(C2S10005_PB_H, true).
+-record(c2s10005, {
+    result = erlang:error({required, result})
+}).
+-endif.
+
 -ifndef(C2S10006_PB_H).
 -define(C2S10006_PB_H, true).
 -record(c2s10006, {

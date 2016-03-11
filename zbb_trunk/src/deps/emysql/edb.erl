@@ -84,6 +84,13 @@ check_db() ->
     Res2 = edb_util:execute(?BASE_MYSQL_POOL, lists:concat(["USE `", DbName, "`"])),
     ?WARNING("change database res:~w",[Res2]),
     %% TODO 数据库语句执行
+    %% global_data表建立
+    %Res3 = edb_util:execute(?BASE_MYSQL_POOL, <<"CREATE TABLE `global_data` (
+    %                                            `global_key` varchar(50) NOT NULL,
+    %                                            `global_value` text NOT NULL,
+    %                                            PRIMARY KEY (`global_key`)
+    %                                            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='全局信息';">>),
+    %?WARNING("create global data res:~w",[Res3]),
     %db_version:check_version(),
 
     ok.

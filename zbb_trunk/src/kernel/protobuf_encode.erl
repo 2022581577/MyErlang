@@ -23,7 +23,7 @@
 -export([
 	 	 encode/2
 		 ,encode/4
-		 ,decode/3
+		 ,decode/1
 	 	 ,decode/4
 		]).
 
@@ -36,14 +36,14 @@ encode(EncryptMode, Key, Cmd, Data) when is_tuple(Data) ->
 	Mod = get_mod(Cmd),
 	Mod1 = util:to_atom(Mod ++ "_pb"),
 	BodyIoList = Mod1:encode(Data),
-	PackageSequence = 1,
+	PackageSequence = 0,
 	IsZip = 0,
-%% 	{IsZip, _, NewBodyIoList} = zip_compress(BodyIoList),
 	%% 打包先压缩 再加密
 	IoList1 = [encode_header(PackageSequence, Cmd), BodyIoList],
 	EncryptBinary = encode_mode(EncryptMode, Key, IoList1),
-%% 	Cmd == 12003 andalso ?DEBUG("size:~w", [erlang:iolist_size([<<EncryptMode:8,IsZip:8>>, EncryptBinary])]),
-	{ok, [<<EncryptMode:8,IsZip:8>>, EncryptBinary]}.
+    FinalBinary = [<<EncryptMode:8,IsZip:8>>, EncryptBinary],
+    Len = iolist_size(FinalBinary),
+	{ok, [<<Len:32>>, FinalBinary]}.
 
 encode_header(PackageSequence, Cmd)->
 	TimeStamp = util:unixtime(),
@@ -59,7 +59,7 @@ encode_mode(_, _Key, Binary)->
 
 %% @doc 解析数据
 %% @return {ok, Cmd, Data, TimeStamp}|{fail, Msg}
-decode(EncryptMode, Key, DataBin) ->
+decode(<<EncryptMode:8, Key:8, DataBin/binary>>) ->
 	decode(EncryptMode, Key, DataBin, "c2s").
 
 decode(EncryptMode, Key, DataBin, Direction) ->

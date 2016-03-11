@@ -103,7 +103,7 @@ rpc()
     $ERL \
       $NAME_FLAG ${CTL_NAME}_ctl@$HOST \
       -noinput \
-      -pa $EBINS \
+      -pa $EBINS $PA_DEPS_EBIN\
       -setcookie ${COOKIE} \
       -s ${APP_CTL} -extra $ERLANG_NODE $@
 }
@@ -171,7 +171,7 @@ live ()
     change_ulimit
     $ERL \
       $NAME_FLAG $ERLANG_NODE \
-      -pa $EBINS \
+      -pa $EBINS $PA_DEPS_EBIN \
       -setcookie ${COOKIE} \
       -s ${APP_MOD} start \
       $ERLANG_OPTS --extra $ARGS "$@"
@@ -194,7 +194,7 @@ start ()
       $NAME_FLAG $ERLANG_NODE \
       -noinput -detached \
       -hidden \
-      -pa $EBINS \
+      -pa $EBINS $PA_DEPS_EBIN\
       -setcookie ${COOKIE} \
       -kernel error_logger silent \
       -sasl sasl_error_logger \{file,\"$SASL_LOG\"\} \
@@ -419,6 +419,9 @@ fi
 
 ERLANG_OPTS="-connect_all $CONNECT_ALL +K $POLL -smp $SMP +P $ERL_PROCESSES \
     +t 10485760 +fnu +hms 8192 +hmbs 8192 +zdbbl 81920 -v"
+
+PA_DEPS_EBIN="-pa $ROOT/deps/protobuffs/ebin \
+              -pa $ROOT/deps/meck/ebin"
 
 
 case $ARGS in
