@@ -19,7 +19,7 @@ start(Sup) ->
 
     ?GLOBAL_DATA_RAM:init(),
 
-    node_interface:set_server_starting(),
+    game_node_interface:set_server_starting(),
 
     %% 网络相关服务
     netword_service(Sup),
@@ -32,17 +32,17 @@ start(Sup) ->
     ?GLOBAL_DATA_DISK:init(),
 
     %% 各种ets初始化
-    ets_init:init(),
+    game_ets_init:init(),
 
     %% 自增id计数器模块
-    counter:init(), 
+    game_counter:init(), 
     %% 统计日志模块
     server_sup:start_child(srv_log),
     
     %% 地图管理进程
     server_sup:start_child(srv_map_manager),
 
-    node_interface:set_server_running(),
+    game_node_interface:set_server_running(),
     ok.
 
 %% 开启错误日志
@@ -73,7 +73,7 @@ mysql_service(Sup) ->
 
 %% 关闭服务
 stop() ->
-    node_interface:set_server_stoping(),
+    game_node_interface:set_server_stoping(),
     %% 踢掉玩家
 
     ?GLOBAL_DATA_DISK:stop(),

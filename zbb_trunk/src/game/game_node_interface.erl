@@ -3,7 +3,7 @@
 %%% @date   : 2016.01.04.
 %%% @desc   : 节点信息接口
 %%%----------------------------------------------------------------------
--module(node_interface).
+-module(game_node_interface).
 -include("common.hrl").
 
 -export([status/0

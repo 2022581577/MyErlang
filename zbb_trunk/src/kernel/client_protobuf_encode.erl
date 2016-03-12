@@ -2,7 +2,7 @@
 %%% @author : zhongbinbin <binbinjnu@163.com>
 %%% @date   : 2013.06.18
 %%% @desc   : 协议包解密处理
--module(protobuf_encode).
+-module(client_protobuf_encode).
 
 -compile(export_all).
 %%
@@ -10,9 +10,8 @@
 %%
 -include("common.hrl").
 
-%% 加密模式
--define(PROTO_DATA_NO_ENCRYPT, 0).  %% 不加密
--define(PROTO_DATA_RC4_ENCRYPT, 1). %% RC4加密
+-define(PROTO_DATA_NO_ENCRYPT, 0).
+-define(PROTO_DATA_RC4_ENCRYPT, 1).
 
 
 %%
@@ -33,19 +32,13 @@ encode(Cmd, Data) ->
 encode(EncryptMode, Key, Cmd, Data) when is_tuple(Data) ->
 	Mod = get_mod(Cmd),
 	Mod1 = util:to_atom(Mod ++ "_pb"),
-	BodyIoList = Mod1:encode(Data),
-	PackageSequence = 0,
-	IsZip = 0,
-	%% 打包先压缩 再加密
-	IoList1 = [encode_header(PackageSequence, Cmd), BodyIoList],
-	EncryptBinary = encode_mode(EncryptMode, Key, IoList1),
-    FinalBinary = [<<EncryptMode:8,IsZip:8>>, EncryptBinary],
-    Len = iolist_size(FinalBinary),
-	{ok, [<<Len:32>>, FinalBinary]}.
-
-encode_header(PackageSequence, Cmd)->
-	TimeStamp = util:unixtime(),
-	<<TimeStamp:32, PackageSequence:32, Cmd:16>>.
+	IoList = Mod1:encode(Data),
+    TimeStamp = util:unixtime(),
+	IoList1 = [<<TimeStamp:32, Cmd:16>>, IoList],
+	IoList2 = encode_mode(EncryptMode, Key, IoList1),
+    IoList3 = [<<EncryptMode:8>>, IoList2],
+    Len = iolist_size(IoList3),
+	{ok, [<<Len:32>>, IoList3]}.
 
 encode_mode(?PROTO_DATA_RC4_ENCRYPT, Key, Binary)->
 	State = crypto:stream_init(rc4, Key),

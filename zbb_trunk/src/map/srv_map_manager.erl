@@ -74,12 +74,12 @@ get_map_index_id(MapID) ->
         #tpl_map{map_type = ?MAP_TYPE_DUP, max_user = MaxUser} ->       %% 副本，开启一个算一个
             case ets:lookup(?ETS_MAP_ID_LIST, MapID) of
                 [{_,L}] ->
-                    IndexID = counter:get_map_index_id(MapID),
+                    IndexID = game_counter:get_map_index_id(MapID),
                     ets:insert(?ETS_MAP_ID_LIST, {MapID, L ++ [IndexID]}),
                     IndexID;
                 [] ->   %% 没有对应地图
                     ?WARNING("Open First Index! MapID:~w, MaxUser:~w",[MapID, MaxUser]),
-                    IndexID = counter:get_map_index_id(MapID),
+                    IndexID = game_counter:get_map_index_id(MapID),
                     ets:insert(?ETS_MAP_ID_LIST, {MapID, [IndexID]}),
                     IndexID
             end;
@@ -95,7 +95,7 @@ get_map_counter(MapID, 0) ->
         [{_,[IndexID |_]}] ->
             IndexID;
         [] ->
-            IndexID = counter:get_map_index_id(MapID),
+            IndexID = game_counter:get_map_index_id(MapID),
             ets:insert(?ETS_MAP_ID_LIST, {MapID, [IndexID]}),
             IndexID
     end;
@@ -106,7 +106,7 @@ get_map_counter(MapID, MaxUser) ->
             case check_map_max_user(MapID, L,MaxUser) of
                 false ->    %% 现有地图人数都满了
                     ?WARNING("Open New Index! MapID:~w, MaxUser:~w",[MapID, MaxUser]),
-                    IndexID = counter:get_map_index_id(MapID),
+                    IndexID = game_counter:get_map_index_id(MapID),
                     ets:insert(?ETS_MAP_ID_LIST, {MapID, L ++ [IndexID]}),
                     IndexID;
                 IndexID ->
@@ -114,7 +114,7 @@ get_map_counter(MapID, MaxUser) ->
             end;
         [] ->   %% 没有对应地图
             ?WARNING("Open First Index! MapID:~w, MaxUser:~w",[MapID, MaxUser]),
-            IndexID = counter:get_map_index_id(MapID),
+            IndexID = game_counter:get_map_index_id(MapID),
             ets:insert(?ETS_MAP_ID_LIST, {MapID, [IndexID]}),
             IndexID
     end.

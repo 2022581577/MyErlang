@@ -4,7 +4,7 @@
 %%% @desc   : ets初始化模块
 %%%----------------------------------------------------------------------
 
--module(ets_init).
+-module(game_ets_init).
 -include("common.hrl").
 -include("record.hrl").
 

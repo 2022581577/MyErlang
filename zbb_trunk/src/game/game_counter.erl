@@ -4,7 +4,7 @@
 %%% @desc   : 计数器模块
 %%%----------------------------------------------------------------------
 
--module(counter).
+-module(game_counter).
 -author('zhongbinbin <binbinjnu@163.com>').
 -include("common.hrl").
 

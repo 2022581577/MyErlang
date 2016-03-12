@@ -61,7 +61,7 @@ init() ->
 %% The commands status, stop and restart are defined here to ensure
 %% they are usable even if ejabberd is completely stopped.
 process(["status"]) ->
-	node_interface:status();
+	game_node_interface:status();
 
 process(["stop",_Time]) ->
     timer:apply_after(10,main,stop,[]),
