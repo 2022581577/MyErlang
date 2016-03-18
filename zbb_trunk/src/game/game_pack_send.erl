@@ -33,14 +33,14 @@
         ,map_send_to_area/5
     ]).
 
--export([pack/3]).
+-export([pack/2]).
 
 %% @doc 玩家进程内发送消息给自己socket，尽量带上#user{}调用send_to_self/3
 send_to_self(#user{} = User, Cmd, Data) ->
-    {ok, Bin} = pack(1, Cmd, Data),
+    {ok, Bin} = pack(Cmd, Data),
     user_send:delay_send(User, Bin).
 send_to_self(Cmd, Data) ->  %% 如果没有带上#user{},给自己进程发消息获取#user{}
-    {ok, Bin} = pack(1, Cmd, Data),
+    {ok, Bin} = pack(Cmd, Data),
     srv_user:cast_state_apply(self(), {user_send, delay_send, [Bin]}).
 
 
@@ -49,7 +49,7 @@ send_to_self(Cmd, Data) ->  %% 如果没有带上#user{},给自己进程发消�
 send_to_one(UserX, Bin) ->
     srv_user:cast_state_apply(UserX, {user_send, send_to_self, [Bin]}).
 send_to_one(UserX, Cmd, Data) ->
-    {ok, Bin} = pack(1, Cmd, Data),
+    {ok, Bin} = pack(Cmd, Data),
     send_to_one(UserX, Bin).
 
 
@@ -58,19 +58,19 @@ send_to_one(UserX, Cmd, Data) ->
 nodelay_send_to_one(UserX, Bin) ->
     srv_user:cast_state_apply(UserX, {user_send, nodelay_send, [Bin]}).
 nodelay_send_to_one(UserX, Cmd, Data) ->
-    {ok, Bin} = pack(1, Cmd, Data),
+    {ok, Bin} = pack(Cmd, Data),
     nodelay_send_to_one(UserX, Bin).
 
 
 %% @doc 发送给多个玩家
 %% 如果是当前节点，可以使用user_id，如果不确定节点，只能使用user_pid
 send_to_users(UserXList, Cmd, Data) ->
-    {ok, Bin} = pack(length(UserXList), Cmd, Data),
+    {ok, Bin} = pack(Cmd, Data),
     [send_to_one(UserX, Bin) || UserX <- UserXList].
 
 %% @doc 给多个玩家直接发消息，一般用于地图中
 nodelay_send_to_users(UserXList, Cmd, Data) ->
-    {ok, Bin} = pack(length(UserXList), Cmd, Data),
+    {ok, Bin} = pack(Cmd, Data),
     [nodelay_send_to_one(UserX, Bin) || UserX <- UserXList].
 
 
@@ -80,8 +80,7 @@ nodelay_send_to_users(UserXList, Cmd, Data) ->
 
 %% @doc 当前节点给所有人发消息
 send_to_all(CmdDataList) ->
-    %% 默认广播至少2个人
-    Bin = [begin {ok, PackBin} = pack(2, Cmd, Data), PackBin end || {Cmd, Data} <- CmdDataList],
+    {ok, Bin} = pack(CmdDataList),
     L = ets:tab2list(?ETS_USER_ONLINE),
     [send_to_one(Pid, Bin) || #user_online{pid = Pid} <- L].
 send_to_all(Cmd, Data) ->
@@ -103,8 +102,7 @@ send_to_map_all(MapPid, Cmd, Data) ->
 
 %% @doc 在地图进程中发送消息给所有人
 map_send_to_all(#map{map_id = MapID, user_dict = UserDict}, CmdDataList) ->
-    Size = dict:size(UserDict),
-    Bin = [begin {ok, PackBin} = pack(Size, Cmd, Data), PackBin end || {Cmd, Data} <- CmdDataList],
+    {ok, Bin} = pack(CmdDataList),
     case data_map:get(MapID) of
         #tpl_map{map_cross_type = 0} -> %% 非跨服地图
             [nodelay_send_to_one(E, Bin) || #map_user{user_pid = E} <- dict:to_list(UserDict)];
@@ -127,8 +125,7 @@ map_send_to_area(#map{map_id = MapID, aoi = Aoi}, X, Y, CmdDataList) ->
     %% 根据x,y获取区域内9宫格
     GridList = map_aoi:get_grids(X, Y),
     AoiObjList = map_aoi:get_grids_object(Aoi, GridList, ?AOI_OBJ_TYPE_USER),
-    Len = length(AoiObjList),
-    Bin = [begin {ok, PackBin} = pack(Len, Cmd, Data), PackBin end || {Cmd, Data} <- CmdDataList],
+    {ok, Bin} = pack(CmdDataList),
     case data_map:get(MapID) of
         #tpl_map{map_cross_type = 0} -> %% 非跨服地图
             [nodelay_send_to_one(E, Bin) || #aoi_obj{pid = E} <- AoiObjList];
@@ -144,18 +141,16 @@ map_send_to_area(Map, X, Y, Cmd, Data) ->
 
 %% @doc 打包
 %% @return {ok, IoList}|any
-%% TODO binary在进程之间共享内存，如果该信息是要发给多个玩家的，最好把iolist转成binary
-pack(0, _Cmd, _Data) ->   %% 没有需要发送的对象，不进行打包
-    {ok, <<>>};
-pack(N, Cmd, Data) ->
-    case protobuf_encode:encode(Cmd, Data) of
-        {ok, IoList} when N == 1 ->  
-            {ok, IoList};
-        {ok, IoList} ->
+%% TODO binary大于64字节时在进程之间共享内存，最好把iolist转成binary
+pack(CmdDataList) ->
+    IoList = [begin {ok, PackBin} = pack(Cmd, Data), PackBin end || {Cmd, Data} <- CmdDataList],
+    case erlang:iolist_size(IoList) >= 64 of
+        true ->
             {ok, erlang:iolist_to_binary(IoList)};
-        R ->
-            R   
+        _ ->
+            {ok, IoList}
     end.
-
+pack(Cmd, Data) ->
+    protobuf_encode:encode(Cmd, Data).
 
 
