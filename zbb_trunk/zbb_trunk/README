@@ -1,5 +1,0 @@
-约定:
-启动服务进程:start() 返 {ok, Pid}
-通过监控树启动进程:server_sup:start_child
-不启动进程用:init() 类似进程中的init
-本erl内的直接调用函数，返回ok
