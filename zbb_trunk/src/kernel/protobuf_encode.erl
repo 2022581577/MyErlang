@@ -31,16 +31,16 @@
 encode(Cmd, Data) ->
 	encode(?PROTO_DATA_NO_ENCRYPT, <<>>, Cmd, Data).
 encode(EncryptMode, Key, Cmd, Data) when is_tuple(Data) ->
-	Mod = get_mod(Cmd),
-	Mod1 = util:to_atom(Mod ++ "_pb"),
-	BodyIoList = Mod1:encode(Data),
+	Mod 			= get_mod(Cmd),
+	Mod1 			= util:to_atom(Mod ++ "_pb"),
+	BodyIoList 		= Mod1:encode(Data),
 	PackageSequence = 0,
-	IsZip = 0,
+	IsZip 			= 0,
 	%% 打包先压缩 再加密
-	IoList1 = [encode_header(PackageSequence, Cmd), BodyIoList],
-	EncryptBinary = encode_mode(EncryptMode, Key, IoList1),
-    FinalBinary = [<<EncryptMode:8,IsZip:8>>, EncryptBinary],
-    Len = iolist_size(FinalBinary),
+	IoList1 		= [encode_header(PackageSequence, Cmd), BodyIoList],
+	EncryptBinary 	= encode_mode(EncryptMode, Key, IoList1),
+    FinalBinary 	= [<<EncryptMode:8,IsZip:8>>, EncryptBinary],
+    Len 			= iolist_size(FinalBinary),
 	{ok, [<<Len:32>>, FinalBinary]}.
 
 encode_header(PackageSequence, Cmd)->

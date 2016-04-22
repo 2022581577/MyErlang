@@ -74,10 +74,10 @@ decode_cmd_body(Data) ->
 
 %% @doc 数据包加密
 encode(Bin) ->
-	Crc32 = erlang:crc32(Bin),
-	Encry = get_encry(),
-	NewBin = <<Crc32:32,Encry/binary,Bin/binary>>,
-	Len = byte_size(NewBin),
+	Crc32 	= erlang:crc32(Bin),
+	Encry 	= get_encry(),
+	NewBin 	= <<Crc32:32,Encry/binary,Bin/binary>>,
+	Len 	= byte_size(NewBin),
 	<<Len:32,NewBin/binary>>.
 
 get_encry() ->

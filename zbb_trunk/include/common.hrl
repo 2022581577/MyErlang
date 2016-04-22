@@ -12,5 +12,6 @@
 
 -define(TRUE, true).
 -define(FALSE, false).
+-define(UNDEFINED, undefined).
 
 -endif.

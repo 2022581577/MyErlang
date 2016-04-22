@@ -53,7 +53,8 @@
 -define(TIMER_ONE_DAY_SEC,      86400).
 
 %% Game Function
+-define(TRY(TryFun, TryErrRes), try (TryFun) catch _:_ -> (TryErrRes) end).
+-define(IF(Case,True,False), case Case of true -> True; _ -> False end).
 -define(RECORD_FIELDS(Record),record_info(fields,Record)).
--define(IF(A,B,C), case A of true -> B;_ -> C end).
 
 -endif.

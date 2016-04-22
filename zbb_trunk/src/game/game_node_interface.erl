@@ -14,14 +14,14 @@
 
 status()->
     try
-        ?GLOBAL_DATA_RAM:get(?GAME_STATUS)
+        global_data_ram:get(?GAME_STATUS)
     catch
         _:_ ->
             ?GAME_STATUS_ERROR
     end.
 
 set_status(Status) ->
-    ?GLOBAL_DATA_RAM:set(?GAME_STATUS,Status).
+    global_data_ram:set(?GAME_STATUS,Status).
 
 set_server_starting() ->
     set_status(?GAME_STATUS_STARTING).

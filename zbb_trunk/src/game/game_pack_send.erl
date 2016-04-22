@@ -123,9 +123,9 @@ send_to_map_area(MapPid, X, Y, Cmd, Data) ->
 %% @doc 在地图进程中发送消息给某个区域的人
 map_send_to_area(#map{map_id = MapID, aoi = Aoi}, X, Y, CmdDataList) ->
     %% 根据x,y获取区域内9宫格
-    GridList = map_aoi:get_grids(X, Y),
-    AoiObjList = map_aoi:get_grids_object(Aoi, GridList, ?AOI_OBJ_TYPE_USER),
-    {ok, Bin} = pack(CmdDataList),
+    GridList    = map_aoi:get_grids(X, Y),
+    AoiObjList  = map_aoi:get_grids_object(Aoi, GridList, ?AOI_OBJ_TYPE_USER),
+    {ok, Bin}   = pack(CmdDataList),
     case data_map:get(MapID) of
         #tpl_map{map_cross_type = 0} -> %% 非跨服地图
             [nodelay_send_to_one(E, Bin) || #aoi_obj{pid = E} <- AoiObjList];
