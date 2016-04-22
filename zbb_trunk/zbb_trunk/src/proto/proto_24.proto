@@ -1,0 +1,92 @@
+// 运镖模块
+package escort;
+import "common.proto";
+
+// 镖车信息
+message s2c24000 {
+	required int32 color=1;					//颜色 1-5
+	required int32 insure_num=2;			//投保次数
+	required int32 rob_num=3;				//被打劫次数
+	required int32 nfc_num=4;				//采集物数
+	required int32 start_time=5;			//开始时间戳
+	required int32 is_finish=6;				//1 已达到目的地 0 未 2 超时
+}
+
+// 查询次数信息
+message c2s24001 {
+}
+message s2c24001 {
+	required int32 color=1;					//当前镖车颜色 1-5
+	required int32 accept_num=2;			//今日已接次数
+	required int32 rob_num=3;				//今日已打劫次数
+	required int32 refresh_free_num=4;		//剩余免费刷新次数
+	required int32 seek_help_time=5;		//上次求援时间戳
+	required int32 start_time=6;			//为0则表示护送结束或者未开始 其他需要判断现在时间是否超时来显示面板
+}
+
+// 刷新品质
+// 返回 24001
+message c2s24002 {
+	required int32 is_one_key=1;			//是否一键 0 否 1 是
+}
+// 刷新成功
+message s2c24002 {
+	required int32 color=1;
+	repeated item_form list=2;		//消耗
+}
+
+// 开始运镖
+// 返回 24000
+message c2s24003 {
+	required int32 insure_num=1;			//投保数量 默认0
+}
+
+// 领取奖励
+// 发放奖励,物品通知
+message c2s24004 {
+}
+message s2c24004 {
+	repeated item_form list=1;
+}
+
+// 求援
+// 返回 24001 24005
+message c2s24005 {
+}
+message s2c24005 {
+	required p_user_little user=1;				//求援者
+	required int32 target_map_id = 2;
+	required int32 target_x = 3;
+	required int32 target_y = 4;
+	optional int32 line = 5[default=0];
+}
+
+// 飞到镖车身边 要有飞鞋
+message c2s24006 {
+}
+
+// 获取镖车位置 寻路用   场景内能找到就不要请求 影响性能
+message c2s24007 {
+}
+message s2c24007 {
+	required int32 map_id=1;
+	required int32 x=2;
+	required int32 y=3;
+	required int32 line=4;
+}
+
+// 打劫提示信息
+message s2c24008 {
+	required int32 type=1;	//1 被攻击 2 目标处于保护 3 被打劫成功 4 打劫次数不足
+	required string my_name=2;
+	required string my_guild_name=3;
+	required string tar_name=4;
+	required string tar_guild_name=5;
+}
+
+// 打劫奖励通知
+message s2c24009 {
+	required p_user_little tar=1;
+	required int32 color=2;
+	repeated item_form list=3;
+}

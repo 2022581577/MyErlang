@@ -1,0 +1,78 @@
+// 排行榜
+package rank;
+import "common.proto";
+
+//1).     %% 等级  
+//2).     %% 战斗力
+//3).     %% 圣衣
+//4).     %% 强化
+//5).     %% 宝石
+//6).     %% 坐骑
+//7).     %% 神器
+//8).     %% 翅膀
+//9).     %% 女神
+
+
+// 请求排行榜 size = 0 表示不分页
+message c2s26000 {
+	required int32 type=1;
+	required int32 size=2;		// 排行榜类型
+	required int32 page=3;
+	required int32 is_cross=4;	// 是否跨服 1 是 0 否
+}
+// 按照数组顺序名次
+message s2c26000 {
+	required int32 page=1;		// 当前页数
+	repeated p_rank list=2;
+}
+message p_rank {
+	required int64 user_id=1;
+	required int32 type=2;		// 排行榜类型
+	required int32 value1=3;	// 主值
+	required int32 value2=4;	// 副值1
+	required int32 value3=5;	// 副值2
+	required p_user user=6;
+}
+
+//  name                    type                    v1                      v2                      v3
+//  user_lv                 1                       user_lv                 exp_now                 none
+//  battlevalue             2                       battlevalue             none                    none
+//  vestment_battlevalue    3                       vestment_battlevalue    battlevalue             none
+//  stren_lv                4                       stren_lv                battlevalue             none
+//  stone_lv                5                       stone_lv                battlevalue             none
+//  ride_rank               6                       ride_rank               ride_battlevalue        battlevalue
+//  magic_rank              7                       magic_rank              magic_battlevalue       battlevalue
+//  wing_rank               8                       wing_rank               wing_battlevalue        battlevalue
+//  goddess_rank            9                       goddess_rank            goddess_battlevalue     battlevalue
+//  charm                   10                      charm                   battlevalue             0
+//  skill                   11                      skill_bv                battlevalue             0
+//  matrix_rank             12                      matrix_rank             matrix_battlevalue      battlevalue
+//  fairy_rank              13                      fairy_rank              fairy_battlevalue       battlevalue
+//  shield_rank             14                      shield_rank             shield_battlevalue      battlevalue
+//  ride_rank_ontime        101                     ride_rank               ride_star               mtime
+//  magic_rank_ontime       102                     magic_rank              magic_star              mtime
+//  wing_rank_ontime        103                     wing_rank               ride_star               mtime
+//  goddess_rank_ontime     104                     goddess_rank            goddess_star            mtime
+//  user_lv                 105                     user_lv                 0                       mtime
+//  stren_lv                106                     stren_lv                0                       mtime
+//  vestment_weapon         107                     soul_lv                 0                       mtime
+
+
+// 请求魁首信息
+message c2s26002 {
+	required int32 is_cross=1;
+}
+message s2c26002 {
+	repeated p_rank list=1;	//各个榜第一名列表 
+}
+
+// 名人堂列表
+message c2s26003 {
+}
+message s2c26003 {
+	repeated p_famous list=1;
+}
+message p_famous {
+	required int64 user_id=1;
+	required p_user user=2;
+}

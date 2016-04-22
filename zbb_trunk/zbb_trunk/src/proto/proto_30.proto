@@ -1,0 +1,49 @@
+// 成就模块
+package achieve;
+
+// 30001 当前成就信息总览
+message c2s30001 {
+}
+
+message s2c30001 {
+	required int32 achieve_num=1;       // 当前成就值
+    repeated struct_type_achieve_num list=2;    // 大类的成就值列表
+	repeated int32 finish_list=3;	    // 完成成就id列表
+	repeated int32 unfinish_list=4;	    // 未完成就id成列表
+}
+message struct_type_achieve_num {
+    required int32 type=1;              // 大类id
+    required int32 achieve_num=2;       // 成就值
+}
+
+// 30002 请求某个成就的详细信息
+message c2s30002 {
+    required int32 type=1;              // 类型
+    required int32 sub_type=2;          // 子类型
+}
+
+message s2c30002 {
+    required int32 type=1;                  // 类型
+    required int32 sub_type=2;              // 子类型
+    repeated struct_achieve_detail list=3;  // 成就信息
+}
+
+message struct_achieve_detail {
+    required int32 id=1;                    // id
+    required int32 is_finish=2;             // 是否完成 0、未完成，1、完成
+    required int32 target_num=3;            // 目标数
+    required int32 now_num=4;               // 当前完成数
+}
+
+// 30003 领取奖励
+message c2s30003 {
+    required int32 id=1;                // 奖励id
+}
+message s2c30003 {
+    repeated int32 id_list=1;           // 已领取的奖励id列表
+}
+
+// 30004 成就达成提示
+message s2c30004 {
+    required int32 id=1;                // 达成的成就id    
+}

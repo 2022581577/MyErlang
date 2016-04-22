@@ -1,0 +1,193 @@
+
+=INFO REPORT==== 2016-03-12 04:40:11 ===
+I(<0.63.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2733> +++++++++++
+
+=INFO REPORT==== 2016-03-12 04:40:11 ===
+I(<0.64.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2733> +++++++++++
+
+=INFO REPORT==== 2016-03-12 04:40:11 ===
+I(<0.65.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2733> +++++++++++
+
+=INFO REPORT==== 2016-03-12 04:40:11 ===
+I(<0.66.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2733> +++++++++++
+
+=INFO REPORT==== 2016-03-12 04:40:11 ===
+I(<0.67.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2733> +++++++++++
+
+=INFO REPORT==== 2016-03-12 04:40:11 ===
+I(<0.68.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2733> +++++++++++
+
+=INFO REPORT==== 2016-03-12 04:40:11 ===
+I(<0.69.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2733> +++++++++++
+
+=INFO REPORT==== 2016-03-12 04:40:11 ===
+I(<0.70.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2733> +++++++++++
+
+=INFO REPORT==== 2016-03-12 04:40:11 ===
+I(<0.71.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2733> +++++++++++
+
+=INFO REPORT==== 2016-03-12 04:40:11 ===
+I(<0.72.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2733> +++++++++++
+
+=INFO REPORT==== 2016-03-12 04:40:11 ===
+I(<0.74.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2738> +++++++++++
+
+=INFO REPORT==== 2016-03-12 04:40:11 ===
+I(<0.75.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2738> +++++++++++
+
+=INFO REPORT==== 2016-03-12 04:40:11 ===
+I(<0.76.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2738> +++++++++++
+
+=INFO REPORT==== 2016-03-12 04:40:11 ===
+I(<0.77.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2738> +++++++++++
+
+=INFO REPORT==== 2016-03-12 04:40:11 ===
+I(<0.78.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2738> +++++++++++
+
+=INFO REPORT==== 2016-03-12 04:40:11 ===
+I(<0.79.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2738> +++++++++++
+
+=INFO REPORT==== 2016-03-12 04:40:11 ===
+I(<0.80.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2738> +++++++++++
+
+=INFO REPORT==== 2016-03-12 04:40:11 ===
+I(<0.81.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2738> +++++++++++
+
+=INFO REPORT==== 2016-03-12 04:40:11 ===
+I(<0.82.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2738> +++++++++++
+
+=INFO REPORT==== 2016-03-12 04:40:11 ===
+I(<0.83.0>:tcp_acceptor:27) : +++++++++++ LSock:#Port<0.2738> +++++++++++
+
+=ERROR REPORT==== 2016-03-12 04:40:11 ===
+W(<0.51.0>:edb:37) : Host:[49,50,55,46,48,46,48,46,49], User:[114,111,111,116], Password:[49,50,51,52,53,54], Encode:utf8, DbName:undefined, Port:3306
+
+=ERROR REPORT==== 2016-03-12 04:40:12 ===
+W(<0.51.0>:edb:75) : have database db_name:"zbb_2"
+
+=ERROR REPORT==== 2016-03-12 04:40:13 ===
+W(<0.51.0>:edb:85) : change database res:0
+
+=INFO REPORT==== 2016-03-12 04:41:02 ===
+I(<0.130.0>:srv_reader:39) : Set Socket:#Port<0.3467>
+
+=ERROR REPORT==== 2016-03-12 04:41:16 ===
+W(<0.130.0>:srv_reader:65) : Len:14
+
+=INFO REPORT==== 2016-03-12 04:41:16 ===
+I(<0.130.0>:srv_reader:79) : Recevie Packet Length 14,Bin:<<0,0,86,227,45,87,0,0,0,1,39,21,8,1>>
+
+=ERROR REPORT==== 2016-03-12 04:41:16 ===
+W(<0.130.0>:packet_encode:49) : Error Crc32:4261914721,ClientCrc32:22243,Data:<<8,1>>
+
+=ERROR REPORT==== 2016-03-12 04:41:16 ===
+E(<0.130.0>:game_gen_server:109) : srv_reader error reason of do_info,Reason:undef,Info:{inet_async,#Port<0.3467>,63,{ok,<<0,0,86,227,45,87,0,0,0,1,39,21,8,1>>}},[{util,get_ip,[#Port<0.3467>],[]},{srv_reader,do_info,2,[{file,[115,114,99,47,107,101,114,110,101,108,47,115,114,118,95,114,101,97,100,101,114,46,101,114,108]},{line,93}]},{game_gen_server,handle_info,2,[{file,[115,114,99,47,107,101,114,110,101,108,47,103,97,109,101,95,103,101,110,95,115,101,114,118,101,114,46,101,114,108]},{line,106}]},{gen_server,try_dispatch,4,[{file,[103,101,110,95,115,101,114,118,101,114,46,101,114,108]},{line,593}]},{gen_server,handle_msg,5,[{file,[103,101,110,95,115,101,114,118,101,114,46,101,114,108]},{line,659}]},{proc_lib,init_p_do_apply,3,[{file,[112,114,111,99,95,108,105,98,46,101,114,108]},{line,237}]}]
+
+=INFO REPORT==== 2016-03-12 05:14:30 ===
+I(<0.133.0>:srv_reader:39) : Set Socket:#Port<0.3476>
+
+=ERROR REPORT==== 2016-03-12 05:14:41 ===
+W(<0.133.0>:srv_reader:65) : Len:14
+
+=INFO REPORT==== 2016-03-12 05:14:41 ===
+I(<0.133.0>:srv_reader:79) : Recevie Packet Length 14,Bin:<<0,0,86,227,53,50,0,0,0,1,39,21,8,1>>
+
+=ERROR REPORT==== 2016-03-12 05:14:41 ===
+W(<0.133.0>:packet_encode:49) : Error Crc32:4261914721,ClientCrc32:22243,Data:<<8,1>>
+
+=ERROR REPORT==== 2016-03-12 05:14:41 ===
+E(<0.133.0>:game_gen_server:109) : srv_reader error reason of do_info,Reason:undef,Info:{inet_async,#Port<0.3476>,66,{ok,<<0,0,86,227,53,50,0,0,0,1,39,21,8,1>>}},[{util,get_ip,[#Port<0.3476>],[]},{srv_reader,do_info,2,[{file,[115,114,99,47,107,101,114,110,101,108,47,115,114,118,95,114,101,97,100,101,114,46,101,114,108]},{line,93}]},{game_gen_server,handle_info,2,[{file,[115,114,99,47,107,101,114,110,101,108,47,103,97,109,101,95,103,101,110,95,115,101,114,118,101,114,46,101,114,108]},{line,106}]},{gen_server,try_dispatch,4,[{file,[103,101,110,95,115,101,114,118,101,114,46,101,114,108]},{line,593}]},{gen_server,handle_msg,5,[{file,[103,101,110,95,115,101,114,118,101,114,46,101,114,108]},{line,659}]},{proc_lib,init_p_do_apply,3,[{file,[112,114,111,99,95,108,105,98,46,101,114,108]},{line,237}]}]
+
+=ERROR REPORT==== 2016-03-12 05:15:32 ===
+W(<0.139.0>:game_reloader:60) : all module:[]
+
+=INFO REPORT==== 2016-03-12 05:15:50 ===
+I(<0.145.0>:srv_reader:39) : Set Socket:#Port<0.6855>
+
+=ERROR REPORT==== 2016-03-12 05:15:53 ===
+W(<0.145.0>:srv_reader:65) : Len:14
+
+=INFO REPORT==== 2016-03-12 05:15:53 ===
+I(<0.145.0>:srv_reader:79) : Recevie Packet Length 14,Bin:<<0,0,86,227,53,50,0,0,0,1,39,21,8,1>>
+
+=ERROR REPORT==== 2016-03-12 05:15:53 ===
+W(<0.145.0>:packet_encode:49) : Error Crc32:4261914721,ClientCrc32:22243,Data:<<8,1>>
+
+=ERROR REPORT==== 2016-03-12 05:15:53 ===
+E(<0.145.0>:game_gen_server:109) : srv_reader error reason of do_info,Reason:undef,Info:{inet_async,#Port<0.6855>,69,{ok,<<0,0,86,227,53,50,0,0,0,1,39,21,8,1>>}},[{util,get_ip,[#Port<0.6855>],[]},{srv_reader,do_info,2,[{file,[115,114,99,47,107,101,114,110,101,108,47,115,114,118,95,114,101,97,100,101,114,46,101,114,108]},{line,93}]},{game_gen_server,handle_info,2,[{file,[115,114,99,47,107,101,114,110,101,108,47,103,97,109,101,95,103,101,110,95,115,101,114,118,101,114,46,101,114,108]},{line,106}]},{gen_server,try_dispatch,4,[{file,[103,101,110,95,115,101,114,118,101,114,46,101,114,108]},{line,593}]},{gen_server,handle_msg,5,[{file,[103,101,110,95,115,101,114,118,101,114,46,101,114,108]},{line,659}]},{proc_lib,init_p_do_apply,3,[{file,[112,114,111,99,95,108,105,98,46,101,114,108]},{line,237}]}]
+
+=INFO REPORT==== 2016-03-12 05:16:08 ===
+    application: sasl
+    exited: stopped
+    type: temporary
+
+=ERROR REPORT==== 2016-03-12 05:16:08 ===
+W(<0.73.0>:tcp_listener:50) : Socket:#Port<0.2738> close,Reason:shutdown
+
+=ERROR REPORT==== 2016-03-12 05:16:08 ===
+W(<0.74.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2738>
+
+=ERROR REPORT==== 2016-03-12 05:16:08 ===
+W(<0.75.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2738>
+
+=ERROR REPORT==== 2016-03-12 05:16:08 ===
+W(<0.76.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2738>
+
+=ERROR REPORT==== 2016-03-12 05:16:08 ===
+W(<0.77.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2738>
+
+=ERROR REPORT==== 2016-03-12 05:16:08 ===
+W(<0.78.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2738>
+
+=ERROR REPORT==== 2016-03-12 05:16:08 ===
+W(<0.79.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2738>
+
+=ERROR REPORT==== 2016-03-12 05:16:08 ===
+W(<0.80.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2738>
+
+=ERROR REPORT==== 2016-03-12 05:16:08 ===
+W(<0.81.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2738>
+
+=ERROR REPORT==== 2016-03-12 05:16:08 ===
+W(<0.82.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2738>
+
+=ERROR REPORT==== 2016-03-12 05:16:08 ===
+W(<0.83.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2738>
+
+=ERROR REPORT==== 2016-03-12 05:16:08 ===
+W(<0.62.0>:tcp_listener:50) : Socket:#Port<0.2733> close,Reason:shutdown
+
+=ERROR REPORT==== 2016-03-12 05:16:08 ===
+W(<0.66.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2733>
+
+=ERROR REPORT==== 2016-03-12 05:16:08 ===
+W(<0.67.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2733>
+
+=ERROR REPORT==== 2016-03-12 05:16:08 ===
+W(<0.68.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2733>
+
+=ERROR REPORT==== 2016-03-12 05:16:08 ===
+W(<0.69.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2733>
+
+=ERROR REPORT==== 2016-03-12 05:16:08 ===
+W(<0.70.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2733>
+
+=ERROR REPORT==== 2016-03-12 05:16:08 ===
+W(<0.71.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2733>
+
+=ERROR REPORT==== 2016-03-12 05:16:08 ===
+W(<0.72.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2733>
+
+=ERROR REPORT==== 2016-03-12 05:16:08 ===
+W(<0.63.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2733>
+
+=ERROR REPORT==== 2016-03-12 05:16:08 ===
+W(<0.64.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2733>
+
+=ERROR REPORT==== 2016-03-12 05:16:08 ===
+W(<0.65.0>:tcp_acceptor:54) : LSock Colsed:#Port<0.2733>
+
+=INFO REPORT==== 2016-03-12 05:16:08 ===
+    application: server
+    exited: stopped
+    type: temporary

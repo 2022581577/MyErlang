@@ -1,0 +1,605 @@
+// 帮会模块
+package guild;
+import "common.proto";
+
+// 22000 查询帮派列表
+message c2s22000 {
+    required int32 page=1;
+    required int32 size=2;
+}
+// 成功返回 22000 否则 22009
+message s2c22000 {
+    repeated p_guild list=1;  //已经排序
+}
+message p_guild {
+    required int32 id=1;
+    required string name=2;
+    required int32 lv=3;
+    required int32 member_num=4;
+    required int32 server_no=5;
+    required int32 is_apply=6;      	//1 已经申请  0 未申请
+	required int32 flag_id=7;
+	required int32 bv_total=8;			// 总战斗力
+	required int32 buy_size_num=9;		// 购买上限次数
+    required p_user_little leader=10;	// 会长信息
+}
+
+// 22001 查询帮会信息
+message c2s22001 {
+    required int32 id=1;    //帮会id
+}
+// 成功返回 22001 否则 22009
+message s2c22001 {
+    required int32 id=1;
+    required string name=2;
+    required int32 lv=3;
+    required int32 member_num=4;
+    required int32 server_no=5;
+    required int32 exp=6;
+    required string notice=7;
+    required string yy=8;
+    required string qq=9;
+    repeated auto_allow auto_allow_list=10;   //自动审批条件列表
+    required int32 flag_lv=11;   		//旗帜等级
+    required int32 tree_lv=12;   		//神树等级
+    required int32 tree_start_time=13;   		//神树开启时间
+	required int32 dup_start_time=14;		//行会副本开启时间
+	required int32 dup_lv=15;		//行会副本怪物等级
+	required int32 flag_id=16;
+	required int32 buy_size_num=17;	//购买上限次数
+	required p_user_little leader=18;	// 会长信息
+}
+message p_guild_apply {
+    required p_user user=1;	//申请者信息
+    required int32 time=2;  //申请时间 时间戳
+}
+message p_guild_invite {
+	required p_user_little inviter=1;	//邀请者
+	required p_user_little tar=2;	//被邀请者
+	required int32 time=3;
+}
+message auto_allow {
+	required int32 key=1;		// 1 vip 2 等级 3 战斗力
+	required int32 value=2;
+}
+
+// 22002 成员列表
+message c2s22002 {
+    required int32 id=1;    //帮会id
+}
+// 成功返回 22002 否则 22009
+message s2c22002 {
+    required int32 id=1;    //帮会id
+    repeated p_guild_member list=2;
+}
+message p_guild_member{
+    required p_user user=1;					//玩家信息
+    required int32 offline_time=2;          //离线时间(秒) 0表示在线
+    required int32 contribute=3;          //当前剩余贡献
+    required int32 contribute_total=4;    //总贡献
+    required int32 pos=5;    				//职位
+}
+
+// 22003 创建帮派
+message c2s22003 {
+    required string name=1;
+	required int32 flag_id=2;
+}
+// 成功返回 22010 否则 22009
+
+// 22004 申请加入
+message c2s22004 {
+    required int32 id=1;
+}
+// 成功自身返回 22009 帮派对应人员返回 22001
+// 失败返回 22009
+
+// 22005 审批
+message c2s22005 {
+    required int64 tar_id=1;       //申请人id
+    required int32 is_allow=2;       //1 允许 0不允许
+}
+// 失败返回 22009 成功 帮派对应人员返回 22001 22011
+
+// 22006 退出
+message c2s22006 {
+}
+// 失败返回 22009 
+// 成功自身返回 22010 帮派成员成员返回 22011
+
+// 22007 改变职位
+message c2s22007 {
+    required int64 tar_id=1;        //目标user_id
+    required int32 pos=2;           //新职位
+}
+// 失败返回 22009 
+// 成功 帮派成员成员返回 22012 目标返回 22010
+
+// 22008 踢人
+message c2s22008 {
+    required int64 tar_id=1;        //目标user_id
+}
+// 失败返回 22009 
+// 成功 帮派成员成员返回 22011 目标返回 22010
+
+// 22009 code 返回
+//0 成功
+//1 已存在
+//2 已有帮派
+//3 没有帮派
+//4 没有权限
+//5 缺钱
+//6 人数已满
+//7 帮派不存在
+//8 目标非法
+//9 不足
+//10).    %% 申请已存在
+//11).    %% 物品申请列表满
+//12).    %% 申请成功
+//13).    %% 分配成功
+//14  冷却中
+// 15 宝箱成功
+// 16 无法开启神树
+// 17 目标任务已完
+// 18 被刷次数满
+// 19 活动进行中
+// 20).    %% 红包领完了
+// 21).    %% 领取过这个红包
+// 22).    %% 升级成功
+// 23).    %% 刷新成功
+// 24).	%% 购买成功
+// 25).    %% 销毁成功成功
+message s2c22009 {
+    required int32 code=1;
+}
+
+// 22010 自身帮会信息
+message s2c22010 {
+    required int32 guild_id=1;              //0表示没有
+    required string guild_name=2;
+    required int32 guild_pos=3;
+    required int32 contribute=4;      		//剩余贡献
+    required int32 contribute_total=5;      //历史总贡献
+    required int32 flag_lv=6;      //旗帜等级
+    required int32 daily_award=7;      //每日宝箱 1 已领取  0 未领取
+    required int32 lv_award=8;      //帮派等级宝箱 已领取到哪个帮派等级
+    required int32 disband_time=9;      //上次解散帮派时间
+    required int32 task_refresh_num=10;      //已刷新任务次数
+	required int32 domain_award_flag=11;	//已领取奖励领地id列表
+	required int32 join_time=12;	//已领取奖励领地id列表
+	required int32 now_time=13;	
+	required int32 is_first_join=14;	// 1 是 0 不是	
+	repeated p_bless bless_info=15;	// 祝福次数
+}
+message p_bless {
+	required int32 type=1;		//祝福类型
+	required int32 num=2;		//次数
+}
+
+// 22011 成员变动
+message s2c22011 {
+    required int32 type=1;                  //0退出 1 加入 2 今日第一次加入
+    required p_user_little user=2;			//玩家信息
+}
+
+// 22012 职位变更
+message s2c22012 {
+    required int32 pos=1;                   //职位
+	required p_user_little user=2;			//玩家信息
+}
+
+// 22013 邀请
+message c2s22013 {
+	required int64 tar_id=1;
+}
+// 被邀请通知 
+message s2c22013 {
+	required int32 guild_id=1;
+	required string guild_name=2;
+	required int32 guild_level=3;
+	required p_user_little leader=4;	//玩家信息
+}
+
+// 22014 邀请回馈
+message c2s22014 {
+	required int32 guild_id=1;
+	required int32 reply=2;		//1同意 0拒绝
+}
+
+// 22015 弹劾
+message c2s22015 {
+}
+
+// 22016 改变公告/yy/qq
+message c2s22016 {
+	required string msg=1;
+	required string yy=2;
+	required string qq=3;
+}
+
+// 22017 设置自动批准条件
+message c2s22017 {
+	repeated auto_allow auto_allow_list=1;   //自动审批条件列表
+}
+
+// 22018 查询申请/邀请列表
+message c2s22018 {
+}
+message s2c22018 {
+    repeated p_guild_apply apply_list=1;   //有权限的人可见,否则空列表
+    repeated p_guild_invite invite_list=2;   //有权限的人可见,否则空列表
+}
+
+// 22019 申请/邀请列表 变化 
+// 新增的数据如果超出限制  直接移除最先得
+// 如果已存在 则替换
+message s2c22019 {
+	repeated p_guild_apply apply_list=1; // 新增
+	repeated p_guild_invite invite_list=2; // 新增
+	repeated int64 apply_deletes=3;	// 删除的列表  user_id
+	repeated int64 invite_deletes=4; //删除
+}
+
+// 转让会长
+message c2s22020 {
+	required int64 tar_id=1;
+}
+
+// 捐献 默认捐献非绑定 成功会更新自身贡献信息   帮派贡献列表等需要请求
+message c2s22021 {
+	repeated item_info list = 1;
+}
+message item_info {
+	required int32 item_tpl_id = 1;
+	required int32 num = 2;
+}
+
+// 请求今日/总 贡献信息
+message c2s22022 {
+}
+message s2c22022 {
+	repeated guild_contribute list = 1;
+}
+message guild_contribute {
+	required p_user_little user=1;
+	required int32 contribute_today=2;
+	required int32 contribute_total=3;
+}
+
+// 请求仓库列表
+message c2s22023 {
+}
+message s2c22023 {
+	repeated p_guild_item list=1;
+}
+message p_guild_item {
+	required int64 id=1;
+	required item_form item=2;
+}
+
+// 捐献物品 仓库更新需要自己请求
+message c2s22024 {
+	required int64 item_id=1;	//物品唯一id
+	required int32 num=2;		//捐献数量
+}
+
+// 申请物品
+message c2s22025 {
+	required int64 item_id=1; //物品id
+	required int32 num=2;
+}
+
+// 查看物品申请列表
+message c2s22026 {
+}
+message s2c22026 {
+	repeated item_apply list=1;
+}
+message item_apply {
+	required p_user_little user=1;
+	required int32 id=2;		//申请id
+	required int32 time=3;
+	required int64 item_id=4;	//物品id
+	required item_form item=5;	//申请物品信息
+}
+
+// 审批物品申请
+message c2s22027 {
+	required int32 id=1; 	//申请id
+	required int32 is_allow=3;  // 1 允许 0 不允许
+}
+
+// 分配物品
+message c2s22028 {
+	repeated item_allot list=1;
+	required int64 tar_id=2;	//对象ID
+}
+
+message item_allot {
+	required int64 item_id=1;	//物品id
+	required int32 num=2;		//数量
+}
+
+// 查看帮派仓库日志
+message c2s22029 {
+}
+message s2c22029 {
+	repeated item_log list = 1;
+}
+message item_log {
+	required p_user_little operator=1;	//操作者
+	required int32 op=2;		//操作 1 取出 2 放入 3 审批 4 分配 5 销毁
+	required int32 time=3;
+	required item_form item=4;
+	required p_user_little tar=5;	//接受者
+}
+
+// 领取每日宝箱
+message c2s22031 {
+}
+
+// 领取等级宝箱
+message c2s22032 {
+}
+
+// 自身任务信息
+message c2s22033 {
+}
+message s2c22033 {
+	required int32 task_id=1;
+	required int32 state=2;			// 0 未接 1 已接 2 已完成 3 失败
+	required int32 color=3;			// 颜色
+	repeated p_task_log list=4;		// 日志 根据日志判断能否邀请对方
+	required int32 help_num=5;		// 已帮助次数
+	required int32 invite_num=6;	// 已邀请次数
+	repeated item_form awards=7;
+	required int32 luck=8;
+}
+
+message p_task_log {
+	required p_user_little user=1;			// 操作者
+	required p_user_little tar=2;			// 目标
+	required int32 color=3;
+}
+
+// 任务信息表
+message c2s22034 {
+}
+message s2c22034 {
+	repeated p_guild_task list=1;	//跟新新增信息
+	repeated int64 deletes=2;		//删除玩家id列表
+}
+
+message p_guild_task {
+	required p_user user=1;
+	required int32 luck=2;		// 手气星级
+	required int32 task_id=3;
+	required int32 state=4;		// 任务状态
+	required int32 color=5;
+	required int32 help_num=6;		// 已帮助次数
+	required int32 invite_num=7;	// 已邀请次数
+	required int32 is_helped=8;	// 我是否帮助过他 1 是 0 否
+}
+
+// 邀请刷新任务
+message c2s22035 {
+	required int64 tar_id=1;
+}
+// 邀请通知
+message s2c22035 {
+	required p_user_little user=1;
+}
+
+// 刷新任务品质 通知自己 22034 22033
+message c2s22036 {
+	required int64 tar_id=1;
+}
+
+// 刷新任务类型 返回 22010 22033
+message c2s22037 {
+}
+
+// 接受任务 返回 22033
+message c2s22038 {
+}
+
+// 帮会boss通关记录
+message c2s22039 {
+}
+message s2c22039 {
+	repeated dup_log list=1;
+}
+message dup_log {
+	required int32 dup_tpl_id=1;
+	required p_user_little user=2;
+}
+
+
+// 神树信息面板 进入场景推送 经验前段自行统计
+message s2c22041 {
+	required int32 guild_id = 1;		// 神树所属帮会id
+	required int32 state = 2;			// 神树状态 0 生长 1 成熟 2 结果 3 收获
+	required int32 hp =3;				// 神树剩余成长值
+	required int32 ret_time = 4;	// 下阶段剩余时间 ms
+}
+
+// 我的采集信息
+message s2c22042 {
+	required int32 guild_id = 1;	// 当前地图神树所属帮会id
+	required int32 num = 2;			// 我采集此树的次数
+	required int32 exp = 3;			// 我在这张地图获得的经验(本字段进入场景是数字有效,变化不会通知)
+}
+
+
+// 进入秘境神树地图
+message c2s22045 {
+	required int32 guild_id=1;			// 目标帮会id
+}
+
+
+// 进入行会地图
+message c2s22047 {
+}
+
+// 行会副本信息
+message s2c22048 {
+	required int32 mon_lv = 1;		// 黑龙登记
+	required int32 score = 2;		// 当前积分
+	required int32 time=3;			// 副本剩余时间
+	required int32 min_score=4;		// 获得个人奖励需要积分
+	repeated dup_score list=5;		// 信息列表
+}
+message dup_score {
+	required p_user_little user=1;		//玩家i
+	required int32 value=2;			//伤害
+	required int32 value1=3;		//积分
+}
+
+// 个人经验信息
+message s2c22049 {
+	required int32 exp=1;
+}
+
+// 结算奖励
+message s2c22050 {
+	required int32 n=4;						//奖励档次
+	required int32 mon_lv=5;				//黑龙等级
+	repeated item_form list_personal=1;		//自身奖励
+	repeated item_form list_guild=2;		//仓库奖励
+	required int32 guild_exp=3;				//公会资金
+}
+
+// 副本排行榜
+message c2s22051 {
+}
+message s2c22051 {
+	repeated p_guild_dup list=1;
+}
+message p_guild_dup {
+	required int32 guild_id=1;
+	required string guild_name=2;
+	required int32 mon_lv=3;
+	required int32 score=4;
+	required p_user_little leader=5;
+}
+
+// 提交龙蛋
+message c2s22052 {
+}
+
+// 领取号角红包
+message c2s22053 {
+	required int32 id=1;	//红包id
+}
+message s2c22053 {
+	required int32 bgold=1;	//领取绑钻数量
+}
+
+// 神树采集收获通知
+message s2c22054 {
+	required int32 guild_id=1;		//被采集的树所属帮会  判断是否抢夺
+	repeated item_form list=2;
+}
+
+//领取领地占有奖励
+message c2s22055 {
+
+}
+
+// 放弃龙蛋
+message c2s22056 {
+}
+
+// 红包信息
+message s2c22057 {
+	required int32 id=1;			//红包id
+	required p_user_little user=2;		//所属玩家
+	required int32 value_max=3;		//红包总额度
+	required int32 value=4;			//红包剩余额度
+	required int32 num=5;			//红包总数
+	repeated red_get_info list=6;	//领取信息
+}
+message red_get_info {
+	required p_user_little user=1;		//玩家
+	required int32 value=2;			//领取数量
+}
+
+// 土豪红包列表 请求返回 s2c22058 s2c22059
+message c2s22058 {
+}
+// 土豪红包列表
+message s2c22058 {
+	repeated p_guild_redbag list = 1;
+}
+message p_guild_redbag {
+	required p_user_little user=1;		//所属玩家
+	required int32 type=2;			//红包类型
+	repeated int64 list=3;			//领取过得玩家id列表
+}
+
+// 我的土豪红包信息
+message s2c22059 {
+	repeated int32 list=1;			//可开启红包类型列表
+	repeated p_redbag_num list2=2;	//今日领取红包信息
+	required int32 num=3;			//已消费额度
+}
+message p_redbag_num {
+	required int32 type=1;			//红包类型
+	required int32 num=2;			//该类型今日已领取数量
+}
+
+// 开启土豪红包 开启成功返回 s2c22058 s2c22059
+message c2s22060 {
+	required int32 type=1;			//开启得类型
+}
+
+// 领取土豪红包 领取成功返回 s2c22058 s2c22059
+message c2s22061 {
+	required int64 user_id=1;		//所属玩家id
+	required int32 type=2;			//红包类型
+}
+message s2c22061 {
+	required int32 code=1;			// 0 成功 1 已完 2 不存在的红包
+}
+
+// 购买上限
+message c2s22062 {
+}
+
+// 销毁物品
+message c2s22063 {
+	repeated int64 item_id_list=1;	// 仓库物品id
+}
+
+// 祝福 对自身返回 22010 对目标发送 22064
+message c2s22064 {
+	required int64 tar_id=1;		// 目标id
+	required int32 type=2;			// 祝福类型
+}
+// 被祝福通知
+message s2c22064 {
+	required int32 type=1;			// 祝福类型
+	required p_user_little user=2;	// 祝福者信息
+}
+
+//帮派战对战查询
+message c2s22065{
+}
+
+message s2c22065 {
+		message room{
+			required int32 room_index = 1;
+			required int32 guild_id_1 = 2;
+			required int32 guild_id_2 = 3;
+			required int32 win_guild_id = 4; //0 表示未战
+			required int32 round = 5;  //轮
+		}
+    repeated p_guild list=1;  //已经排序
+    repeated room room_list = 2;
+    required int32 round = 3;
+    required int32 win_guild_id = 4;
+}
+
+message s2c22066 {
+	required int32 num=1;		// 行会仓库已使用格子数
+}

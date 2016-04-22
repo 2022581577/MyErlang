@@ -1,0 +1,316 @@
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:58 ===
+          supervisor: {local,sasl_safe_sup}
+             started: [{pid,<0.45.0>},
+                       {name,alarm_handler},
+                       {mfargs,{alarm_handler,start_link,[]}},
+                       {restart_type,permanent},
+                       {shutdown,2000},
+                       {child_type,worker}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:58 ===
+          supervisor: {local,sasl_safe_sup}
+             started: [{pid,<0.46.0>},
+                       {name,overload},
+                       {mfargs,{overload,start_link,[]}},
+                       {restart_type,permanent},
+                       {shutdown,2000},
+                       {child_type,worker}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:58 ===
+          supervisor: {local,sasl_sup}
+             started: [{pid,<0.44.0>},
+                       {name,sasl_safe_sup},
+                       {mfargs,
+                           {supervisor,start_link,
+                               [{local,sasl_safe_sup},sasl,safe]}},
+                       {restart_type,permanent},
+                       {shutdown,infinity},
+                       {child_type,supervisor}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:58 ===
+          supervisor: {local,sasl_sup}
+             started: [{pid,<0.47.0>},
+                       {name,release_handler},
+                       {mfargs,{release_handler,start_link,[]}},
+                       {restart_type,permanent},
+                       {shutdown,2000},
+                       {child_type,worker}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:58 ===
+         application: sasl
+          started_at: 'game_zbb_s1_38001@172.19.17.102'
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:58 ===
+          supervisor: {local,server_sup}
+             started: [{pid,<0.53.0>},
+                       {name,user_sup},
+                       {mfargs,
+                           {supervisor,start_link,
+                               [{local,user_sup},server_sup,user]}},
+                       {restart_type,transient},
+                       {shutdown,infinity},
+                       {child_type,supervisor}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:58 ===
+          supervisor: {local,server_sup}
+             started: [{pid,<0.54.0>},
+                       {name,map_sup},
+                       {mfargs,
+                           {supervisor,start_link,
+                               [{local,map_sup},server_sup,map]}},
+                       {restart_type,transient},
+                       {shutdown,infinity},
+                       {child_type,supervisor}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:58 ===
+          supervisor: {local,server_sup}
+             started: [{pid,<0.55.0>},
+                       {name,send_sup},
+                       {mfargs,
+                           {supervisor,start_link,
+                               [{local,send_sup},server_sup,send]}},
+                       {restart_type,transient},
+                       {shutdown,infinity},
+                       {child_type,supervisor}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:58 ===
+          supervisor: {local,server_sup}
+             started: [{pid,<0.58.0>},
+                       {name,srv_timer},
+                       {mfargs,{srv_timer,start_link,[]}},
+                       {restart_type,transient},
+                       {shutdown,5000},
+                       {child_type,worker}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:58 ===
+          supervisor: {local,tcp_listener_sup}
+             started: [{pid,<0.61.0>},
+                       {name,tcp_acceptor_sup},
+                       {mfargs,{tcp_acceptor_sup,start_link,[]}},
+                       {restart_type,transient},
+                       {shutdown,infinity},
+                       {child_type,supervisor}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:58 ===
+          supervisor: {local,tcp_listener_sup}
+             started: [{pid,<0.62.0>},
+                       {name,tcp_listener_main},
+                       {mfargs,
+                           {tcp_listener,start_link,
+                               ["172.19.17.102",38001,
+                                [binary,
+                                 {packet,0},
+                                 {active,false},
+                                 {reuseaddr,true},
+                                 {nodelay,true},
+                                 {delay_send,true},
+                                 {send_timeout,5000},
+                                 {keepalive,true},
+                                 {exit_on_close,true},
+                                 {high_watermark,131072},
+                                 {low_watermark,65536}]]}},
+                       {restart_type,transient},
+                       {shutdown,4294967295},
+                       {child_type,worker}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:58 ===
+          supervisor: {local,tcp_listener_sup}
+             started: [{pid,<0.73.0>},
+                       {name,tcp_listener_map},
+                       {mfargs,
+                           {tcp_listener,start_link,
+                               ["172.19.17.102",38002,
+                                [binary,
+                                 {packet,0},
+                                 {active,false},
+                                 {reuseaddr,true},
+                                 {nodelay,true},
+                                 {delay_send,true},
+                                 {send_timeout,5000},
+                                 {keepalive,true},
+                                 {exit_on_close,true},
+                                 {high_watermark,131072},
+                                 {low_watermark,65536}]]}},
+                       {restart_type,transient},
+                       {shutdown,4294967295},
+                       {child_type,worker}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:58 ===
+          supervisor: {local,server_sup}
+             started: [{pid,<0.60.0>},
+                       {name,tcp_listener_sup},
+                       {mfargs,
+                           {tcp_listener_sup,start_link,
+                               ["172.19.17.102",38001,
+                                [binary,
+                                 {packet,0},
+                                 {active,false},
+                                 {reuseaddr,true},
+                                 {nodelay,true},
+                                 {delay_send,true},
+                                 {send_timeout,5000},
+                                 {keepalive,true},
+                                 {exit_on_close,true},
+                                 {high_watermark,131072},
+                                 {low_watermark,65536}]]}},
+                       {restart_type,transient},
+                       {shutdown,infinity},
+                       {child_type,supervisor}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:58 ===
+          supervisor: {local,server_sup}
+             started: [{pid,<0.84.0>},
+                       {name,tcp_client_sup},
+                       {mfargs,{tcp_client_sup,start_link,[]}},
+                       {restart_type,transient},
+                       {shutdown,infinity},
+                       {child_type,supervisor}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:58 ===
+          supervisor: {local,inets_sup}
+             started: [{pid,<0.89.0>},
+                       {name,ftp_sup},
+                       {mfargs,{ftp_sup,start_link,[]}},
+                       {restart_type,permanent},
+                       {shutdown,infinity},
+                       {child_type,supervisor}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:59 ===
+          supervisor: {local,httpc_profile_sup}
+             started: [{pid,<0.92.0>},
+                       {name,httpc_manager},
+                       {mfargs,
+                           {httpc_manager,start_link,
+                               [default,only_session_cookies,inets]}},
+                       {restart_type,permanent},
+                       {shutdown,4000},
+                       {child_type,worker}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:59 ===
+          supervisor: {local,httpc_sup}
+             started: [{pid,<0.91.0>},
+                       {name,httpc_profile_sup},
+                       {mfargs,
+                           {httpc_profile_sup,start_link,
+                               [[{httpc,{default,only_session_cookies}}]]}},
+                       {restart_type,permanent},
+                       {shutdown,infinity},
+                       {child_type,supervisor}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:59 ===
+          supervisor: {local,httpc_sup}
+             started: [{pid,<0.93.0>},
+                       {name,httpc_handler_sup},
+                       {mfargs,{httpc_handler_sup,start_link,[]}},
+                       {restart_type,permanent},
+                       {shutdown,infinity},
+                       {child_type,supervisor}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:59 ===
+          supervisor: {local,inets_sup}
+             started: [{pid,<0.90.0>},
+                       {name,httpc_sup},
+                       {mfargs,
+                           {httpc_sup,start_link,
+                               [[{httpc,{default,only_session_cookies}}]]}},
+                       {restart_type,permanent},
+                       {shutdown,infinity},
+                       {child_type,supervisor}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:59 ===
+          supervisor: {local,inets_sup}
+             started: [{pid,<0.94.0>},
+                       {name,httpd_sup},
+                       {mfargs,{httpd_sup,start_link,[[]]}},
+                       {restart_type,permanent},
+                       {shutdown,infinity},
+                       {child_type,supervisor}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:59 ===
+          supervisor: {local,inets_sup}
+             started: [{pid,<0.95.0>},
+                       {name,tftp_sup},
+                       {mfargs,{tftp_sup,start_link,[[]]}},
+                       {restart_type,permanent},
+                       {shutdown,infinity},
+                       {child_type,supervisor}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:59 ===
+         application: inets
+          started_at: 'game_zbb_s1_38001@172.19.17.102'
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:59 ===
+         application: crypto
+          started_at: 'game_zbb_s1_38001@172.19.17.102'
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:59 ===
+          supervisor: {local,emysql_sup}
+             started: [{pid,<0.99.0>},
+                       {name,emysql_statements},
+                       {mfargs,{emysql_statements,start_link,[]}},
+                       {restart_type,permanent},
+                       {shutdown,5000},
+                       {child_type,worker}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:59 ===
+          supervisor: {local,emysql_sup}
+             started: [{pid,<0.100.0>},
+                       {name,emysql_conn_mgr},
+                       {mfargs,{emysql_conn_mgr,start_link,[]}},
+                       {restart_type,permanent},
+                       {shutdown,5000},
+                       {child_type,worker}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:59 ===
+          supervisor: {local,server_sup}
+             started: [{pid,<0.98.0>},
+                       {name,emysql_sup},
+                       {mfargs,{emysql_sup,start_link,[]}},
+                       {restart_type,transient},
+                       {shutdown,infinity},
+                       {child_type,supervisor}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:59 ===
+          supervisor: {local,inet_gethost_native_sup}
+             started: [{pid,<0.102.0>},{mfa,{inet_gethost_native,init,[[]]}}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:23:59 ===
+          supervisor: {local,kernel_safe_sup}
+             started: [{pid,<0.101.0>},
+                       {name,inet_gethost_native_sup},
+                       {mfargs,{inet_gethost_native,start_link,[]}},
+                       {restart_type,temporary},
+                       {shutdown,1000},
+                       {child_type,worker}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:24:02 ===
+          supervisor: {local,kernel_safe_sup}
+             started: [{pid,<0.112.0>},
+                       {name,timer_server},
+                       {mfargs,{timer,start_link,[]}},
+                       {restart_type,permanent},
+                       {shutdown,1000},
+                       {child_type,worker}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:24:02 ===
+          supervisor: {local,server_sup}
+             started: [{pid,<0.116.0>},
+                       {name,srv_log},
+                       {mfargs,{srv_log,start_link,[]}},
+                       {restart_type,transient},
+                       {shutdown,5000},
+                       {child_type,worker}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:24:02 ===
+          supervisor: {local,server_sup}
+             started: [{pid,<0.117.0>},
+                       {name,srv_map_manager},
+                       {mfargs,{srv_map_manager,start_link,[]}},
+                       {restart_type,transient},
+                       {shutdown,5000},
+                       {child_type,worker}]
+
+=PROGRESS REPORT==== 23-Feb-2016::01:24:02 ===
+         application: server
+          started_at: 'game_zbb_s1_38001@172.19.17.102'

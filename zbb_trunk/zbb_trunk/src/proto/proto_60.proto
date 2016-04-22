@@ -1,0 +1,81 @@
+// 系统模块
+package sys;
+
+// 60001 心跳
+message c2s60001 {
+	required int32 lag = 1; 				//	延迟ms
+	optional int32 frame = 2[default=0];	//	帧频
+	optional int32 memory = 3[default=0];	//	内存占用
+	optional int32 state = 4[default=0];	//	休眠状态(正常0，休眠1，锁屏2)
+}
+
+message s2c60001 {
+	required int64 time_stamp = 1;	
+}
+
+// 60002 地图配置数据
+message c2s60002 {
+	message point {
+		required int32 x = 1;
+		required int32 y = 2;
+	}
+	
+	message item {
+		required int32 x = 1;
+		required int32 y = 2;
+		required int64 id = 3;
+		required int32 type = 4;
+	}
+	
+	message polygon {
+		repeated point point_list = 1;	//多边形
+	}
+	
+	message door {
+		required int32 x = 1;
+		required int32 y = 2;
+		required int64 id = 3;
+		required int32 target_x = 4;
+		required int32 target_y = 5;
+	}
+	
+	message item_list {
+		repeated item list = 1;	
+	}
+	
+	required int32 source_id = 1;		    //地图资源id
+	required int32 map_type = 2;	 		//地图类型号 1-等级 2-野外 3-副本 4-活动
+	required int32 width = 3;				//地图宽度
+	required int32 height = 4;				//地图高度
+	repeated int32 block_list = 5;			//地图格子点	
+	repeated item npc_list = 6;				//npc
+	repeated item monster_list = 7;			//怪物
+	repeated item collect_list = 8;			//采集物
+	repeated door door_list = 9; 			//传送门
+	repeated point born_point = 10;  		//出生点
+	required polygon edge = 11;				//地图最外缘多边形
+	repeated polygon polygon_list = 12;		//地图障碍多边形数组
+	required string name = 13;				//地图名				
+	required int32 min_level = 14;			//进入等级
+	repeated item_list dup_mon_list = 15;	//副本多波怪物
+}
+
+// 60003 获取GM格式
+message c2s60003 {
+
+}
+
+message s2c60003 {
+	required string help = 1;		//GM指令帮助
+}
+
+// 60004 发送GM指令
+message c2s60004 {
+	required string gm = 1;			//GM指令(指令+参数  以单个空格分隔 -- add_item TplId Num)
+}
+
+// 60004 错误返回
+message s2c60004 {
+	required string reply = 1;		//错误结果返回
+}
+

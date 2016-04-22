@@ -1,0 +1,125 @@
+// 奖励活动
+package award_activity;
+import "common.proto";
+
+// 34000 当前进行中的活动
+message s2c34000 {
+    repeated struct_main_activity main_activities=1;      // 主活动信息
+    repeated struct_award_activity award_activities=2;    // 进行中的活动
+}
+
+message struct_main_activity {
+    required int32 activity_id=1;   // 活动id
+    required int32 type=2;          // 活动类型
+    required int32 start_time=3;    // 开始时间
+    required int32 stop_time=4;     // 结束时间
+}
+
+message struct_award_activity {
+    required int32 activity_id=1;   // 活动id
+    required int32 type=2;          // 活动类型
+    required int32 subtype=3;       // 子活动
+    required int32 start_time=4;    // 开始时间
+    required int32 stop_time=5;     // 结束时间
+    required int32 balance_time=6;  // 结算时间
+}
+
+// 34001 活动详细信息
+message c2s34001 {
+    required int32 activity_id=1;   // 活动id
+    required int32 type=2;          // 活动类型
+    required int32 subtype=3;       // 子活动
+}
+message s2c34001 {
+    required int32 activity_id=1;   // 活动id
+    required int32 type=2;          // 活动类型
+    required int32 subtype=3;       // 子活动
+    repeated struct_condition conditions=4;  // 条件信息
+}
+
+message struct_condition {
+    required int32 nth=1;           // 第几个
+    required int32 is_award=2;      // 领取状态：0、未领取，1、已领取
+    repeated struct_event_target event_targets=3;   // 条件信息
+}
+
+message struct_event_target {
+    required int32 event_id=1;      // 事件id
+    required int32 target=2;        // 目标值
+    required int32 value=3;         // 当前值
+}
+
+// 34002 领取条件奖励
+message c2s34002 {
+    required int32 activity_id=1;   // 活动id
+    required int32 type=2;          // 活动类型
+    required int32 subtype=3;       // 子活动
+    required int32 nth=4;           // 第几个(比如七天目标每个子活动有多个条件和奖励，只有一个的则为1) or 兑换序号
+}
+
+// 34003 活动详细信息(值、领取列表信息)
+message s2c34003 {
+    required int32 activity_id=1;   // 活动id
+    required int32 type=2;          // 活动类型
+    required int32 subtype=3;       // 子活动
+    required int32 value=4;         // 当前值
+    repeated int32 lists=5;         // 已领取列表
+}
+
+// 34004 投资计划信息
+message s2c34004{
+    required int32 activity_id = 1;   // 活动id
+    required int32 type = 2;          // 活动类型
+    required int32 subtype = 3;       // 子活动
+    required int32 is_buy = 4;        // 是否已购买投资
+    required int32 buy_time = 5;      // 购买时间
+    repeated key_value lists = 6;     // 已领取列表 Key:领取天数 Value:领取物品模板ID
+}
+
+// 34005 购买投资计划
+message c2s34005{
+    required int32 activity_id = 1;   // 活动id
+    required int32 type = 2;          // 活动类型
+    required int32 subtype = 3;       // 子活动
+    }
+    
+// 34006 领取投资计划
+message c2s34006{
+    required int32 activity_id = 1;   // 活动id
+    required int32 type = 2;          // 活动类型
+    required int32 subtype = 3;       // 子活动
+    required int32 day = 4;           // 第几天
+    required int32 index = 5;         // 奖励模板ID
+    }
+
+// 34007 活动公共信息(团购首充，行会首充)
+message s2c34007 {
+    required int32 activity_id=1;   // 活动id
+    required int32 type=2;          // 活动类型
+    required int32 subtype=3;       // 子活动
+    required int32 value=4;         // 统计值   
+}
+
+// 34008 活动提醒
+message s2c34008 {
+    required int32 activity_id=1;   // 活动id
+    required int32 type=2;          // 活动类型
+    required int32 subtype=3;       // 子活动
+}
+
+// 34009 兑换活动
+message s2c34009{
+    required int32 activity_id = 1;   // 活动id
+    required int32 type = 2;          // 活动类型
+    required int32 subtype = 3;       // 子活动
+    repeated key_value lists = 4;     // 已领取列表 Key:Index  Value:已兑换次数
+}
+
+// 34010 活动详细信息(值列表、领取列表信息) 当前有新的单笔充值活动使用
+message s2c34010 {
+    required int32 activity_id=1;   // 活动id
+    required int32 type=2;          // 活动类型
+    required int32 subtype=3;       // 子活动
+    repeated int32 value_lists=4;   // 当前值列表
+    repeated int32 lists=5;         // 已领取列表
+}

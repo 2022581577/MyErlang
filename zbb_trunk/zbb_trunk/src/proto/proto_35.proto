@@ -1,0 +1,51 @@
+// 3v3模块
+package battle_3v3;
+
+// 35000 玩家3v3信息
+message s2c35000 {
+    required struct_user_battle_3v3 info=1;
+}
+
+message struct_user_battle_3v3{
+    required int64 user_id=1;
+    required int32 win=2;                // 胜利
+    required int32 fail=3;               // 失败(逃跑算失败)
+    required int32 draw=4;               // 平局
+    required int32 escape=5;             // 逃跑次数
+    required int32 exp=6;                // 经验(1000经验进入晋级赛升阶)
+    required int32 lv=7;                 // 5阶升1个段位
+    required int32 dan_grading=8;        // 段位(0、无段位，1、青铜，2、白银，3、黄金，4、白金，5、钻石, 6、王者)
+    required int32 king_finish_time=9;   // 王者结束时间
+    required int32 rise_win=10;          // 晋级赛胜场(晋级成功或失败后清0)
+    required int32 rise_fail=11;         // 晋级赛败场(晋级成功或失败后清0)
+    }
+
+
+// 进活动场景(和普通进入活动一样?)
+
+// 退出活动场景(退出地图判断?)
+
+// 创建房间
+
+// 加入房间
+
+// 退出房间
+
+// 踢人?
+
+// 邀请?
+
+// 加入匹配(个人加入,房间主机加入)
+
+// 进入战斗场景(服务端主动发起)
+
+// 退出战斗场景(退出地图判断?)不同时间、不同状态退出到哪个场景？
+
+// 进入战斗场景后发送战场信息(战斗时间等)
+
+// 进入战斗场景后发送对战双方信息
+
+// 战场信息定时广播
+
+// 结算
+

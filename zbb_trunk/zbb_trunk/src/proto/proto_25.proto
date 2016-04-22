@@ -1,0 +1,485 @@
+// 活动模块
+package activity;
+import "common.proto";
+
+// 活动信息
+message s2c25000 {
+	message activity_info{
+		required int32 type = 1;		//1 阵营战 2 领地战 3沙滩 4 1VN
+		required int32 state = 2;	//状态：1 已结束 2 活动中
+		required int32 start_time = 3;	//开始时间 时间戳s
+		required int32 end_time = 4;	//结束时间  时间戳s
+		repeated key_value param_list = 5; //参数列表
+		
+	}
+	repeated activity_info activity_list = 1;
+	required int32 open_time = 2;	//开服时间 时间戳s
+}
+
+
+// 世界boss全局信息
+message s2c25001 {
+	message boss_info{
+		required int32 id = 1;		//对应世界boss配置表中的id
+		required int32 state = 2;	//状态：1 已击杀 2 活动中
+		required int32 hour = 3;	//下次刷新时
+		required int32 min = 4;	//下次刷新分 
+		required int64 last_kill_id = 5;	//上次击杀玩家ID 
+		required string last_kill_name = 6;	//上次击杀玩家名字 
+		required int32 next_refresh_time = 7; //时间戳s 精英boss使用
+		required int32 last_kill_server_no = 8; //上次击杀玩家服务器号
+		
+	}
+	repeated boss_info boss_list = 1;
+}
+
+// 世界boss排行信息
+message s2c25002 {
+	message rank_info {
+		required int32 rank = 1;	//名次
+		required int64 user_id = 2;
+		required string user_name = 3;
+		required int32 hurt = 4; //伤害值
+		required int32 server_no = 5;
+	}
+	required int32 id = 1;  //对应世界boss配置表中的id
+	required int32 belong_guild_id = 2;					//归属帮派ID
+	required string belong_guild_name = 3;			  //归属帮派名
+	required int64 belong_user_id = 	4;				//boss归属玩家
+	required int32 own_rank = 5;		//自己排名
+	required int32 boss_left_hp = 6;		//boss剩余血量
+	required int32 boss_total_hp = 7;		//boss总血量
+	repeated rank_info rank_list = 8;
+}
+
+//活动进入
+message c2s25010{
+	required int32 type = 1;  //活动类型 1 阵营战
+}
+
+message s2c25010{
+	required int32 result = 1; // 1 成功 2 该房间的活动已经结束 3 不符合参加条件
+}
+
+//阵营战信息
+message s2c25011{
+	required int32 banner = 1;			// 0 未有旗帜 1生成了旗帜
+	required int64 banner_user_id = 2; //旗帜归属玩家ID 0表示不归属任何玩家
+	required int32 banner_x = 3;	//旗帜所在X
+	required int32 banner_y = 4;	//旗帜所在Y
+	required int32 left_refresh_box_time = 5;	//剩余刷新时间 ms
+	required int32 left_time = 6;					//活动剩余时间
+	repeated camp_point camp_list = 7;		//阵营列表
+	repeated user_point user_list = 8;	//玩家列表
+	repeated post_info post_list = 9;	//据点信息
+
+}
+
+//阵营积分
+message camp_point{
+	required int32 camp_id = 1;		//阵营
+	required int32 post_num = 2;		//中立塔的个数
+	required int32 occupy_point = 3;	//占领积分
+	required int32 point = 4;				//其余积分
+	required int32 banner_num = 5;	//旗帜数量
+	required int32 user_num = 6;		//玩家人数
+}
+
+//个人积分
+message user_point{
+	required int64 user_id = 1;
+	required string user_name = 2;
+	required int32 camp_id = 3;
+	required int32 point = 4;
+	required int32 soul = 5;	//战魂数量
+	required int32 kill_num = 6;	//击杀人数
+	required int32 banner_num = 7;	//旗帜数量
+	required int32 level = 8;	//等级
+	required int32 help_kill = 9; //助攻数量
+	required int32 dead_num = 10; //死亡次数
+	required int32 last_hit_num = 11; //补刀次数
+	required int32 server_no = 12;
+	required int32 con_kill_num = 13;//连杀数量
+}
+
+//据点阵营信息
+message post_info{
+	required int32 pos_x = 1;
+	required int32 pos_y = 2;
+	required int32 camp = 3;
+}
+
+//领地信息推送
+message s2c25020 {
+	required int32 type = 1; // type = 1 登录 type =2 活动结束时变更推送 type = 3 活动中推送
+	repeated domain_info domain_list = 2;
+}
+
+//地图领地信息
+message s2c25021 {
+	required int32 id = 1;		// 领地战ID
+	required int32 guild_id = 2;	//占领的帮派ID
+	required string guild_name = 3;	//帮派名
+	required int32 occupy_time = 4;	//已占领时间 	ms
+	required int32 left_occupy_time = 5;	//剩余占领时间ms 	0表示已占领
+	required int32 left_time = 6;	//活动剩余时间	ms	
+}
+
+
+
+//查询活动信息
+message c2s25022{
+	required int32 type = 1; //type=1 帮派排名 type=2个人排名 type=3 日志记录
+}
+
+//帮派排名
+message s2c25023{
+	repeated domain_guild rank_list = 1;
+}
+
+//个人排名
+message s2c25024{
+	repeated domain_user rank_list = 1;
+}
+
+//日志
+message s2c25025{
+	repeated domain_msg rank_list = 1;
+}
+
+//个人获得经验和积分
+message s2c25026{
+	required int32 add_exp = 1;
+	required int32 point = 2;
+}
+
+message domain_info{
+	required int32 id = 1;		// 领地战ID
+	required int32 guild_id = 2;	//占领的帮派ID
+	required string guild_name = 3;	//帮派名
+	required int32 occupy_time = 4;	//占领时间点 时间戳s 		
+	required int32 guild_flag_id = 5;	//帮派旗帜ID	
+	optional int32 last_occupy_time = 6[default=0];	//最近一次占领时间	
+}
+
+message domain_guild{
+		required int32 guild_id = 1;
+		required string guild_name = 2;
+		required int32 user_num = 3;
+		required int32 domain_num = 4;
+	}
+message domain_user{
+		required int64 user_id = 1;
+		required string user_name = 2;
+		required int32 guild_id = 3;
+		required string guild_name = 4;
+		required int32 kill_num = 5;
+		required int32 point = 6;
+		required int32 level = 7;
+		required int32 battle_value = 8;
+		required int32 server_no = 9;
+	}
+message domain_msg{
+		message args{
+			required int32 arg_type = 1;
+			required int64  arg_int = 2;
+			required string arg_string = 3;
+		}
+		required int32 msg_id = 1;		// 消息类型
+		required int32 msg_time = 2;	//消息时间戳
+		repeated  args list = 3;		//参数列表
+	}
+
+//进入领地	
+message c2s25027{
+	required int32 id = 1;
+}
+
+
+
+//1VN
+//准备场状态
+message s2c25030{
+	required int32 state = 1; //0 预赛准备时间 1 预赛时间 2 30秒准备 
+	required int64 state_end_time = 2; //状态截止时间  ms
+	required int32 sub_state = 3; // 0 正常 1 正在匹配中
+	required int32 round = 4; // 轮
+	required int32 round_no = 5; //场
+}
+//个人信息
+message s2c25031{
+	required int32 point = 1;	//积分
+	required int32 exp = 2;		//经验
+	required int32 exploit = 3; //功勋
+	required int32 identity = 4; //身份 0：未晋级 1 1vn的1 2 1vn的N
+}
+
+//准备战斗信息
+message s2c25032{
+	required int32 type = 1;	//1 : 1v1 2: 1VN
+	repeated pvn_user_info list = 2; // type=2时列表第一个元素为挑战者
+	required int32 left_time = 3;	//ms后可战斗
+}
+
+message pvn_user_info{
+	required int64 user_id = 1;
+	required string user_name = 2;
+	required int32 server_no	= 3;
+	required int32 level = 4;
+	required int32 battle_value = 5; 	//战斗力
+}
+//战斗结果
+message s2c25033{
+	required int64 user_id = 1;
+	required int32 type = 2; //1 : 1v1 2: 1VN
+	required int32 result = 3; // 1 胜利 2 失败
+	repeated int32 point = 4; 
+	required int32 exp = 5;
+	required int32 exploit = 6;
+}
+
+//1VN 信息
+message s2c25034{
+	message bet_info{
+			required int32 user_id = 1;	//挑战者ID 作为下注主键
+			repeated pvn_user_info list = 2; 	//匹配信息 第一个元素为挑战者
+			required int32 result = 3; //0未战 1胜利 2失败
+		}
+	required int32 round = 1; // 轮
+	required int32 round_no = 2; //场	
+	repeated bet_info list = 3; //信息
+	required int32 state = 4; //1 匹配等待 2 押注时间 3 战斗时间
+	required int64 state_end_time = 5; //状态截止时间 ms
+}
+
+//下注
+message c2s25035{
+	required int32 user_id = 1;
+	required int32 result = 2; // 1 胜利 2 失败
+}
+
+//下注结果
+message s2c25035{
+
+}
+
+
+//奖励汇总
+message c2s25036{
+	required int32 coin = 1;	//押注奖励铜币
+	required int32 exp = 2; 
+	required int32 exploit = 3;
+	required int32 gift_id = 4; 
+}
+
+
+//观战
+message c2s25037{
+	required int64 user_id = 1;
+}
+
+//第一轮积分排行
+message s2c25038{
+	message pvp_user_rank{
+		required int64 user_id = 1;
+		required int32 server_no = 2;
+		required string user_name = 3;
+		required int32 level = 4;
+		required int32 battle_value = 5;
+		required int32 point = 6;
+		required int32 identity = 7;
+	}
+	repeated pvp_user_rank list = 1;
+}
+//第二轮排行
+message s2c25039{
+	message pvn_user_rank{
+		required int64 user_id = 1;
+		required int32 server_no = 2;
+		required string user_name = 3;
+		required int32 level = 4;
+		required int32 battle_value = 5;
+		required int32 round = 6;		
+		required int32 result = 7;	
+		required int32 time = 8;	//耗时
+		required int32 gift_id = 9;	//礼包ID
+	}
+	repeated pvn_user_rank list = 1;
+}
+
+//战场任务
+message s2c25100{
+	required int32 id = 1;
+	required int32 type = 2;
+	required int32 progress = 3;
+}
+
+//领奖
+message c2s25101{
+
+}
+
+
+//密境寻宝进入下一层
+message c2s25201{
+
+}
+//秘境寻宝地图信息推送
+message s2c25202{
+	required int32 state = 1; //状态
+	required int32 boss_dead = 2; //boss是否死亡 0 没有死亡 1 死亡
+	required int64 user_id = 3;	//击杀信息
+	required int32 server_no = 4;
+	required string user_name = 5;
+	required int64 state_end_time = 6; //状态截止时间 ms
+}
+
+message c2s25301{
+	
+}
+
+//血战到底信息
+message s2c25301{
+	message user_blood{
+		required int64 user_id = 1;
+		required int32 server_no = 2;
+		required string user_name = 3;
+		required int32 kill_num = 4;
+		required int32 help_num = 5;
+		required int32 point = 6;
+		required int32 left_revive_num = 7;
+	}
+	required int32 total_num = 1;			// 总人数
+	required int32 left_num  = 2; //剩余人数
+	required int64 end_time = 3;	//结束时间戳
+	required int32 state = 4;		//0准备时间 1 正在活动 2 已结束 3 查询返回
+	repeated user_blood user_list = 5;	//玩家列表
+	repeated int32 destroy_list = 6;		//即将摧毁的列表 [1,2]
+	required int64 destroy_time = 7;	//摧毁时间
+	repeated int32 destroyed_list = 8; //已经摧毁的列表
+}
+
+
+//死亡通知剩余复活次数
+message s2c25302{
+	message award{
+		required int32 award_id = 1;
+		required int32 award_num = 2;
+	}
+	required int32 left_revive_num = 1;
+	required int32 award_num = 2;		//存活奖励的剩余次数
+	repeated award award_list = 3;	//累计的存活奖励
+}
+
+//夺宝奇兵
+message s2c25401{
+	message user_raid{
+		required int64 user_id = 1;
+		required int32 server_no = 2;
+		required string user_name = 3;
+		required int32 extrem_num = 4; //至尊数量
+		required int32 gold_num = 5;	//黄金数量
+		required int32 point = 6;
+	}
+
+	required int64 end_time = 1;	//结束时间戳 ms
+	required int32 state = 2;		//1 正在活动 2 已结束
+	repeated user_raid user_list = 3;	//玩家列表
+	optional int64 own_user_id = 4[default=0]; //拥有至尊的玩家ID 为0表示没有玩家采集到
+	optional int32 pos_x = 5[default=0]; //至尊宝箱的位置 
+	optional int32 pos_y = 6[default=0]; // 
+	optional int64 next_refresh_time = 7[default=0]; // 下次刷新宝箱时间
+}
+
+
+//怪物攻城
+message s2c25501{
+	message user_siege{
+		required int64 user_id = 1;
+		required int32 server_no = 2;
+		required string user_name = 3;
+		required int32 point = 4;
+	}
+
+	required int64 end_time = 1;	//结束时间戳 ms
+	required int32 state = 2;		//1 正在活动 2 已结束
+	required int32 wave = 3;	//
+	repeated user_siege user_list = 4;	//玩家列表
+}
+
+
+//抽奖
+message c2s25502{
+
+}
+
+message s2c25502{
+	required int32 item_tpl_id = 1;
+	required int32 item_num = 2;
+}
+
+
+
+
+// 神魔战场 定时推送
+message s2c25102 {
+	repeated p_god_boss list=1;
+	required int32 state=2;  // 1 进行中 2 结束 3 关闭中
+	required int32 end_time=3;
+}
+message p_god_boss {
+	required int32 mon_tpl_id=1;
+	required int32 mon_hp=2;
+	required int32 mon_max_hp=3;
+	required int64 killer_id=5;
+	repeated p_god_boss_harm list=4;
+}
+message p_god_boss_harm {
+	required int64 user_id=1;
+	required string user_name=2;
+	required int32 server_no=4;
+	required int32 harm=3;			//伤害值
+}
+
+//帮派战信息
+message s2c25601{
+	message guild_info{
+		required int32 guild_id = 1;
+		required string guild_name = 2;
+		required int32 resource_point = 3;
+		required int32 battle_value = 4;
+	}
+	message user_info{
+		required int64 user_id = 1;
+		required int32 server_no = 2;
+		required string user_name = 3;
+		required int32 kill_num = 4;
+		required int32 add_honor = 5;
+		required int32 help_num = 6;
+		required int32 dead_num = 7;
+		required int32 guild_id = 8;
+		required int32 point = 9;
+	}
+	required guild_info guild_1=1;
+	required guild_info guild_2=2;
+	required int32 state = 3; //0准备 1 进行中 2结束
+	required int64 state_end_time = 4; //ms时间戳
+	repeated user_info user_list = 5;
+	repeated guild_post_info post_list = 6; //占据的据点列表
+	required int32 win_guild_id = 7;
+
+}
+
+message guild_post_info{
+	required int32 pos_x = 1;
+	required int32 pos_y = 2;
+	required int32 guild_id = 3; //占据帮派ID
+	required int64 time = 4; //开始占据的时间
+}
+
+
+
+//第二轮打开活动面板
+message s2c25602{
+	
+}
