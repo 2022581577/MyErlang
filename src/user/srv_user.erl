@@ -234,7 +234,7 @@ do_info({loop, Time}, User) ->  %% 前端确认登录完成后才进行loop
 do_info(tiny_loop, User) ->
 	erlang:send_after(?MODULE_TINY_LOOP_TICK, self(), tiny_loop),
     {ok, User1} = user_send:send_msg(User),
-    {ok, UserN} = user_log:send_log(User1),
+    {ok, UserN} = user_log:store_log(User1),
     {noreply, UserN};
 
 do_info(Info, User) -> 

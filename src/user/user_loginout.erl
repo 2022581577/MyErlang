@@ -54,4 +54,5 @@ save_modules() ->
     ,user_item    %% 道具
     ,user_mail    %% 邮件
     ,user_task    %% 任务
+    ,user_log     %% 日志
     ].

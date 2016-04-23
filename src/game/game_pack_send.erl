@@ -12,7 +12,6 @@
 
 -export([
         send_to_one/2
-        ,nodelay_send_to_one/1
         ,nodelay_send_to_one/2
         ,send_to_users/2
         ,nodelay_send_to_users/2
@@ -126,7 +125,7 @@ map_send_to_area(Map, X, Y, Data) ->
 %% @return {ok, IoList}|any
 %% TODO binary大于64字节时在进程之间共享内存，最好把iolist转成binary
 pack(DataList) when is_list(DataList) ->
-    IoList = [begin {ok, PackBin} = pack(Data), PackBin end || Data <- CmdDataList],
+    IoList = [begin {ok, PackBin} = pack(Data), PackBin end || Data <- DataList],
     case erlang:iolist_size(IoList) >= 64 of
         true ->
             {ok, erlang:iolist_to_binary(IoList)};

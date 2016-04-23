@@ -637,7 +637,7 @@ HEADER_LENGTH	include/inst/game.hrl	/^-define(HEADER_LENGTH, 4).          % 消�
 HEART_TIMEOUT	include/inst/game.hrl	/^-define(HEART_TIMEOUT, (90 * 1000)).  % 接收数据超时时间$/;"	d
 HTTP_PORT	include/deps/http.hrl	/^-define(HTTP_PORT, 80).$/;"	d
 ID_NUM_STRUCT_PB_H	include/proto_15_pb.hrl	/^-define(ID_NUM_STRUCT_PB_H, true).$/;"	d
-IF	include/inst/game.hrl	/^-define(IF(A,B,C), case A of true -> B;_ -> C end).$/;"	d
+IF	include/inst/game.hrl	/^-define(IF(Case,True,False), case Case of true -> True; _ -> False end).$/;"	d
 INDEX_ITEM_PB_H	include/proto_12_pb.hrl	/^-define(INDEX_ITEM_PB_H, true).$/;"	d
 INFO	include/deps/lager.hrl	/^-define(INFO, 64).$/;"	d
 INFO	include/inst/logger.hrl	/^-define(INFO(Format), logger:info_msg(?MODULE,?LINE,Format, [])).$/;"	d
@@ -758,6 +758,7 @@ LOG_LIST_CACHE	src/logger/logger_h.erl	/^-define(LOG_LIST_CACHE,log_list_cache).
 LOG_LOGIN_STEP	include/inst/log.hrl	/^-define(LOG_LOGIN_STEP(AccName, Step, IsNew), srv_log:add_log(log_login_step, ?OPERATION_INSERT, [AccName, Step, IsNew, util:unixtime()])).$/;"	d
 LOG_NONE	include/deps/lager.hrl	/^-define(LOG_NONE, 0).$/;"	d
 LOG_PB_H	include/proto_23_pb.hrl	/^-define(LOG_PB_H, true).$/;"	d
+LOG_TEST	include/inst/log.hrl	/^-define(LOG_TEST(Test1, Test2), {log_test, ?OPERATION_INSERT, [Test1, Test2, util:unixtime()]}).$/;"	d
 LONG_FLAG	include/emysql/emysql.hrl	/^-define(LONG_FLAG, 4).$/;"	d
 LONG_FLAG	olddeps/mysql/mysql_auth.erl	/^-define(LONG_FLAG, 4).$/;"	d
 LONG_PASSWORD	include/emysql/emysql.hrl	/^-define(LONG_PASSWORD, 1).$/;"	d
@@ -816,7 +817,8 @@ MAX_PACKET_SIZE	olddeps/mysql/mysql_auth.erl	/^-define(MAX_PACKET_SIZE, 1000000)
 MAX_SEND_BUFFER_SIZE	src/user/user_send.erl	/^-define(MAX_SEND_BUFFER_SIZE, 1400).        %% 最大发缓冲区大小(字节)$/;"	d
 MODULE_LOOP_TICK	src/kernel/srv_node.erl	/^-define(MODULE_LOOP_TICK, 5000).		%% 进程循环时间10秒$/;"	d
 MODULE_LOOP_TICK	src/srv_game/srv_log.erl	/^-define(MODULE_LOOP_TICK, 5000).		%% 循环时间$/;"	d
-MODULE_LOOP_TICK	src/user/srv_user.erl	/^-define(MODULE_LOOP_TICK,5000).		%% 玩家循环时间5秒$/;"	d
+MODULE_LOOP_TICK	src/user/srv_user.erl	/^-define(MODULE_LOOP_TICK,       5000).		%% 玩家循环时间 5秒$/;"	d
+MODULE_TINY_LOOP_TICK	src/user/srv_user.erl	/^-define(MODULE_TINY_LOOP_TICK,   200).		%% 玩家小循环时间 200毫秒$/;"	d
 MON_TARGET_PB_H	include/proto_20_pb.hrl	/^-define(MON_TARGET_PB_H, true).$/;"	d
 MYSQL_4_0	olddeps/mysql/mysql_conn.erl	/^-define(MYSQL_4_0, 40). %% Support for MySQL 4.0.x$/;"	d
 MYSQL_4_1	olddeps/mysql/mysql_conn.erl	/^-define(MYSQL_4_1, 41). %% Support for MySQL 4.1.x et 5.0.x$/;"	d
@@ -1408,12 +1410,14 @@ TRIANGLE_SIDE_AB	include/deps/game_geom.hrl	/^-define(TRIANGLE_SIDE_AB,	0).$/;"	
 TRIANGLE_SIDE_BC	include/deps/game_geom.hrl	/^-define(TRIANGLE_SIDE_BC,	1).$/;"	d
 TRIANGLE_SIDE_CA	include/deps/game_geom.hrl	/^-define(TRIANGLE_SIDE_CA,	2).$/;"	d
 TRUE	include/common.hrl	/^-define(TRUE, true).$/;"	d
+TRY	include/inst/game.hrl	/^-define(TRY(TryFun, TryErrRes), try (TryFun) catch _:_ -> (TryErrRes) end).$/;"	d
 TYPE_32BIT	deps/protobuffs/src/protobuffs.erl	/^-define(TYPE_32BIT, 5).$/;"	d
 TYPE_64BIT	deps/protobuffs/src/protobuffs.erl	/^-define(TYPE_64BIT, 1).$/;"	d
 TYPE_END_GROUP	deps/protobuffs/src/protobuffs.erl	/^-define(TYPE_END_GROUP, 4).$/;"	d
 TYPE_START_GROUP	deps/protobuffs/src/protobuffs.erl	/^-define(TYPE_START_GROUP, 3).$/;"	d
 TYPE_STRING	deps/protobuffs/src/protobuffs.erl	/^-define(TYPE_STRING, 2).$/;"	d
 TYPE_VARINT	deps/protobuffs/src/protobuffs.erl	/^-define(TYPE_VARINT, 0).$/;"	d
+UNDEFINED	include/common.hrl	/^-define(UNDEFINED, undefined).$/;"	d
 UNLOCK_LIST_STRUCT_PB_H	include/common_pb.hrl	/^-define(UNLOCK_LIST_STRUCT_PB_H, true).$/;"	d
 UNLOCK_LIST_STRUCT_PB_H	include/proto_11_pb.hrl	/^-define(UNLOCK_LIST_STRUCT_PB_H, true).$/;"	d
 UNLOCK_LIST_STRUCT_PB_H	include/proto_12_pb.hrl	/^-define(UNLOCK_LIST_STRUCT_PB_H, true).$/;"	d
@@ -1559,8 +1563,13 @@ add_exports	deps/meck/src/meck_code.erl	/^add_exports(Exports, AbsCode) ->$/;"	f
 add_exports	src/misc/dynarec.erl	/^add_exports(Forms) ->$/;"	f	module:dynarec
 add_history	deps/meck/src/meck_proc.erl	/^add_history(Mod, CallerPid, Func, Args, Result) ->$/;"	f	module:meck_proc
 add_history_exception	deps/meck/src/meck_proc.erl	/^add_history_exception(Mod, CallerPid, Func, Args, {Class, Reason, StackTrace}) ->$/;"	f	module:meck_proc
+add_log	src/srv_game/srv_log.erl	/^add_log(LogList) ->$/;"	f	module:srv_log
 add_log	src/srv_game/srv_log.erl	/^add_log(Operation, TableName, Value) ->$/;"	f	module:srv_log
+add_log	src/user/user_log.erl	/^add_log(#user{other_data = #user_other{log_list = LogList} = UserOther} = User, Log) ->$/;"	f	module:user_log
 add_monitor_ref	src/deps/emysql/emysql_conn.erl	/^add_monitor_ref(Conn, MonitorRef) ->$/;"	f	module:emysql_conn
+add_msg	src/user/user_send.erl	/^add_msg(#user{other_data = #user_other{msg_list = MsgList} = UserOther} = User, [Data | L]) ->$/;"	f	module:user_send
+add_msg	src/user/user_send.erl	/^add_msg(User, Data) ->$/;"	f	module:user_send
+add_msg	src/user/user_send.erl	/^add_msg(User, []) ->$/;"	f	module:user_send
 add_node	src/logger/logger_h.erl	/^add_node(X, Pid) when is_atom(X) ->$/;"	f	module:logger_h
 add_node	src/logger/logger_h.erl	/^add_node(X, Pid) when node(Pid) \/= node() ->$/;"	f	module:logger_h
 add_node	src/logger/logger_h.erl	/^add_node(X, _) ->$/;"	f	module:logger_h
@@ -1679,7 +1688,6 @@ atom_to_binary	olddeps/mysql/mysql_conn.erl	/^atom_to_binary(Val) ->$/;"	f	modul
 atomize	deps/protobuffs/src/protobuffs_compile.erl	/^atomize(String) ->$/;"	f	module:protobuffs_compile
 atomize	deps/protobuffs/src/protobuffs_compile.erl	/^atomize([String]) when is_list(String) ->$/;"	f	module:protobuffs_compile
 atomize	deps/protobuffs/src/protobuffs_compile.erl	/^atomize([String|[_Rest]]) when is_list(String) ->$/;"	f	module:protobuffs_compile
-attach	gamectl	/^attach ()$/;"	f
 attribute	deps/meck/src/meck_code_gen.erl	/^-define(attribute(Attribute, Args), {attribute, ?LINE, Attribute, Args}).$/;"	d
 attributes	deps/meck/src/meck_code_gen.erl	/^attributes(Mod) ->$/;"	f	module:meck_code_gen
 auth	src/deps/emysql/emysql_auth.erl	/^auth(Sock, User, Password, #greeting { seq_num = SeqNum } = Greeting) ->$/;"	f	module:emysql_auth
@@ -2215,7 +2223,6 @@ change_name_in_term	deps/meck/src/meck_cover.erl	/^change_name_in_term({Bump={bu
 change_name_in_term	deps/meck/src/meck_cover.erl	/^change_name_in_term({_Mod,Clauses}, {Name, Terms}) ->$/;"	f	module:meck_cover
 change_name_in_term	deps/meck/src/meck_cover.erl	/^change_name_in_term({file, Mod, File}, {Name, Terms}) ->$/;"	f	module:meck_cover
 change_timer	src/srv_game/srv_timer.erl	/^change_timer(UnixTime) ->$/;"	f	module:srv_timer
-change_ulimit	gamectl	/^change_ulimit() {$/;"	f
 char	src/deps/lager/lager_format.erl	/^char(C, F, Adj, P, Pad) when F >= P ->$/;"	f	module:lager_format
 char	src/deps/lager/lager_format.erl	/^char(C, F, _Adj, none, _Pad) -> chars(C, F);$/;"	f	module:lager_format
 char	src/deps/lager/lager_format.erl	/^char(C, none, _Adj, P, _Pad) -> chars(C, P);$/;"	f	module:lager_format
@@ -2237,7 +2244,6 @@ check_cd	test/util.erl	/^check_cd(Key,CdTime) ->$/;"	f	module:util
 check_cmd_need_encrypt	src/kernel/client_protobuf_encode.erl	/^check_cmd_need_encrypt(_Cmd)->$/;"	f	module:client_protobuf_encode
 check_cmd_need_encrypt	src/kernel/protobuf_encode.erl	/^check_cmd_need_encrypt(_Cmd)->$/;"	f	module:protobuf_encode
 check_cron_timer	src/deps/crontab/cron.erl	/^check_cron_timer() ->$/;"	f	module:cron
-check_db	gamectl	/^check_db ()$/;"	f
 check_db	src/deps/emysql/edb.erl	/^check_db() ->$/;"	f	module:edb
 check_db_state	olddeps/mysql/db_util.erl	/^check_db_state() ->$/;"	f	module:db_util
 check_encry	src/kernel/packet_encode.erl	/^check_encry(Encry,Key) ->$/;"	f	module:packet_encode
@@ -2459,7 +2465,6 @@ control2	src/deps/lager/lager_format.erl	/^control2($w, [A], F, Adj, P, Pad, _En
 convert_type	olddeps/mysql/mysql_conn.erl	/^convert_type(Val, ColType) ->$/;"	f	module:mysql_conn
 correct_float	test/util.erl	/^correct_float(N) ->$/;"	f	module:util
 cost_tpl_struct	include/proto_15_pb.hrl	/^-record(cost_tpl_struct, {$/;"	r
-count	gamectl	/^count ()$/;"	f
 count	lib_map_counter.erl	/^count(MapOnlyID) ->$/;"	f	module:lib_map_counter
 count	src/user/user_online.erl	/^count() ->$/;"	f	module:user_online
 count_nl	src/deps/lager/lager_stdlib.erl	/^count_nl($\\n) ->$/;"	f	module:lager_stdlib
@@ -2608,7 +2613,6 @@ del	src/game/global_data_disk.erl	/^del(K) ->$/;"	f	module:global_data_disk
 del	src/game/global_data_ram.erl	/^del(K) ->$/;"	f	module:global_data_ram
 del_map	src/map/srv_map_manager.erl	/^del_map(MapID, MapIndexID) ->$/;"	f	module:srv_map_manager
 delaunay	src/deps/game_geom/delaunay.erl	/^-module(delaunay).$/;"	m
-delay_send	src/user/user_send.erl	/^delay_send(#user{other_data = #user_other{socket = Socket}} = _User, Bin) ->$/;"	f	module:user_send
 delayed_halt	src/deps/game_core/rebar_utils.erl	/^delayed_halt(Code) ->$/;"	f	module:rebar_utils
 delete	deps/meck/src/meck.erl	/^delete(Mod, Func, Ari) when is_list(Mod) ->$/;"	f	module:meck
 delete	deps/meck/src/meck.erl	/^delete(Mod, Func, Ari)$/;"	f	module:meck
@@ -2680,7 +2684,8 @@ distance	src/deps/game_geom/vector2f.erl	/^distance(#vector2f{x = X, y = Y}, #ve
 distance_squared	src/deps/game_geom/vector2f.erl	/^distance_squared(#vector2f{x = X, y = Y}, #vector2f{x = TargetX, y = TargetY}) ->$/;"	f	module:vector2f
 divide	src/deps/game_geom/vector2f.erl	/^divide(#vector2f{x = X, y = Y}, Scalar) ->$/;"	f	module:vector2f
 do	src/deps/json/rfc4627_jsonrpc_inets.erl	/^do(ModData = #mod{data = OldData}) ->$/;"	f	module:rfc4627_jsonrpc_inets
-do_add_log	src/srv_game/srv_log.erl	/^do_add_log(Operation, TableName, Value, Dict) ->$/;"	f	module:srv_log
+do_add_log	src/srv_game/srv_log.erl	/^do_add_log(#state{insert_dict = InsertDict, replace_dict = ReplaceDict} = State, Operation, TableName, Value) ->$/;"	f	module:srv_log
+do_add_log1	src/srv_game/srv_log.erl	/^do_add_log1(Operation, TableName, Value, Dict) ->$/;"	f	module:srv_log
 do_call	src/kernel/game_gen_server.erl	/^do_call(Info, From, State) ->$/;"	f	module:game_gen_server
 do_call	src/kernel/game_gen_server.erl	/^do_call(get_state,_From,State) ->$/;"	f	module:game_gen_server
 do_call	src/kernel/game_gen_server.erl	/^do_call(stop,_From,State) ->$/;"	f	module:game_gen_server
@@ -2708,7 +2713,8 @@ do_cast	src/kernel/srv_reader.erl	/^do_cast({set_socket,Socket},State) ->    $/;
 do_cast	src/map/srv_map.erl	/^do_cast(Info, Map) -> $/;"	f	module:srv_map
 do_cast	src/map/srv_map_manager.erl	/^do_cast(Info, State) -> $/;"	f	module:srv_map_manager
 do_cast	src/srv_game/srv_log.erl	/^do_cast(Info, State) -> $/;"	f	module:srv_log
-do_cast	src/srv_game/srv_log.erl	/^do_cast({add_log, Operation, TableName, Value}, #state{insert_dict = InsertDict, replace_dict = ReplaceDict} = State) ->$/;"	f	module:srv_log
+do_cast	src/srv_game/srv_log.erl	/^do_cast({add_log, LogList}, State) ->$/;"	f	module:srv_log
+do_cast	src/srv_game/srv_log.erl	/^do_cast({add_log, Operation, TableName, Value}, State) ->$/;"	f	module:srv_log
 do_cast	src/user/srv_user.erl	/^do_cast(Info, User) -> $/;"	f	module:srv_user
 do_cast	src/user/srv_user.erl	/^do_cast({set_socket,Socket,Time,Index},#user{user_id = _UserID, other_data = #user_other{socket = UserSocket} = UserOther} = User) ->$/;"	f	module:srv_user
 do_cast	src/user/srv_user.erl	/^do_cast({stop_user, Type}, User) ->$/;"	f	module:srv_user
@@ -2745,6 +2751,7 @@ do_info	src/map/srv_map_manager.erl	/^do_info(Info, State) -> $/;"	f	module:srv_
 do_info	src/srv_game/srv_log.erl	/^do_info(Info, State) -> $/;"	f	module:srv_log
 do_info	src/srv_game/srv_log.erl	/^do_info(loop, State) ->$/;"	f	module:srv_log
 do_info	src/user/srv_user.erl	/^do_info(Info, User) -> $/;"	f	module:srv_user
+do_info	src/user/srv_user.erl	/^do_info(tiny_loop, User) ->$/;"	f	module:srv_user
 do_info	src/user/srv_user.erl	/^do_info({inet_async,Socket,_Ref,{error,Reason}},#user{user_id = UserID, other_data = #user_other{socket = UserSocket} = UserOther} = User) ->$/;"	f	module:srv_user
 do_info	src/user/srv_user.erl	/^do_info({inet_async,Socket,_Ref,{error,closed}},#user{user_id = UserID, other_data = #user_other{socket = UserSocket} = UserOther} = User) ->$/;"	f	module:srv_user
 do_info	src/user/srv_user.erl	/^do_info({inet_async,Socket,_Ref,{ok,<<0:16,Len:16>>}},#user{other_data = #user_other{socket = Socket}} = User) ->$/;"	f	module:srv_user
@@ -2842,8 +2849,6 @@ durable_record	include/generation.hrl	/^-record(durable_record,{name,           
 dynamic_compile	src/logger/dynamic_compile.erl	/^-module(dynamic_compile).$/;"	m
 dynarec	src/misc/dynarec.erl	/^-module(dynarec).$/;"	m
 ebin_dir	src/deps/game_core/rebar_utils.erl	/^ebin_dir() ->$/;"	f	module:rebar_utils
-echo2	gamectl	/^echo2() {$/;"	f
-echo2_n	gamectl	/^echo2_n() {$/;"	f
 ecsv	src/deps/game_core/csv_parser.erl	/^-record(ecsv,{ $/;"	r
 edb	src/deps/emysql/edb.erl	/^-module(edb).$/;"	m
 edb_util	src/deps/emysql/edb_util.erl	/^-module(edb_util).$/;"	m
@@ -3036,7 +3041,6 @@ end_per_group	deps/protobuffs/test/erlang_protobuffs_SUITE.erl	/^end_per_group(_
 end_per_suite	deps/protobuffs/test/erlang_protobuffs_SUITE.erl	/^end_per_suite(_Config) -> ok.$/;"	f	module:erlang_protobuffs_SUITE
 end_per_testcase	deps/protobuffs/test/erlang_protobuffs_SUITE.erl	/^end_per_testcase(_TestCase, _Config) -> ok.$/;"	f	module:erlang_protobuffs_SUITE
 ensure_dir	src/deps/game_core/rebar_utils.erl	/^ensure_dir(Path) ->$/;"	f	module:rebar_utils
-ensure_log_dir	gamectl	/^ensure_log_dir()$/;"	f
 ensure_logfile	src/deps/lager/lager_util.erl	/^ensure_logfile(Name, FD, Inode, Buffer) ->$/;"	f	module:lager_util
 enum_negative_test_	deps/protobuffs/test/protobuffs_parser_tests.erl	/^enum_negative_test_() ->$/;"	f	module:protobuffs_parser_tests
 enum_outside_value	deps/protobuffs/test/protobuffs_proper.erl	/^enum_outside_value() -> oneof(['FIRST', 'SECOND']).$/;"	f	module:protobuffs_proper
@@ -3065,7 +3069,6 @@ erase_cd	test/util.erl	/^erase_cd(Key) ->$/;"	f	module:util
 erl_opts	src/deps/game_core/rebar_utils.erl	/^erl_opts(Config) ->$/;"	f	module:rebar_utils
 erl_to_mod	src/deps/game_core/rebar_utils.erl	/^erl_to_mod(Filename) ->$/;"	f	module:rebar_utils
 erlang_protobuffs_SUITE	deps/protobuffs/test/erlang_protobuffs_SUITE.erl	/^-module(erlang_protobuffs_SUITE).$/;"	m
-error	gamectl	/^error() {$/;"	f
 error_logger_lager_h	src/deps/lager/error_logger_lager_h.erl	/^-module(error_logger_lager_h).$/;"	m
 error_logger_service	src/kernel/lib_server.erl	/^error_logger_service(_Sup) ->$/;"	f	module:lib_server
 error_packet	include/emysql/emysql.hrl	/^-record(error_packet, {seq_num :: number(), $/;"	r
@@ -25599,7 +25602,6 @@ get_all	src/game/global_data_disk.erl	/^get_all() ->$/;"	f	module:global_data_di
 get_aoi_grid	src/map/map_aoi.erl	/^get_aoi_grid(#aoi{grid_dict = GridDict}, IndexX, IndexY) ->$/;"	f	module:map_aoi
 get_arch	src/deps/game_core/rebar_utils.erl	/^get_arch() ->$/;"	f	module:rebar_utils
 get_base_id	test/lib_counter.erl	/^get_base_id() ->$/;"	f	module:lib_counter
-get_buffer	src/user/user_send.erl	/^get_buffer() ->$/;"	f	module:user_send
 get_by_bit	test/util.erl	/^get_by_bit(Int32, N) when N>0,N<33->$/;"	f	module:util
 get_callback_mod	src/kernel/game_gen_server.erl	/^get_callback_mod() ->$/;"	f	module:game_gen_server
 get_cell	src/deps/game_geom/navmesh.erl	/^get_cell(CellArray, Index) ->$/;"	f	module:navmesh
@@ -25848,7 +25850,6 @@ get_value_pos	test/util.erl	/^get_value_pos([], _Value, _Seq) ->$/;"	f	module:ut
 get_value_pos	test/util.erl	/^get_value_pos([_V|List], Value, Seq) ->$/;"	f	module:util
 get_vertex	src/deps/game_geom/triangle.erl	/^get_vertex(Triangle, Index) ->$/;"	f	module:triangle
 get_with_length	olddeps/mysql/mysql_conn.erl	/^get_with_length(Bin) when is_binary(Bin) ->$/;"	f	module:mysql_conn
-getip	gamectl	/^getip() {$/;"	f
 give_manager_control	src/deps/emysql/emysql_conn.erl	/^give_manager_control(Socket) ->$/;"	f	module:emysql_conn
 give_manager_control	src/deps/emysql/emysql_conn_mgr.erl	/^give_manager_control(Socket) ->$/;"	f	module:emysql_conn_mgr
 global_data	src/game/global_data_disk.erl	/^-record(global_data, {key, value, is_dirty = 0}).$/;"	r
@@ -26176,6 +26177,7 @@ init	src/misc/game_config.erl	/^init() ->$/;"	f	module:game_config
 init	src/misc/game_ctl.erl	/^init() ->$/;"	f	module:game_ctl
 init	src/srv_game/srv_timer.erl	/^init([]) ->$/;"	f	module:srv_timer
 init	src/test/fsm_lock.erl	/^init(Code) ->$/;"	f	module:fsm_lock
+init	src/user/user_loginout.erl	/^init(UserID) ->$/;"	f	module:user_loginout
 init	test/lib_counter.erl	/^init() ->$/;"	f	module:lib_counter
 init_clear_all	test/lib_counter.erl	/^init_clear_all() ->$/;"	f	module:lib_counter
 init_connect_list	src/kernel/srv_node.erl	/^init_connect_list() ->$/;"	f	module:srv_node
@@ -26189,6 +26191,7 @@ init_id	src/game/game_counter.erl	/^init_id() ->$/;"	f	module:game_counter
 init_item_id	test/lib_counter.erl	/^init_item_id() ->$/;"	f	module:lib_counter
 init_login_logout_id	test/lib_counter.erl	/^init_login_logout_id() ->$/;"	f	module:lib_counter
 init_mail_id	test/lib_counter.erl	/^init_mail_id() ->$/;"	f	module:lib_counter
+init_modules	src/user/user_loginout.erl	/^init_modules() ->$/;"	f	module:user_loginout
 init_packet_index	src/kernel/packet_encode.erl	/^init_packet_index()->$/;"	f	module:packet_encode
 init_path_data	src/deps/game_geom/game_geom_astar.erl	/^init_path_data([H|T], Index, {MapW,MapH}, Arr) ->$/;"	f	module:game_geom_astar
 init_path_data	src/deps/game_geom/game_geom_astar.erl	/^init_path_data([], _, _, Arr) -> Arr;$/;"	f	module:game_geom_astar
@@ -26263,7 +26266,6 @@ is_changed	src/misc/game_reloader.erl	/^is_changed(M) ->$/;"	f	module:game_reloa
 is_contain	src/deps/game_geom/rectangle.erl	/^is_contain(Rectangle, _Point = #vector2f{x = X, y = Y}) when is_record(Rectangle, rectangle) ->$/;"	f	module:rectangle
 is_contain	src/deps/game_geom/rectangle.erl	/^is_contain(_Rectangle = #rectangle{x = X, y = Y, width = Width, height = Height}, PointX, PointY) ->$/;"	f	module:rectangle
 is_contain	src/deps/game_geom/rectangle.erl	/^is_contain({X, Y, Width, Height}, PointX, PointY) ->$/;"	f	module:rectangle
-is_crashed	gamectl	/^is_crashed() $/;"	f
 is_cw	src/deps/game_geom/polygon.erl	/^is_cw(_PointList) ->$/;"	f	module:polygon
 is_digit	src/deps/json/rfc4627.erl	/^is_digit($0) -> true;$/;"	f	module:rfc4627
 is_digit	src/deps/json/rfc4627.erl	/^is_digit($1) -> true;$/;"	f	module:rfc4627
@@ -26345,7 +26347,6 @@ is_stacktrace	src/deps/lager/lager_stdlib.erl	/^is_stacktrace([]) ->$/;"	f	modul
 is_stacktrace	src/deps/lager/lager_stdlib.erl	/^is_stacktrace([{M,F,As}|Fs]) when is_atom(M), is_atom(F), length(As) >= 0 ->$/;"	f	module:lager_stdlib
 is_stacktrace	src/deps/lager/lager_stdlib.erl	/^is_stacktrace([{M,F,A}|Fs]) when is_atom(M), is_atom(F), is_integer(A) ->$/;"	f	module:lager_stdlib
 is_stacktrace	src/deps/lager/lager_stdlib.erl	/^is_stacktrace(_) ->$/;"	f	module:lager_stdlib
-is_started	gamectl	/^is_started () $/;"	f
 is_valid	src/deps/game_geom/game_geom_bstar.erl	/^is_valid(X, Y, MapW, MapH) ->$/;"	f	module:game_geom_bstar
 is_visible_in2point	src/deps/game_geom/delaunay.erl	/^is_visible_in2point(PointA, PointB, EdgeList) ->$/;"	f	module:delaunay
 is_visible_in2point1	src/deps/game_geom/delaunay.erl	/^is_visible_in2point1(Line, [Edge|EdgeList], Flag) ->$/;"	f	module:delaunay
@@ -26551,11 +26552,12 @@ list_to_atom2	test/util.erl	/^list_to_atom2(List) when is_list(List) ->$/;"	f	mo
 lists_any	deps/meck/src/meck_code_gen.erl	/^lists_any(Pred, Improper) ->$/;"	f	module:meck_code_gen
 lists_any	deps/meck/src/meck_code_gen.erl	/^lists_any(Pred, [Hd|Tail]) ->$/;"	f	module:meck_code_gen
 lists_any	deps/meck/src/meck_code_gen.erl	/^lists_any(Pred, []) when is_function(Pred, 1) -> false;$/;"	f	module:meck_code_gen
-live	gamectl	/^live ()$/;"	f
 load	src/deps/json/rfc4627_jsonrpc_inets.erl	/^load("JsonRpcAlias " ++ Alias, []) ->$/;"	f	module:rfc4627_jsonrpc_inets
 load_binary	deps/meck/src/meck_code.erl	/^load_binary(Name, Binary) ->$/;"	f	module:meck_code
 load_game_config	src/misc/game_config.erl	/^load_game_config() ->$/;"	f	module:game_config
 load_guild	src/game/game_mmdb_preload.erl	/^load_guild() ->$/;"	f	module:game_mmdb_preload
+load_init	src/user/user_load.erl	/^load_init(UserID) ->$/;"	f	module:user_load
+load_init_modules	src/user/user_load.erl	/^load_init_modules() ->$/;"	f	module:user_load
 load_map_block	src/map/map_block.erl	/^load_map_block(SourceID, BlockList) ->$/;"	f	module:map_block
 load_map_config	src/map/map_config.erl	/^load_map_config() ->$/;"	f	module:map_config
 load_map_config	src/map/map_config.erl	/^load_map_config(SourceID) ->$/;"	f	module:map_config
@@ -26592,6 +26594,7 @@ log_warnings	src/deps/emysql/emysql_conn.erl	/^log_warnings(_Sock, _OtherPacket)
 logger_h	src/logger/logger_h.erl	/^-module(logger_h).$/;"	m
 logger_src	src/logger/loglevel.erl	/^logger_src(Loglevel) ->$/;"	f	module:loglevel
 loglevel	src/logger/loglevel.erl	/^-module(loglevel).$/;"	m
+logout	src/user/user_loginout.erl	/^logout(User) ->$/;"	f	module:user_loginout
 longunixtime	src/misc/util.erl	/^longunixtime() ->$/;"	f	module:util
 longunixtime	test/util.erl	/^longunixtime() ->$/;"	f	module:util
 lookup	src/deps/emysql/emysql_statements.erl	/^lookup(Key, Tree) ->$/;"	f	module:emysql_statements
@@ -26874,8 +26877,6 @@ next_field_num	deps/protobuffs/src/protobuffs.erl	/^next_field_num(Bytes) ->$/;"
 no_cover_passthrough_test	deps/meck/test/meck_tests.erl	/^no_cover_passthrough_test() ->$/;"	f	module:meck_tests
 node2node_info	src/kernel/srv_node.erl	/^node2node_info(Node) ->$/;"	f	module:srv_node
 node_info	src/kernel/srv_node.erl	/^-record(node_info, {node            %% 节点$/;"	r
-nodelay_send	src/user/user_send.erl	/^nodelay_send(#user{other_data = #user_other{socket = Socket}} = _User) ->$/;"	f	module:user_send
-nodelay_send	src/user/user_send.erl	/^nodelay_send(#user{other_data = #user_other{socket = Socket}} = _User, Bin) ->$/;"	f	module:user_send
 nodelay_send_to_one	src/game/game_pack_send.erl	/^nodelay_send_to_one(UserX, Bin) ->$/;"	f	module:game_pack_send
 nodelay_send_to_one	src/game/game_pack_send.erl	/^nodelay_send_to_one(UserX, Data) when is_tuple(Data) ->$/;"	f	module:game_pack_send
 nodelay_send_to_users	src/game/game_pack_send.erl	/^nodelay_send_to_users(UserXList, Data) ->$/;"	f	module:game_pack_send
@@ -27033,8 +27034,8 @@ pack	deps/protobuffs/src/pokemon_pb.erl	/^pack(_, repeated, [], _, Acc) ->$/;"	f
 pack	deps/protobuffs/src/pokemon_pb.erl	/^pack(_, repeated, undefined, _, _) -> [];$/;"	f	module:pokemon_pb
 pack	deps/protobuffs/src/pokemon_pb.erl	/^pack(_, repeated_packed, [], _, _) -> [];$/;"	f	module:pokemon_pb
 pack	deps/protobuffs/src/pokemon_pb.erl	/^pack(_, repeated_packed, undefined, _, _) -> [];$/;"	f	module:pokemon_pb
-pack	src/game/game_pack_send.erl	/^pack(Cmd, Data) ->$/;"	f	module:game_pack_send
-pack	src/game/game_pack_send.erl	/^pack(DataList) ->$/;"	f	module:game_pack_send
+pack	src/game/game_pack_send.erl	/^pack(Data) ->$/;"	f	module:game_pack_send
+pack	src/game/game_pack_send.erl	/^pack(DataList) when is_list(DataList) ->$/;"	f	module:game_pack_send
 pack_list	src/kernel/client_protobuf_encode.erl	/^pack_list(L) -> $/;"	f	module:client_protobuf_encode
 pack_list	src/kernel/protobuf_encode.erl	/^pack_list(L) -> $/;"	f	module:protobuf_encode
 pack_repeated	deps/protobuffs/src/protobuffs_parser.erl	/^pack_repeated(Type,_) ->$/;"	f	module:protobuffs_parser
@@ -27283,7 +27284,6 @@ print_infos_stack	src/deps/game_core/mtop.erl	/^print_infos_stack(Fd,Info) ->$/;
 print_infos_top	src/deps/game_core/mtop.erl	/^print_infos_top(Fd,Info) ->$/;"	f
 print_options	src/deps/lager/lager_trunc_io.erl	/^-record(print_options, {$/;"	r
 print_record	src/misc/lib_record.erl	/^print_record(Record) ->$/;"	f	module:lib_record
-print_rpc_return	gamectl	/^print_rpc_return ()$/;"	f
 print_silly_list	src/deps/lager/error_logger_lager_h.erl	/^print_silly_list(L) ->$/;"	f	module:error_logger_lager_h
 print_silly_list	src/deps/lager/error_logger_lager_h.erl	/^print_silly_list(L) when is_list(L) ->$/;"	f	module:error_logger_lager_h
 print_silly_list	src/deps/lager/error_logger_lager_h.erl	/^print_silly_list([H|T], Fmt, Acc) ->$/;"	f	module:error_logger_lager_h
@@ -27501,7 +27501,6 @@ register_info	src/kernel/srv_node.erl	/^-record(register_info, {node$/;"	r
 register_service	src/deps/json/rfc4627_jsonrpc.erl	/^register_service(Pid, ServiceDescription) ->$/;"	f	module:rfc4627_jsonrpc
 reinstall_on_initial_failure_test_	src/deps/lager/lager_handler_watcher.erl	/^reinstall_on_initial_failure_test_() ->$/;"	f	module:lager_handler_watcher
 reinstall_on_runtime_failure_test_	src/deps/lager/lager_handler_watcher.erl	/^reinstall_on_runtime_failure_test_() ->$/;"	f	module:lager_handler_watcher
-reload	gamectl	/^reload ()$/;"	f
 reload	src/deps/crontab/cron.erl	/^reload() ->$/;"	f	module:cron
 reload	src/misc/game_config.erl	/^reload() ->$/;"	f	module:game_config
 reload	src/misc/game_reloader.erl	/^reload() ->$/;"	f	module:game_reloader
@@ -27608,7 +27607,7 @@ rotation_calculation_test	src/deps/lager/lager_util.erl	/^rotation_calculation_t
 rotation_test_	src/deps/lager/lager_file_backend.erl	/^rotation_test_() ->$/;"	f	module:lager_file_backend
 round_float	test/util.erl	/^round_float(F) ->$/;"	f	module:util
 routing	src/kernel/srv_reader.erl	/^routing(Cmd,Bin,Socket) ->$/;"	f	module:srv_reader
-rpc	gamectl	/^rpc() $/;"	f
+routing	src/user/user_routing.erl	/^routing(User, Cmd, Data) ->$/;"	f	module:user_load
 rsync_apply	test/util.erl	/^rsync_apply([_, M, F, A]) ->$/;"	f	module:util
 run	deps/meck/test/meck_performance_test.erl	/^run(N) ->$/;"	f	module:meck_performance_test
 run_handler	src/deps/json/rfc4627_jsonrpc.erl	/^run_handler({function, F}, Name, RequestInfo, CoercedArgs, _Timeout) ->$/;"	f	module:rfc4627_jsonrpc
@@ -27955,8 +27954,14 @@ sasl_type_to_report_head	src/deps/lager/lager_crash_log.erl	/^sasl_type_to_repor
 sasl_type_to_report_head	src/deps/lager/lager_crash_log.erl	/^sasl_type_to_report_head(supervisor_report) ->$/;"	f	module:lager_crash_log
 save	src/deps/game_geom/game_geom_astar.erl	/^save(Index, Node) ->$/;"	f	module:game_geom_astar
 save	src/srv_game/srv_log.erl	/^save(State) ->$/;"	f	module:srv_log
-save_buffer	src/user/user_send.erl	/^save_buffer(List) ->$/;"	f	module:user_send
+save	src/user/user_load.erl	/^save(User) ->$/;"	f	module:user_load
+save	src/user/user_loginout.erl	/^save(User) ->$/;"	f	module:user_loginout
+save_logout	src/user/user_load.erl	/^save_logout(User) ->$/;"	f	module:user_load
+save_loop	src/user/user_load.erl	/^save_loop(User) ->$/;"	f	module:user_load
+save_loop	src/user/user_loginout.erl	/^save_loop(User) ->$/;"	f	module:user_loginout
 save_map_state	lib_map_counter.erl	/^save_map_state(#map_state{} = MapState) ->$/;"	f	module:lib_map_counter
+save_modules	src/user/user_load.erl	/^save_modules() ->$/;"	f	module:user_load
+save_modules	src/user/user_loginout.erl	/^save_modules() ->$/;"	f	module:user_loginout
 save_node	src/deps/game_geom/game_geom_bstar.erl	/^save_node(PathData,Node) ->$/;"	f	module:game_geom_bstar
 save_packet_index	src/kernel/packet_encode.erl	/^save_packet_index(Time,Index,SetIndex,NewIndex) ->$/;"	f	module:packet_encode
 scan_and_parse	src/logger/dynamic_compile.erl	/^scan_and_parse(RemainingText, CurrFilename, CurrLine, RevForms, MacroDict, IncludeSearchPath) ->$/;"	f	module:dynamic_compile
@@ -28010,7 +28015,12 @@ select_sort	src/test/sort_test.erl	/^select_sort([], L) ->$/;"	f	module:sort_tes
 select_sort1	src/test/sort_test.erl	/^select_sort1([H | T], L, Max) ->$/;"	f	module:sort_test
 select_sort1	src/test/sort_test.erl	/^select_sort1([], L, Max) ->$/;"	f	module:sort_test
 send_and_recv_packet	src/deps/emysql/emysql_tcp.erl	/^send_and_recv_packet(Sock, Packet, SeqNum) ->$/;"	f	module:emysql_tcp
+send_bin	src/user/user_send.erl	/^send_bin(#user{other_data = #user_other{socket = Socket}} = _User, Bin) ->$/;"	f	module:user_send
+send_log	src/user/user_log.erl	/^send_log(#user{other_data = #user_other{log_list = LogList} = UserOther} = User) ->$/;"	f	module:user_log
+send_log	src/user/user_log.erl	/^send_log(#user{other_data = #user_other{log_list = []}} = User) ->$/;"	f	module:user_log
 send_msg	olddeps/mysql/mysql_conn.erl	/^send_msg(Pid, Msg, From, Timeout) ->$/;"	f	module:mysql_conn
+send_msg	src/user/user_send.erl	/^send_msg(#user{other_data = #user_other{msg_list = MsgList, socket = Socket} = UserOther} = User) ->$/;"	f	module:user_send
+send_msg	src/user/user_send.erl	/^send_msg(#user{other_data = #user_other{msg_list = []}} = User) ->$/;"	f	module:user_send
 send_recv	src/deps/emysql/emysql_conn.erl	/^send_recv(#emysql_connection{socket = Socket, warnings = Warnings}, Packet) ->$/;"	f	module:emysql_conn
 send_reply	olddeps/mysql/mysql_conn.erl	/^send_reply(GenSrvFrom, Res) ->$/;"	f	module:mysql_conn
 send_reply	olddeps/mysql/mysql_conn.erl	/^send_reply(GenSrvFrom, Res) when is_pid(GenSrvFrom) ->$/;"	f	module:mysql_conn
@@ -28022,8 +28032,6 @@ send_to_map_area	src/game/game_pack_send.erl	/^send_to_map_area(MapPid, X, Y, Da
 send_to_map_area	src/game/game_pack_send.erl	/^send_to_map_area(MapPid, X, Y, DataList) when is_list(DataList) ->$/;"	f	module:game_pack_send
 send_to_one	src/game/game_pack_send.erl	/^send_to_one(UserX, Bin) ->$/;"	f	module:game_pack_send
 send_to_one	src/game/game_pack_send.erl	/^send_to_one(UserX, Data) when is_tuple(Data) ->$/;"	f	module:game_pack_send
-send_to_self	src/game/game_pack_send.erl	/^send_to_self(#user{} = User, Data) ->$/;"	f	module:game_pack_send
-send_to_self	src/game/game_pack_send.erl	/^send_to_self(Data) ->  %% 如果没有带上#user{},给自己进程发消息获取#user{}$/;"	f	module:game_pack_send
 send_to_users	src/game/game_pack_send.erl	/^send_to_users(UserXList, Data) ->$/;"	f	module:game_pack_send
 sendpacket	olddeps/mysql/mysql_recv.erl	/^sendpacket(Parent, Data) ->$/;"	f	module:mysql_recv
 sep	src/deps/lager/lager_stdlib.erl	/^sep(1, S) -> S;$/;"	f	module:lager_stdlib
@@ -28178,7 +28186,6 @@ stacktrace_	deps/meck/test/meck_tests.erl	/^stacktrace_(Mod) ->$/;"	f	module:mec
 stacktrace_function_clause_	deps/meck/test/meck_tests.erl	/^stacktrace_function_clause_(Mod) ->$/;"	f	module:meck_tests
 stamp	src/misc/game_reloader.erl	/^stamp() ->$/;"	f	module:game_reloader
 start	deps/meck/src/meck_proc.erl	/^start(Mod, Options) ->$/;"	f	module:meck_proc
-start	gamectl	/^start ()$/;"	f
 start	olddeps/mysql/mysql.erl	/^start(PoolId, Host, Port, User, Password, Database) ->$/;"	f	module:mysql
 start	olddeps/mysql/mysql.erl	/^start(PoolId, Host, Port, User, Password, Database, LogFun) ->$/;"	f	module:mysql
 start	olddeps/mysql/mysql.erl	/^start(PoolId, Host, Port, User, Password, Database, LogFun, Encoding) ->$/;"	f	module:mysql
@@ -28288,14 +28295,12 @@ state	src/map/srv_map_manager.erl	/^-record(state,{}).$/;"	r
 state	src/srv_game/srv_log.erl	/^-record(state, {insert_dict = dict:new(), replace_dict = dict:new()}).$/;"	r
 state	tpl/srv_xxx.erl	/^-record(state, {id}).$/;"	r
 state_info	src/kernel/game_gen_server.erl	/^state_info(Pid, M, F, A) ->$/;"	f	module:game_gen_server
-status	gamectl	/^status ()$/;"	f
 status	src/deps/lager/lager.erl	/^status() ->$/;"	f	module:lager
 status	src/game/game_node_interface.erl	/^status()->$/;"	f	module:game_node_interface
 sticky_directory_test_	deps/meck/test/meck_tests.erl	/^sticky_directory_test_() ->$/;"	f	module:meck_tests
 sticky_setup	deps/meck/test/meck_tests.erl	/^sticky_setup() ->$/;"	f	module:meck_tests
 sticky_teardown	deps/meck/test/meck_tests.erl	/^sticky_teardown({Module, {Dir, Dest}}) ->$/;"	f	module:meck_tests
 stop	deps/meck/src/meck_proc.erl	/^stop(Mod) ->$/;"	f	module:meck_proc
-stop	gamectl	/^stop ()$/;"	f
 stop	olddeps/mysql/db.erl	/^stop() ->$/;"	f	module:db
 stop	olddeps/mysql/mysql.erl	/^stop() ->$/;"	f	module:mysql
 stop	src/deps/emysql/edb.erl	/^stop() ->$/;"	f	module:edb
@@ -28414,7 +28419,6 @@ suite	deps/protobuffs/test/erlang_protobuffs_SUITE.erl	/^suite() -> [{timetrap, 
 sup_get	src/deps/lager/lager_stdlib.erl	/^sup_get(Tag, Report) ->$/;"	f	module:lager_stdlib
 supervisor_name	src/deps/lager/error_logger_lager_h.erl	/^supervisor_name(Name) -> Name.$/;"	f	module:error_logger_lager_h
 supervisor_name	src/deps/lager/error_logger_lager_h.erl	/^supervisor_name({local, Name}) -> Name;$/;"	f	module:error_logger_lager_h
-switch_db	gamectl	/^switch_db ()$/;"	f
 switch_db	olddeps/mysql/db.erl	/^switch_db() ->$/;"	f	module:db
 sync	src/game/global_data_disk.erl	/^sync() ->$/;"	f	module:global_data_disk
 sync_apply	test/util.erl	/^sync_apply(Pid, M, F, A) ->$/;"	f	module:util
@@ -28764,8 +28768,7 @@ url_encode	test/util.erl	/^url_encode([$\\s | Rest], Acc) ->$/;"	f	module:util
 url_encode	test/util.erl	/^url_encode([C | Rest], Acc) ->$/;"	f	module:util
 url_encode	test/util.erl	/^url_encode([C | Rest], Acc) when ?QS_SAFE(C) ->$/;"	f	module:util
 url_encode	test/util.erl	/^url_encode([], Acc) ->$/;"	f	module:util
-usage	gamectl	/^usage ()$/;"	f
-user	include/inst/rd_user.hrl	/^-record(user, {user_id = 0$/;"	r
+user	include/inst/rd_user.hrl	/^-record(user, {user_id          = 0$/;"	r
 user_attr	include/common_pb.hrl	/^-record(user_attr, {$/;"	r
 user_attr	include/proto_11_pb.hrl	/^-record(user_attr, {$/;"	r
 user_attr	include/proto_12_pb.hrl	/^-record(user_attr, {$/;"	r
@@ -28786,6 +28789,10 @@ user_attr	include/proto_26_pb.hrl	/^-record(user_attr, {$/;"	r
 user_attr	include/proto_28_pb.hrl	/^-record(user_attr, {$/;"	r
 user_attr	include/proto_29_pb.hrl	/^-record(user_attr, {$/;"	r
 user_attr	include/proto_34_pb.hrl	/^-record(user_attr, {$/;"	r
+user_load	src/user/user_load.erl	/^-module(user_load).$/;"	m
+user_load	src/user/user_routing.erl	/^-module(user_load).$/;"	m
+user_log	src/user/user_log.erl	/^-module(user_log).$/;"	m
+user_loginout	src/user/user_loginout.erl	/^-module(user_loginout).$/;"	m
 user_misc	include/inst/rd_user.hrl	/^-record(user_misc, {key         = 0$/;"	r
 user_misc_struct	include/proto_13_pb.hrl	/^-record(user_misc_struct, {$/;"	r
 user_online	include/inst/rd_user.hrl	/^-record(user_online, {user_id = 0$/;"	r
@@ -28884,7 +28891,6 @@ vcs_vsn_cmd	src/deps/game_core/rebar_utils.erl	/^vcs_vsn_cmd({cmd, _Cmd}=Custom)
 vcs_vsn_invoke	src/deps/game_core/rebar_utils.erl	/^vcs_vsn_invoke(Cmd, Dir) ->$/;"	f	module:rebar_utils
 vector2f	include/deps/game_geom.hrl	/^-record(vector2f, {$/;"	r
 vector2f	src/deps/game_geom/vector2f.erl	/^-module(vector2f).$/;"	m
-version	gamectl	/^version ()$/;"	f
 version	olddeps/mysql/db_sql.erl	/^version() ->$/;"	f	module:db_sql
 version	src/deps/emysql/emysql_statements.erl	/^version(ConnId, StmtName) ->$/;"	f	module:emysql_statements
 version_sql	olddeps/mysql/db_version.erl	/^version_sql(1) ->$/;"	f	module:db_version
@@ -28971,7 +28977,6 @@ walk_body	src/deps/lager/lager_transform.erl	/^walk_body(Acc, [H|T]) ->$/;"	f	mo
 walk_body	src/deps/lager/lager_transform.erl	/^walk_body(Acc, []) ->$/;"	f	module:lager_transform
 walk_clauses	src/deps/lager/lager_transform.erl	/^walk_clauses(Acc, []) ->$/;"	f	module:lager_transform
 walk_clauses	src/deps/lager/lager_transform.erl	/^walk_clauses(Acc, [{clause, Line, Arguments, Guards, Body}|T]) ->$/;"	f	module:lager_transform
-warn	gamectl	/^warn() {$/;"	f
 way_point	include/deps/game_geom.hrl	/^-record(way_point, {$/;"	r
 wg_dynamic_config	src/misc/wg_dynamic_config.erl	/^-module(wg_dynamic_config).$/;"	m
 whereis_name	src/deps/game_core/sys_info.erl	/^whereis_name({global, Atom}) ->$/;"	f	module:sys_info
