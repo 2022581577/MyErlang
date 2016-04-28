@@ -1,0 +1,8 @@
+ebin
+erl_crash*.dump
+logs
+log
+config/game.config
+config/game2.config
+include/*_pb.hrl
+.rebar
