@@ -271,7 +271,7 @@ f2s(F) when is_float(F) ->
 
 %% @doc 转换为AcsII list(一般传入binary)
 to_utf8_list(Msg) ->
-    {ok, L} = asn1rt:utf8_binary_to_list(to_binary(Msg)),
+    L = unicode:characters_to_list(to_binary(Msg)),
     L.
 
 term_to_string(Term) ->

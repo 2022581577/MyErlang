@@ -15,8 +15,8 @@
 -define(MAP_HEIGHT, 25000).
 
 %% 格子宽、高
--define(CELL_WIDTH,     30).    
--define(CELL_HEIGHT,    30).
+-define(CELL_WIDTH,     40).    
+-define(CELL_HEIGHT,    40).
 %% 大格子宽、高
 -define(GRID_WIDTH,     720).
 -define(GRID_HEIGHT,    480).

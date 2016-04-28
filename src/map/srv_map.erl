@@ -73,7 +73,7 @@ do_init([MapID, MapIndexID]) ->
     lib_map_point:init(MapID),
             
 
-    TimeStamp = util:timestamp(),
+    _TimeStamp = util:timestamp(),
 
     MapInfo = #map_info{map_inst_id = {MapID, MapIndexID}
                         ,map_id = MapID

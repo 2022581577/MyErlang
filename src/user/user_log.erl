@@ -16,7 +16,7 @@
 %% @doc 添加玩家日志到log_list中
 %% 玩家进程内部调用
 add_log(#user{other_data = #user_other{log_list = LogList} = UserOther} = User, Log) ->
-    User1 = #user{other_data = UserOther#user_other{log_list = [Log | LogList]}},
+    User1 = User#user{other_data = UserOther#user_other{log_list = [Log | LogList]}},
     {ok, User1}.
 
 %% @doc 把log_list中的日志转储到dic中

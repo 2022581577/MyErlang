@@ -103,7 +103,7 @@ rpc()
     $ERL \
       $NAME_FLAG ${CTL_NAME}_ctl@$HOST \
       -noinput \
-      -pa $EBINS $PA_DEPS_EBIN\
+      -pa $EBINS $DEPS_EBIN_DIR\
       -setcookie ${COOKIE} \
       -s ${APP_CTL} -extra $ERLANG_NODE $@
 }
@@ -171,7 +171,7 @@ live ()
     change_ulimit
     $ERL \
       $NAME_FLAG $ERLANG_NODE \
-      -pa $EBINS $PA_DEPS_EBIN \
+      -pa $EBINS $DEPS_EBIN_DIR \
       -setcookie ${COOKIE} \
       -s ${APP_MOD} start \
       $ERLANG_OPTS --extra $ARGS "$@"
@@ -194,7 +194,7 @@ start ()
       $NAME_FLAG $ERLANG_NODE \
       -noinput -detached \
       -hidden \
-      -pa $EBINS $PA_DEPS_EBIN\
+      -pa $EBINS $DEPS_EBIN_DIR\
       -setcookie ${COOKIE} \
       -kernel error_logger silent \
       -sasl sasl_error_logger \{file,\"$SASL_LOG\"\} \
@@ -388,7 +388,8 @@ SERVER_TYPE=`cat ${GAME_CONF_FILE}  | grep -ri '{server_type,' | sed -e 's/{serv
 SERVER_ID=`cat ${GAME_CONF_FILE}  | grep -ri '{server_id,' | sed -e 's/{server_id,\s*\(.*\)}.*/\1/'`
 PLATFORM_ID=`cat ${GAME_CONF_FILE}  | grep -ri '{platform,' | sed -e 's/{platform,\s*\"\(.*\)\"}.*/\1/'`
 SERVER_PREFIX=`cat ${GAME_CONF_FILE}  | grep -ri '{prefix,' | sed -e 's/{prefix,\s*\(.*\)}.*/\1/'`
-SERVER_IP=`cat ${GAME_CONF_FILE} | grep -ri '{server_ip,' | sed -e 's/{server_ip,\s*\"\(.*\)\"}.*/\1/'`
+#SERVER_IP=`cat ${GAME_CONF_FILE} | grep -ri '{server_ip,' | sed -e 's/{server_ip,\s*\"\(.*\)\"}.*/\1/'`
+SERVER_IP=`ifconfig eth1 | grep "inet addr" | awk '{print $2}' | awk -F: '{print $2}'`
 SERVER_PORT=`cat ${GAME_CONF_FILE} | grep -ri '{server_port,' | sed -e 's/{server_port,\s*\(.*\)}.*/\1/'`
 
 if [ "$SERVER_PREFIX" = "" ]; then
@@ -420,8 +421,10 @@ fi
 ERLANG_OPTS="-connect_all $CONNECT_ALL +K $POLL -smp $SMP +P $ERL_PROCESSES \
     +t 10485760 +fnu +hms 8192 +hmbs 8192 +zdbbl 81920 -v"
 
-PA_DEPS_EBIN="-pa $ROOT/deps/protobuffs/ebin \
-              -pa $ROOT/deps/meck/ebin"
+DEPS_DIR=${ROOT}/deps
+DEPS_EBIN_DIR=`find $DEPS_DIR -name ebin -type d`
+#DEPS_EBIN_DIR="-pa $ROOT/deps/protobuffs/ebin \
+#              -pa $ROOT/deps/meck/ebin"
 
 
 case $ARGS in
