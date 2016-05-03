@@ -388,8 +388,8 @@ SERVER_TYPE=`cat ${GAME_CONF_FILE}  | grep -ri '{server_type,' | sed -e 's/{serv
 SERVER_ID=`cat ${GAME_CONF_FILE}  | grep -ri '{server_id,' | sed -e 's/{server_id,\s*\(.*\)}.*/\1/'`
 PLATFORM_ID=`cat ${GAME_CONF_FILE}  | grep -ri '{platform,' | sed -e 's/{platform,\s*\"\(.*\)\"}.*/\1/'`
 SERVER_PREFIX=`cat ${GAME_CONF_FILE}  | grep -ri '{prefix,' | sed -e 's/{prefix,\s*\(.*\)}.*/\1/'`
-#SERVER_IP=`cat ${GAME_CONF_FILE} | grep -ri '{server_ip,' | sed -e 's/{server_ip,\s*\"\(.*\)\"}.*/\1/'`
-SERVER_IP=`ifconfig eth1 | grep "inet addr" | awk '{print $2}' | awk -F: '{print $2}'`
+SERVER_IP=`cat ${GAME_CONF_FILE} | grep -ri '{server_ip,' | sed -e 's/{server_ip,\s*\"\(.*\)\"}.*/\1/'`
+#SERVER_IP=`ifconfig eth1 | grep "inet addr" | awk '{print $2}' | awk -F: '{print $2}'`
 SERVER_PORT=`cat ${GAME_CONF_FILE} | grep -ri '{server_port,' | sed -e 's/{server_port,\s*\(.*\)}.*/\1/'`
 
 if [ "$SERVER_PREFIX" = "" ]; then
