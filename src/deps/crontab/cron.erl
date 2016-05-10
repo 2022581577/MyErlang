@@ -5,8 +5,8 @@
 
 -export([
          start_link/0
-        ,gm_next_day_refresh/0
-        ,reload/0
+%        ,gm_next_day_refresh/0
+%        ,reload/0
         ]).
 -export([init/1, 
         handle_call/3, handle_cast/2, handle_info/2,
@@ -32,11 +32,11 @@ start_link() ->
             {ok, Pid}
     end.
 
-gm_next_day_refresh() ->
-    {?MODULE, game_misc:get_local_node()} ! gm_next_day_refresh.
+%gm_next_day_refresh() ->
+%    {?MODULE, game_misc:get_local_node()} ! gm_next_day_refresh.
 
-reload() ->
-    {?MODULE, game_misc:get_local_node()} ! reload.
+%reload() ->
+%    {?MODULE, game_misc:get_local_node()} ! reload.
 
 %% gen_server callbacks
 init(_Args) ->
