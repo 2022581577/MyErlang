@@ -7,3 +7,9 @@ config/game2.config
 include/*_pb.hrl
 .rebar
 tags
+*/tags
+*/*/tags
+*/*/*/tags
+*/*/*/*/tags
+*/*/*/*/*/tags
+
