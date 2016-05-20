@@ -6,8 +6,8 @@
 
 -module(edb).
 
--include("emysql.hrl").
 -include("common.hrl").
+-include("../../deps/emysql/include/emysql.hrl").
 
 -export([init/1
         ,check_db/0

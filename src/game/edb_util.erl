@@ -38,7 +38,7 @@
         make_value_sql/1]).
 
 -include("common.hrl").
--include("emysql.hrl").
+-include("../../deps/emysql/include/emysql.hrl").
 
 -define(MYSQL_TIME_OUT, 5000).
 -define(MYSQL_LAST_CONNECTION_TIME,mysql_last_connection_time). %% mysql上次重连时间
