@@ -11,9 +11,14 @@
 -include("rd_map.hrl").
 -include("rd_guild.hrl").
 
-%% 跨服服务器保存信息
--record(cross_server_config, {merge_list = []               %% 合服列表[{{Platform, ServerID}, {Platform, MainServerID}} | _]，用于根据平台和服务器id获取主服务器id
-                             ,dict_node_info = dict:new()   %% node_info字典，key:{Platform, ServerID}，value:#node_info{}
-                            }).
+%% 节点数据结构
+-record(node, {key             %% 根据不同的需求，设置不同的key（以node_name为key；以{platform,server_id}为key）
+              ,node_name       %% 节点
+              ,node_type       %% 节点类型(config中的server_type)
+              ,platform        %% 平台(config中的platform)
+              ,server_id       %% 服务器编号(config中的server_id)
+              ,ip              %% ip(config中的server_ip)
+              ,port            %% 端口(config中的server_port)
+               }).
 
 -endif.
