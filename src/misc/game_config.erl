@@ -47,9 +47,10 @@ load_game_config() ->
 
 %% 重置列表，做合法性检查
 reset_list(List) ->
-    {server_type, ServerType}   = proplists:get_value(server_type, List),
-    {server_id, ServerID}       = proplists:get_value(server_id, List),
-    {platform, Platform}        = proplists:get_value(platform, List),
+    io:format("List:~w", [List]),
+    ServerType  = proplists:get_value(server_type, List),
+    ServerID    = proplists:get_value(server_id, List),
+    Platform    = proplists:get_value(platform, List),
     reset_list(ServerType, Platform, ServerID, List).
 reset_list(ServerType, Platform, ServerID, List) ->
     DBName = lists:concat([ServerType, "_", Platform, "_", ServerID]),

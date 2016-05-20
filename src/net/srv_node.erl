@@ -50,7 +50,7 @@ do_cast({register_reply, ReplyNode}, #state{cross_connects = CrossConnects} = St
          ,node_type = ReplyServerType} = ReplyNode,
     case ReplyServerType of
         ?SERVER_TYPE_CROSS ->   %% 跨服注册返回
-            case lists:members(ReplyNodeName, CrossConnects) of
+            case lists:member(ReplyNodeName, CrossConnects) of
                 ?FALSE ->   
                     ets:insert(?ETS_NODE, key_node_name(ReplyNode)),
                     ets:insert(?ETS_NODE, key_platf_server(ReplyNode)),
@@ -109,7 +109,7 @@ do_info(loop, #state{cross_connects = CrossConnects} = State) ->
         ?SERVER_TYPE_GAME ->    
             %% 连跨服
             CrossNode = game_config:get_config(cross_node),
-            case lists:members(CrossNode, CrossConnects) of
+            case lists:member(CrossNode, CrossConnects) of
                 ?FALSE ->   
                     %% 没有在已连接的跨服节点列表中
                     net_kernel:connect_node(CrossNode), %% 连接节点

@@ -30,6 +30,7 @@ start(Sup) ->
     ok = game_ets_init:init(),                          %% 各种ets初始化
     %% ok = game_counter:init(),                           %% 自增id计数器模块
 
+    {ok, _} = server_sup:start_child(srv_node),         %% 节点管理进程
     {ok, _} = server_sup:start_child(srv_log),          %% 统计日志模块
     {ok, _} = server_sup:start_child(srv_map_manager),  %% 地图管理进程
 
