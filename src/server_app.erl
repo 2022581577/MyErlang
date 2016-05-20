@@ -19,8 +19,6 @@
 start(normal, []) ->
     %% 开启主监控树
     {ok, Sup} = server_sup:start_link(),
-    %% 加载配置
-    game_config:init(),
     ok = lib_server:start(Sup),
     {ok, Sup}.
 

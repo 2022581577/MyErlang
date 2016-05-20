@@ -85,18 +85,19 @@
 -record(user, {user_id          = 0
               ,name             = <<>>
               ,acc_name         = <<>>
-              ,server_no        = 1
-              ,user_type        = 0                  %% 玩家类型:0、普通玩家，1、新手指导员，2、GM
+              ,server_id        = 1         %% 玩家当前server_id(config中的)
+              ,reg_server_id    = 1         %% 玩家注册的server_id(注册时所在服的config中的)
+              ,user_type        = 0         %% 玩家类型:0、普通玩家，1、新手指导员，2、GM
               ,ip               = ""
 
               ,reg_time         = 0
               ,is_online        = 0
-              ,online_time      = 0                %% 在线时间
-              ,total_online_time= 0          %% 累计在线时间
+              ,online_time      = 0         %% 在线时间
+              ,total_online_time= 0         %% 累计在线时间
               ,login_time       = 0
               ,last_online_time = 0 
-              ,last_update_time = 0           %% save db time
-              ,logout_type               %% 下线类型
+              ,last_update_time = 0         %% save db time
+              ,logout_type                  %% 下线类型
 
               ,recharge_gold    = 0
               ,gold             = 0
@@ -118,7 +119,7 @@
               ,mp               = 0
 
               ,guild_id         = 0         %% 帮派id
-              ,guild_position   = 0   %% 帮派位置
+              ,guild_position   = 0         %% 帮派位置
 
               ,other_data       = #user_other{}    %% 存库时该字段清空
          }).

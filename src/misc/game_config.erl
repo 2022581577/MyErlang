@@ -47,15 +47,10 @@ load_game_config() ->
 
 %% 重置列表，做合法性检查
 reset_list(List) ->
-    {server_id,ServerID} = lists:keyfind(server_id,1,List),
-    {platform,Platform} = lists:keyfind(platform,1,List),
-    reset_list(Platform,ServerID,List).
-reset_list(Platform, ServerID, List) ->
-    case lists:keyfind(db_name,1,List) of
-        {db_name,DBName} ->
-            lists:keystore(db_name,1,List,{db_name,util:to_list(DBName)});
-        false ->
-            DBName = lists:concat([Platform,"_",ServerID]),
-            [{db_name,DBName} | List]
-    end.
-
+    {server_type, ServerType}   = proplists:get_value(server_type, List),
+    {server_id, ServerID}       = proplists:get_value(server_id, List),
+    {platform, Platform}        = proplists:get_value(platform, List),
+    reset_list(ServerType, Platform, ServerID, List).
+reset_list(ServerType, Platform, ServerID, List) ->
+    DBName = lists:concat([ServerType, "_", Platform, "_", ServerID]),
+    lists:keystore(db_name, 1, List, {db_name, DBName}).

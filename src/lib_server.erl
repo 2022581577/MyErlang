@@ -13,6 +13,8 @@
 
 %% @doc 开启服务
 start(Sup) ->
+    game_config:init(),                                 %% 加载配置
+
     {ok, _} = server_sup:start_child(srv_timer),        %% 时间管理进程
 
     ok = lager_service(Sup),                            %% lager
