@@ -17,9 +17,9 @@ start(Sup) ->
 
     {ok, _} = server_sup:start_child(srv_timer),        %% 时间管理进程
 
-    ok = lager_service(Sup),                            %% lager
+    ok = log_lager:init(),                              %% lager
 
-    ok = error_logger_service(Sup),                     %% 错误日志相关
+%    ok = error_logger_service(Sup),                     %% 错误日志相关
     ok = global_data_ram:init(),                        %% 需要在一开始init，game_node_interface中有用到
 
     game_node_interface:set_server_starting(),
@@ -37,13 +37,6 @@ start(Sup) ->
     game_node_interface:set_server_running(),
     ok.
 
-%% lager
-lager_service(_Sup) ->
-    application:start(syntax_tools),
-    application:start(compiler),
-    application:start(goldrush),
-    application:start(lager),
-    ok.
 
 %% 开启错误日志
 error_logger_service(_Sup) ->

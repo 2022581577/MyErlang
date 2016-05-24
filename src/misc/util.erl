@@ -8,6 +8,7 @@
 -module(util).
 -include("common.hrl").
 
+-export([lager_filename/2]).
 -export([log_filename/1]).
 
 -export([to_integer/1
@@ -245,6 +246,14 @@ get_month_days(Year, Month) ->
 %%    OpenDays = calendar:date_to_gregorian_days(Year, Month, Day),
 %%    UnixDays = unixdays(),
 %%    UnixDays - OpenDays + 1.
+
+
+%% lager filename
+lager_filename(BaseDir, Level) ->
+    BaseDir ++ to_list(Level) ++ ".log".
+%lager_filename(BaseDir, Level) ->
+%    log_filename(lists:concat([BaseDir,?CONFIG(server_type),"_",?CONFIG(platform),"_",?CONFIG(prefix),?CONFIG(server_id),"_"]), 
+%        "." ++ to_list(Level) ++ ".log").
 
 
 %% 游戏输出日志文件名
