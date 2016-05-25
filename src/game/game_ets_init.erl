@@ -11,40 +11,40 @@
 -export([init/0]).
 
 init() ->
-    ets:new(?ETS_NODE, [{keypos, #node.key}, named_table, public, set, {read_concurrency, true}]),                      %% 节点信息
-    ets:new(?ETS_USER_ONLINE,[{keypos,#user_online.user_id},named_table,public,set,{read_concurrency,true}]),           %% 玩家在线
-    ets:new(?ETS_MAP_ID_LIST,[{keypos,1},named_table,public,set,{read_concurrency,true}]),                              %% 地图MapID,IndexIDList映射
-    ets:new(?ETS_MAP_INFO,[{keypos,#map_info.map_inst_id},named_table,public,set,{read_concurrency,true}]),             %% 地图MapInstID:{map_id, index_id}信息映射
-    ets:new(?ETS_MAP_CONFIG, [{keypos, #tpl_map_config.source_id}, named_table, public, set, {read_concurrency,true}]), %% 地图配置
+    ets:new(?ETS_NODE, [{keypos, #node.key} | ?ETS_OPT]),                           %% 节点信息
+    ets:new(?ETS_USER_ONLINE,[{keypos,#user_online.user_id} | ?ETS_OPT]),           %% 玩家在线
+    ets:new(?ETS_MAP_ID_LIST,[{keypos,1} | ?ETS_OPT]),                              %% 地图MapID,IndexIDList映射
+    ets:new(?ETS_MAP_INFO,[{keypos,#map_info.map_inst_id} | ?ETS_OPT]),             %% 地图MapInstID:{map_id, index_id}信息映射
+    ets:new(?ETS_MAP_CONFIG, [{keypos, #tpl_map_config.source_id} | ?ETS_OPT]),     %% 地图配置
 
-    %ets:new(?ETS_WALK_POINT,[{keypos,#map_walk_point.map_id},named_table,public,set,{read_concurrency,true}]),                       %% 阻挡点信息
-    %ets:new(?ETS_NPC, [{keypos, #npc.id}, named_table, public, set, {read_concurrency,true}]),                           %% NPC信息 
-    %ets:new(?ETS_USER_DROP, [{keypos, #user_drop.user_id}, named_table, public, set, {read_concurrency,true}]),          %% 玩家掉落
-    %ets:new(?ETS_TEAM, [{keypos, #team.id}, named_table, public, set, {read_concurrency, true}]),                        %% 队伍
-    %ets:new(?ETS_GUILD_USER, [{keypos, #guild_user.user_id}, named_table, public, set, {read_concurrency, true}]),       %% 帮派成员信息
-    %ets:new(?ETS_GUILD_REQUEST, [{keypos, #guild_request.id}, named_table, public, set, {read_concurrency, true}]),       %% 帮派成员信息
-    %ets:new(?ETS_DELETE, [{keypos, #ets_delete.key}, named_table, public, set, {read_concurrency, true}]),      %% 删除数据信息
-    %ets:new(?ETS_OPEN_PACKAGE_MASK,[{keypos,1},named_table,public,set,{read_concurrency,true}]),                         %% 开包裹掩码
-    %ets:new(?ETS_CHAT_ITEM,[{keypos, 3},named_table,public,set,{read_concurrency,true}]),                     %% 聊天帖的物品信息
-    %ets:new(?ETS_LOGIN_FLAG,[{keypos,#login_flag.key},named_table,public,set,{read_concurrency,true}]),                     %% 登陆秘钥
-    %ets:new(?ETS_RANK_ITEM, [{keypos, #user_item.id}, named_table, public, set, {read_concurrency, true}]),                 %% 排行榜物品信息
-    %ets:new(?ETS_RANK_ITEM_TEMP, [{keypos, #rank_item_info.id}, named_table, public, set, {read_concurrency, true}]),       %% 排行榜物品信息缓存
-    %ets:new(?ETS_USER_TO_RANK, [{keypos, #user_to_rank.user_id}, named_table, public, set, {read_concurrency, true}]),      %% 玩家ID-排名映射表
-    %ets:new(?ETS_USER_TO_DUP, [{keypos, #user_to_dup.user_id}, named_table, public, set, {read_concurrency, true}]),      %% 占领玩家ID-副本ID映射表
-    %ets:new(?ETS_RELA_LV_ONLINE,[{keypos, #rela_lv_online.lv}, named_table, public, set, {read_concurrency, true}]),  %% 好友在线等级列表记录 
-    %ets:new(?ETS_IP_ONLINE,[{keypos, #ip_online.ip}, named_table, public, set, {read_concurrency, true}]),  %% 好友在线等级列表记录 
-    %ets:new(?ETS_EVENT_TEMP, [{keypos, #event_temp.user_id}, named_table, public, set, {read_concurrency, true}]),       %% 离线事件缓存
+    %ets:new(?ETS_WALK_POINT,[{keypos,#map_walk_point.map_id} | ?ETS_OPT]),         %% 阻挡点信息
+    %ets:new(?ETS_NPC, [{keypos, #npc.id} | ?ETS_OPT]),                             %% NPC信息
+    %ets:new(?ETS_USER_DROP, [{keypos, #user_drop.user_id} | ?ETS_OPT]),            %% 玩家掉落
+    %ets:new(?ETS_TEAM, [{keypos, #team.id} | ?ETS_OPT]),                           %% 队伍
+    %ets:new(?ETS_GUILD_USER, [{keypos, #guild_user.user_id} | ?ETS_OPT]),          %% 帮派成员信息
+    %ets:new(?ETS_GUILD_REQUEST, [{keypos, #guild_request.id} | ?ETS_OPT]),         %% 帮派成员信息
+    %ets:new(?ETS_DELETE, [{keypos, #ets_delete.key} | ?ETS_OPT]),                  %% 删除数据信息
+    %ets:new(?ETS_OPEN_PACKAGE_MASK,[{keypos,1} | ?ETS_OPT]),                       %% 开包裹掩码
+    %ets:new(?ETS_CHAT_ITEM,[{keypos, 3} | ?ETS_OPT]),                              %% 聊天帖的物品信息
+    %ets:new(?ETS_LOGIN_FLAG,[{keypos,#login_flag.key} | ?ETS_OPT]),                %% 登陆秘钥
+    %ets:new(?ETS_RANK_ITEM, [{keypos, #user_item.id} | ?ETS_OPT]),                 %% 排行榜物品信息
+    %ets:new(?ETS_RANK_ITEM_TEMP, [{keypos, #rank_item_info.id} | ?ETS_OPT]),       %% 排行榜物品信息缓存
+    %ets:new(?ETS_USER_TO_RANK, [{keypos, #user_to_rank.user_id} | ?ETS_OPT]),      %% 玩家ID-排名映射表
+    %ets:new(?ETS_USER_TO_DUP, [{keypos, #user_to_dup.user_id} | ?ETS_OPT]),        %% 占领玩家ID-副本ID映射表
+    %ets:new(?ETS_RELA_LV_ONLINE,[{keypos, #rela_lv_online.lv} | ?ETS_OPT]),        %% 好友在线等级列表记录
+    %ets:new(?ETS_IP_ONLINE,[{keypos, #ip_online.ip} | ?ETS_OPT]),                  %% 好友在线等级列表记录
+    %ets:new(?ETS_EVENT_TEMP, [{keypos, #event_temp.user_id} | ?ETS_OPT]),          %% 离线事件缓存
 
-    %ets:new(?ETS_ACROSS_CLIENT_INFO,[{keypos,#across_client_info.key},named_table,public,set,{read_concurrency,true}]),     %% client的链接信息
-    %ets:new(?ETS_ACROSS_SERVER_INFO,[{keypos,#across_server_info.key},named_table,public,set,{read_concurrency,true}]),     %% 链接的server的信息
-    %ets:new(?ETS_ACROSS_USER_INFO,[{keypos,#across_user_info.user_id},named_table,public,set,{read_concurrency,true}]),     %% 参加跨服的玩家信息
+    %ets:new(?ETS_ACROSS_CLIENT_INFO,[{keypos,#across_client_info.key} | ?ETS_OPT]),%% client的链接信息
+    %ets:new(?ETS_ACROSS_SERVER_INFO,[{keypos,#across_server_info.key} | ?ETS_OPT]),%% 链接的server的信息
+    %ets:new(?ETS_ACROSS_USER_INFO,[{keypos,#across_user_info.user_id} | ?ETS_OPT]),%% 参加跨服的玩家信息
 
-    %ets:insert(?ETS_MAP_COUNTER,{?MAP_COUNTER,?INIT_MAP_ONLY_ID}),    
+    %ets:insert(?ETS_MAP_COUNTER,{?MAP_COUNTER,?INIT_MAP_ONLY_ID}),
     %%% 数据包统计
-    %ets:new(?ETS_PACKET_STAT,[{keypos,1},named_table,public,set,{read_concurrency,true}]),
+    %ets:new(?ETS_PACKET_STAT,[{keypos,1} | ?ETS_OPT]),
 
     %% 阻挡点信息，每个地图资源一个ets表
-    [ets:new(E, [{keypos,1},named_table,public,set,{read_concurrency,true}]) || E <- map_block:ets_map_block_name_list()],
+    [ets:new(E, [{keypos,1} | ?ETS_OPT]) || E <- map_block:ets_map_block_name_list()],
     %% 内存数据库ets表初始化
     game_mmdb:init(),
     ok.

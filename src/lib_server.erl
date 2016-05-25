@@ -25,8 +25,8 @@ start(Sup) ->
     game_node_interface:set_server_starting(),
 
     ok = netword_service(Sup),                          %% 网络相关服务
-    %% ok = mysql_service(Sup),                            %% 数据库相关
-    %% ok = global_data_disk:init(),                       %% 数据库启动后开启
+    ok = mysql_service(Sup),                            %% 数据库相关
+    ok = global_data_disk:init(),                       %% 数据库启动后开启
     ok = game_ets_init:init(),                          %% 各种ets初始化
     %% ok = game_counter:init(),                           %% 自增id计数器模块
 

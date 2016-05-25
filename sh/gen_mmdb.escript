@@ -32,13 +32,13 @@ get_header(Mod) ->
 
 fun_init() ->
     "init() ->\n" ++
-    lists:foldl(fun(#durable_record{name = Name,keypos = KeyPos, ets_type = EtsType},AccIn) ->
+    lists:foldl(fun(#durable_record{name = Name,keypos = KeyPos},AccIn) ->
                     AccIn ++ "\tets:new(" ++ ?ETS_RECORD_NAME(Name) ++
-                    ",[" ++ ?KEYPOS(Name,KeyPos) ++ ",named_table,public," ++ atom_to_list(EtsType) ++ ",{read_concurrency,true}]),\n"
+                    ",[" ++ ?KEYPOS(Name,KeyPos) ++ " | ?ETS_OPT]),\n"
                 end,"",?DURABLE_RECORD_LIST) ++ 
     %% 映射信息先不处理
-    "\tets:new(?ETS_ACCOUNT_INFO,[{keypos,#account_info.acc_name},named_table,public,set,{read_concurrency,true}]),     %% 账号角色ID映射\n"
-    %"\tets:new(?ETS_USER_NAME,[{keypos,#name_info.name},named_table,public,set,{read_concurrency,true}]),                  %% 角色名称映射\n" TODO 看后续是否需要加server_id
+    "\tets:new(?ETS_ACCOUNT_INFO,[{keypos,#account_info.acc_name} | ?ETS_OPT]),     %% 账号角色ID映射\n"
+    %"\tets:new(?ETS_USER_NAME,[{keypos,#name_info.name} | ?ETS_OPT]),                  %% 角色名称映射\n" TODO 看后续是否需要加server_id
     "\tok.\n\n\n"
     "get_account_info(AccName) ->\n"
     "\tAccName1 = util:to_binary(AccName),\n"

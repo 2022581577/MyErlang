@@ -1,6 +1,6 @@
 %% Generate by code robot @ binbinjnu@163.com>
 %% All rights reserved
-%% @desc 游戏内存数据库
+%% @desc æ¸¸æåå­æ°æ®åº
 
 -module(game_mmdb).
 
@@ -19,10 +19,10 @@
 
 
 init() ->
-	ets:new(?ETS_USER,[{keypos,#user.user_id},named_table,public,set,{read_concurrency,true}]),
-	ets:new(?ETS_USER_ITEM,[{keypos,1},named_table,public,set,{read_concurrency,true}]),
-	ets:new(?ETS_GUILD,[{keypos,#guild.guild_id},named_table,public,set,{read_concurrency,true}]),
-	ets:new(?ETS_ACCOUNT_INFO,[{keypos,#account_info.acc_name},named_table,public,set,{read_concurrency,true}]),     %% 账号角色ID映射
+	ets:new(?ETS_USER,[{keypos,#user.user_id} | ?ETS_OPT]),
+	ets:new(?ETS_USER_ITEM,[{keypos,1} | ?ETS_OPT]),
+	ets:new(?ETS_GUILD,[{keypos,#guild.guild_id} | ?ETS_OPT]),
+	ets:new(?ETS_ACCOUNT_INFO,[{keypos,#account_info.acc_name} | ?ETS_OPT]),     %% è´¦å·è§è²IDæ å°
 	ok.
 
 
@@ -43,7 +43,7 @@ add_account_mapping(AccName,UserID) ->
 			false ->
 				#account_info{acc_name = AccName,user_ids = [UserID]}
 		end,
-	%% 帐号和对应玩家id列表映射
+	%% å¸å·åå¯¹åºç©å®¶idåè¡¨æ å°
 	ets:insert(?ETS_ACCOUNT_INFO,AccountInfo1).
 
 
@@ -77,7 +77,7 @@ get_guild(Key) ->
 			false
 	end.
 
-%% @doc 新号初始化ets
+%% @doc æ°å·åå§åets
 new_user_init_ets(UserID) ->
 	ets:insert(?ETS_USER_ITEM, {UserID, []}),
 	ok.

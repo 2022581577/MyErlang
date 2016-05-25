@@ -19,7 +19,7 @@
 -define(MYSQL_CONNECT_COUNT,4).
 -define(BASE_MYSQL_POOL, base_mysql_pool).
 
-init(SupPid) ->
+init(_SupPid) ->
     crypto:start(), %% 开启crypto模块
     emysql:start(), %% 
 	start_mysql(),
@@ -34,7 +34,8 @@ start_mysql()->
 	Encode = ?CONFIG(db_encode),
 	DbName = undefined,   %% 连接默认数据库
 	Port = ?CONFIG(db_port),
-    ?WARNING("Host:~w, User:~w, Password:~w, Encode:~w, DbName:~w, Port:~w", [Host, User, Password, Encode, DbName, Port]),
+    ?WARNING("Host:~w, User:~w, Password:~w, Encode:~w, DbName:~w, Port:~w",
+        [Host, User, Password, Encode, DbName, Port]),
     emysql:add_pool(?BASE_MYSQL_POOL, 1, User, Password, Host, Port, DbName, Encode), %% 先开启一个基础数据库
     %% 检测数据库（创建、切换等操作）
     check_db(),
@@ -75,7 +76,8 @@ check_db() ->
 			?WARNING("have database db_name:~p", [DbName]),
             skip;
         _ ->    %% 没有数据库，创建
-            Res1 = edb_util:execute(?BASE_MYSQL_POOL, lists:concat(["CREATE DATABASE `", DbName, "` DEFAULT charset utf8"])),
+            Res1 = edb_util:execute(?BASE_MYSQL_POOL,
+                lists:concat(["CREATE DATABASE `", DbName, "` DEFAULT charset utf8"])),
 			?WARNING("create database ~p res:~w",[DbName, Res1]),
             ok
     end,
@@ -85,13 +87,14 @@ check_db() ->
     ?WARNING("change database res:~w",[Res2]),
     %% TODO 数据库语句执行
     %% global_data表建立
-    %Res3 = edb_util:execute(?BASE_MYSQL_POOL, <<"CREATE TABLE `global_data` (
-    %                                            `global_key` varchar(50) NOT NULL,
-    %                                            `global_value` text NOT NULL,
-    %                                            PRIMARY KEY (`global_key`)
-    %                                            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='全局信息';">>),
-    %?WARNING("create global data res:~w",[Res3]),
-    %db_version:check_version(),
+    Res3 = edb_util:execute(?BASE_MYSQL_POOL,
+        <<"CREATE TABLE `global_data` (
+        `global_key` varchar(50) NOT NULL,
+        `global_value` text NOT NULL,
+        PRIMARY KEY (`global_key`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='全局信息';">>),
+    ?WARNING("create global data res:~w",[Res3]),
+    %% db_version:check_version(),
 
     ok.
 

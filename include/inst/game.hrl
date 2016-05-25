@@ -15,6 +15,8 @@
                 ,{low_watermark, 64 * 1024}
             ]).
 
+-define(ETS_OPT, [named_table, public, set, {read_concurrency, true}]).
+
 -define(HEADER_LENGTH, 4).          % 消息头长度
 -define(HEART_TIMEOUT, (90 * 1000)).  % 接收数据超时时间
 

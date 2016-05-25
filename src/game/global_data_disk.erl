@@ -66,7 +66,10 @@ stop() ->
 
 do_sync() ->
     EtsInfoList = list(),
-    [edb_util:replace(global_data, [{global_key, util:term_to_bitstring(K)}, {global_value, util:term_to_bitstring(V)}]) || #global_data{key = K, value = V, is_dirty = 1} <- EtsInfoList],
+    [edb_util:replace(
+        global_data,
+        [{global_key, util:term_to_bitstring(K)}, {global_value, util:term_to_bitstring(V)}]
+    ) || #global_data{key = K, value = V, is_dirty = 1} <- EtsInfoList],
     ok.
 
 %%% ------------------------------
@@ -75,4 +78,5 @@ do_sync() ->
 %% @doc 获取所有数据
 get_all() ->
     DbList = edb_util:get_all(global_data, [global_key, global_value], []),
-    [#global_data{key = util:bitstring_to_term(Key), value = util:bitstring_to_term(Value)} || [Key, Value] <- DbList].
+    [#global_data{key = util:bitstring_to_term(Key), value = util:bitstring_to_term(Value)}
+        || [Key, Value] <- DbList].
