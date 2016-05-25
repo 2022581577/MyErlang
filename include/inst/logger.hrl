@@ -11,26 +11,7 @@
     -define(_U(S),S).
 -endif.
 
-
--ifdef(LOGGER).
-
-%% define logger
--define(D(Format, Args),            logger:debug_msg(?MODULE,?LINE,Format, Args)).
--define(INFO(Format, Args),         logger:info_msg(?MODULE,?LINE,Format, Args)).
--define(WARNING(Format, Args),      logger:warning_msg(?MODULE,?LINE,Format, Args)).
--define(WARNING2(Format, Args),     logger:warning_msg(?MODULE,?LINE,Format ++ ",~w", Args ++ [erlang:get_stacktrace()])).
--define(ERROR(Format, Args),        logger:error_msg(?MODULE,?LINE,Format ++ ",~w", Args ++ [erlang:get_stacktrace()])).    
--define(CRITICAL_MSG(Format, Args), logger:critical_msg(?MODULE,?LINE,Format, Args)).
-
-%% no param logger
--define(D(Format),                  logger:debug_msg(?MODULE,?LINE,Format, [])).
--define(INFO(Format),               logger:info_msg(?MODULE,?LINE,Format, [])).
--define(WARNING(Format),            logger:warning_msg(?MODULE,?LINE,Format, [])).
--define(WARNING2(Format),           logger:warning_msg(?MODULE,?LINE,Format ++ ",~w", [] ++ [erlang:get_stacktrace()])).
--define(ERROR(Format),              logger:error_msg(?MODULE,?LINE,Format ++ ",~w", [] ++ [erlang:get_stacktrace()])).    
--define(CRITICAL_MSG(Format),       logger:critical_msg(?MODULE,?LINE,Format, [])).
-
--else.
+-ifdef(LAGER).
 
 %% define logger
 -define(D(Format, Args),            log_lager:lager(fun_info, ?MODULE, ?LINE, Format, Args)).
@@ -41,13 +22,32 @@
 -define(CRITICAL_MSG(Format, Args), log_lager:lager(fun_crash, ?MODULE, ?LINE, Format, Args)).
 
 %% no param logger
--define(D(Format),                  log_lager:lager(fun_info, ?MODULE, ?LINE, Format, [])).
--define(INFO(Format),               log_lager:lager(fun_info, ?MODULE, ?LINE, Format, [])).
--define(WARNING(Format),            log_lager:lager(fun_warning, ?MODULE, ?LINE, Format, [])).
--define(WARNING2(Format),           log_lager:lager(fun_warning, ?MODULE, ?LINE, Format ++ ",~w", [] ++ [erlang:get_stacktrace()])).
--define(ERROR(Format),              log_lager:lager(fun_error, ?MODULE, ?LINE, Format ++ ",~w", [] ++ [erlang:get_stacktrace()])).    
--define(CRITICAL_MSG(Format),       log_lager:lager(fun_crash, ?MODULE, ?LINE, Format, [])).
+-define(D(Format),                  ?D(Format, [])).     
+-define(INFO(Format),               ?INFO(Format, [])).   
+-define(WARNING(Format),            ?WARNING(Format, [])). 
+-define(WARNING2(Format),           ?WARNING2(Format ++ ",~w", [erlang:get_stacktrace()])).
+-define(ERROR(Format),              ?ERROR(Format ++ ",~w", [erlang:get_stacktrace()])).
+-define(CRITICAL_MSG(Format),       ?CRITICAL_MSG(Format, [])).
+
+-else.
+
+%% define logger
+-define(D(Format, Args),            logger:debug_msg(?MODULE,?LINE,Format, Args)).
+-define(INFO(Format, Args),         logger:info_msg(?MODULE,?LINE,Format, Args)).
+-define(WARNING(Format, Args),      logger:warning_msg(?MODULE,?LINE,Format, Args)).
+-define(WARNING2(Format, Args),     logger:warning_msg(?MODULE,?LINE,Format ++ ",~w", Args ++ [erlang:get_stacktrace()])).
+-define(ERROR(Format, Args),        logger:error_msg(?MODULE,?LINE,Format ++ ",~w", Args ++ [erlang:get_stacktrace()])).    
+-define(CRITICAL_MSG(Format, Args), logger:critical_msg(?MODULE,?LINE,Format, Args)).
+
+%% no param logger
+-define(D(Format),                  ?D(Format, [])).     
+-define(INFO(Format),               ?INFO(Format, [])).   
+-define(WARNING(Format),            ?WARNING(Format, [])). 
+-define(WARNING2(Format),           ?WARNING2(Format ++ ",~w", [erlang:get_stacktrace()])).
+-define(ERROR(Format),              ?ERROR(Format ++ ",~w", [erlang:get_stacktrace()])).
+-define(CRITICAL_MSG(Format),       ?CRITICAL_MSG(Format, [])).
 
 -endif.
+
 
 -endif.

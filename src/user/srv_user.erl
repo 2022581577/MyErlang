@@ -6,7 +6,7 @@
 
 -module(srv_user).
 -author('zhongbinbin <binbinjnu@163.com>').
--behaviour(game_gen_server).
+-behaviour(behaviour_gen_server).
 -compile(inline).
 
 -include("common.hrl").
@@ -20,6 +20,8 @@
 
 -export([start/1
         ,start_link/1]).
+
+-export([after_routine/1]).
 
 %% cast接口
 -export([cast/2
@@ -43,7 +45,7 @@
 start(UserID) ->
 	server_sup:start_user([UserID]).
 start_link(UserID) ->
-    game_gen_server:start_link(?MODULE, [UserID], []).
+    behaviour_gen_server:start_link(?MODULE, [UserID], []).
 
 
 do_init([UserID]) ->
@@ -55,7 +57,7 @@ do_init([UserID]) ->
                     process_flag(trap_exit,true),
                     %% loop最好在前端请求了玩家初始化协议后开启（需要注意重连时loop的处理）
                     erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, ?PLAYER_LOOP_INCREACE}),
-                    erlang:send_after(?MODULE_TINY_LOOP_TICK, self(), tiny_loop),
+                    %% erlang:send_after(?MODULE_TINY_LOOP_TICK, self(), tiny_loop),
                     ProcessName = lib_user:get_user_process_name(UserID),
                     erlang:register(ProcessName, self()),
                     user_online:add(#user_online{user_id = UserID, pid = self()}),
@@ -69,10 +71,6 @@ do_init([UserID]) ->
             ?WARNING("User Has been Started,UserID:~w,Pid:~w",[UserID,Pid]),
             process_exist
     end. 
-
-%do_cast({send_data,L},#user{socket = Socket} = User) ->
-%    lib_send:send(Socket,lists:reverse(L)),
-%    {noreply,User};
 
 do_cast({stop_user, Type}, User) ->
     ?WARNING("cast stop user!"),
@@ -145,19 +143,19 @@ do_info({inet_async,Socket,_Ref,{ok,<<0:16,Len:16>>}},#user{other_data = #user_o
 do_info({inet_async,Socket,_Ref,{ok,Bin}},#user{user_id = UserID, other_data = #user_other{socket = Socket}} = User) ->
 	case protobuf_encode:decode(Bin) of
 		{Cmd,Data} ->
-            lib_packet_monitor:check_packet_count(Cmd),
 			_NewRef = async_recv(Socket,?HEADER_LENGTH,?HEART_TIMEOUT),	
-			%% User2 = User#user{packet_len = 0},
-            %% ?INFO("Recevie Data:~w",[Cmd]),
+
+            lib_packet_monitor:check_packet_count(Cmd),
             case user_routing:routing(Cmd, Data, User) of
-                {ok, #user{} = NewUser} ->   %% 尽量全部都返回{ok, NewUser}
-					{noreply,NewUser};
+                {ok, #user{} = NewUser} ->
+                    {ok, NewUser1} = after_routine(NewUser),    %% 按事务处理完后
+					{noreply, NewUser1};
 				{ok, ErrorUser} ->
 					?WARNING("Return Error User:~w",[ErrorUser]),
-					{noreply,User};
+					{noreply, User};
 				ErrorRes ->
 					?WARNING("Return Error Res:~w",[ErrorRes]),
-					{noreply,User}
+					{noreply, User}
 			end;
 		Error ->
             ?WARNING("Receive Data Error:~w,UserID:~w,Ip:~p,Bin:~w",[Error,UserID,lib_user:get_ip(),Bin]),
@@ -208,34 +206,20 @@ do_info({inet_reply,Socket,{error,Reason}},#user{user_id = UserID, other_data = 
     cast_stop(self(), netword_error),
     {noreply,User#user{other_data = UserOther#user_other{socket = NewSocket}}};
 
-%do_info({send,Bin},#user{other_data = #user_other{socket = Socket}} = User) ->
-%    lib_user_send:send(Socket,Bin),
-%    {noreply,User};
-%
-%do_info({nodelay_send,Bin},#user{other_data = #user_other{socket = Socket}} = User) ->
-%    lib_send:send(Socket,Bin),
-%	{noreply,User};
-%
-%do_info(send,#user{other_data = #user_other{socket = Socket}} = User)->
-%    %% ?INFO("Send User Buff"),
-%    lib_user_send:do_send(Socket),
-%    lib_user_send:set_timer_ref(?NOT_TIMER_REF),
-%    {noreply,User};
-	
+
 do_info({loop, Time}, #user{other_data = #user_other{is_loop = 0}} = User) ->
 	erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, Time}),
     {noreply, User};
 do_info({loop, Time}, User) ->  %% 前端确认登录完成后才进行loop
     %% 加个判断，判断是否在socket断掉的时候，考虑是否需要断掉loop
 	erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, Time + ?PLAYER_LOOP_INCREACE}),
-    NewUser = lib_user_loop:loop(User,Time),
+    {ok, NewUser} = user_loop:loop(User,Time),
 	{noreply,NewUser};
 
-do_info(tiny_loop, User) ->
-	erlang:send_after(?MODULE_TINY_LOOP_TICK, self(), tiny_loop),
-    {ok, User1} = user_send:send_msg(User),
-    {ok, UserN} = user_log:store_log(User1),
-    {noreply, UserN};
+%do_info(tiny_loop, User) ->
+%	erlang:send_after(?MODULE_TINY_LOOP_TICK, self(), tiny_loop),
+%    {ok, UserN} = user_send:send_msg(User),
+%    {noreply, UserN};
 
 do_info(Info, User) -> 
     ?WARNING("Not done do_info:~w",[Info]),
@@ -269,6 +253,21 @@ close_socket(Socket) ->
 %%% ----------------------
 
 
+%%% ----------------------
+%%%     处理事务相关
+%%% ----------------------
+after_routine(User) ->
+    %% 发消息
+    {ok, User1} = user_send:send_msg(User),
+    %% 下发事件
+    {ok, UserN} = user_event:send_event(User1),
+    %% 日志累积在loop中和数据一起save
+    {ok, UserN}.
+
+%%% ----------------------
+%%%     处理事务相关
+%%% ----------------------
+
 %%% -------------------------------------------
 %%%             -----API-----
 %%% -------------------------------------------
@@ -288,7 +287,7 @@ cast_stop(UserX, Type) ->
         {false, R} ->   
             ?WARNING("cast stop user false, UserX:~w, Type:~w, R:~w", [UserX, Type, R]);
         UserPid ->
-            game_gen_server:cast(UserPid, {stop_user, Type})
+            behaviour_gen_server:cast(UserPid, {stop_user, Type})
     end.
 	
 %% @doc 同步停止进程
@@ -297,7 +296,7 @@ call_stop(UserX, Type) ->
         {false, R} ->   
             ?WARNING("call stop user false, UserX:~w, Type:~w, R:~w", [UserX, Type, R]);
         UserPid ->
-            game_gen_server:call(UserPid, {stop_user, Type})
+            behaviour_gen_server:call(UserPid, {stop_user, Type})
     end.
 
 
@@ -312,7 +311,7 @@ cast_state_apply(UserX, Callback) ->
             {false, R};
         UserPid ->
             {M, F, A} = util:transform_callback(Callback),
-            game_gen_server:cast_state_apply(UserPid, M, F, A)
+            behaviour_gen_server:cast_state_apply(UserPid, M, F, A)
     end.
 cast_apply(UserX, Callback) ->      
     case analyze_user_x(UserX) of
@@ -321,7 +320,7 @@ cast_apply(UserX, Callback) ->
             {false, R};
         UserPid ->
             {M, F, A} = util:transform_callback(Callback),
-            game_gen_server:cast_apply(UserPid, M, F, A)
+            behaviour_gen_server:cast_apply(UserPid, M, F, A)
     end.
 
 %% @param UserX: User | UserPid | UserID
@@ -334,7 +333,7 @@ cast(UserX, Msg) ->
             ?WARNING("cast user false, UserX:~w, Msg:~w, R:~w", [UserX, Msg, R]),
             {false, R};
         UserPid ->
-            game_gen_server:cast(UserPid, Msg)
+            behaviour_gen_server:cast(UserPid, Msg)
     end.
 
 
@@ -349,7 +348,7 @@ call_state_apply(UserX, Callback) ->
             {false, R};
         UserPid ->
             {M, F, A} = util:transform_callback(Callback),
-            game_gen_server:call_state_apply(UserPid, M, F, A)
+            behaviour_gen_server:call_state_apply(UserPid, M, F, A)
     end.
 call_apply(UserX, Callback) ->      
     case analyze_user_x(UserX) of
@@ -358,7 +357,7 @@ call_apply(UserX, Callback) ->
             {false, R};
         UserPid ->
             {M, F, A} = util:transform_callback(Callback),
-            game_gen_server:call_apply(UserPid, M, F, A)
+            behaviour_gen_server:call_apply(UserPid, M, F, A)
     end.
 
 %% @param UserX: User | UserPid | UserID
@@ -371,7 +370,7 @@ call(UserX, Msg) ->
             ?WARNING("call user false, UserX:~w, Msg:~w, R:~w", [UserX, Msg, R]),
             {false, R};
         UserPid ->
-            game_gen_server:call(UserPid, Msg)
+            behaviour_gen_server:call(UserPid, Msg)
     end.
 
 

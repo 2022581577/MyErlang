@@ -21,7 +21,7 @@
 
 init(SupPid) ->
     crypto:start(), %% 开启crypto模块
-    emysql_sup:start(SupPid),   %% 开启emysql主监控进程
+    emysql:start(), %% 
 	start_mysql(),
     %% 开启多个进程池
     start_mysql_pool(),

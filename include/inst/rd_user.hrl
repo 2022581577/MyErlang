@@ -13,8 +13,6 @@
 -record(user_other, {is_loop        = 0     %% 前端发送协议确认正式登录完成后，才开始loop
                     ,pid
                     ,socket
-                    ,msg_list       = []    %% 用于存储每次前段发协议上来处理时需要反馈给前端的协议信息
-                    ,log_list       = []    %% 用于存储玩家日志
                     ,map_id
                     ,map_index_id
                     ,map_pid
@@ -22,6 +20,10 @@
                     ,mail                   %% 邮件
                     ,misc           = []    %% 需要持久化的杂项信息 对应user_misc
                     ,temp_misc      = []    %% 无需持久化的杂项信息 对应user_misc
+
+                    ,msg_list       = []    %% 用于存储每次前段发协议上来处理时需要反馈给前端的协议信息
+                    ,log_list       = []    %% 用于存储玩家日志
+                    ,event_list     = []    %% 用于存储玩家事件
     }).
 
 %    ,map_pid

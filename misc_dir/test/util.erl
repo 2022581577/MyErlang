@@ -1044,7 +1044,7 @@ dict2list(Dict) ->
 
 %% 调试使用
 sync_apply(Pid, M, F, A) ->
-	game_gen_server:call(Pid, util, rsync_apply, [M, F, A]).
+	behaviour_gen_server:call(Pid, util, rsync_apply, [M, F, A]).
 
 rsync_apply([_, M, F, A]) ->
 	Res = erlang:apply(M, F, A),

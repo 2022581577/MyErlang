@@ -5,7 +5,7 @@
 %%%----------------------------------------------------------------------
 
 -module(srv_map).
--behaviour(game_gen_server).
+-behaviour(behaviour_gen_server).
 -compile(inline).
 
 -include("common.hrl").
@@ -53,13 +53,13 @@ start(MapID, MapIndexID) ->
         undefined ->
             server_sup:start_map([MapID, MapIndexID]);
         Pid ->
-            game_gen_server:cast_apply(Pid, srv_map, set_last_active, []),   
+            behaviour_gen_server:cast_apply(Pid, srv_map, set_last_active, []),   
             {ok,Pid}
     end.
 
 start_link(MapID, MapIndexID) ->
     ProcessName = lib_map:get_map_process_name(MapID, MapIndexID),
-    game_gen_server:start_link({local,ProcessName}, ?MODULE, [MapID, MapIndexID], []).
+    behaviour_gen_server:start_link({local,ProcessName}, ?MODULE, [MapID, MapIndexID], []).
 
 do_init([MapID, MapIndexID]) ->
     ?INFO("Start Map, MapID:~w, MapIndexID:~w",[MapID, MapIndexID]),
@@ -153,7 +153,7 @@ cast_state_apply(MapID, MapIndexID, Callback) ->
     end.
 cast_state_apply(MapPid, Callback) ->
     {M, F, A} = util:transform_callback(Callback),
-    game_gen_server:cast_state_apply(MapPid, M, F, A).
+    behaviour_gen_server:cast_state_apply(MapPid, M, F, A).
 
 cast_apply(MapID, MapIndexID, Callback) ->      
     case lib_map:get_map_pid(MapID, MapIndexID) of
@@ -165,7 +165,7 @@ cast_apply(MapID, MapIndexID, Callback) ->
     end.
 cast_apply(MapPid, Callback) ->
     {M, F, A} = util:transform_callback(Callback),
-    game_gen_server:cast_apply(MapPid, M, F, A).
+    behaviour_gen_server:cast_apply(MapPid, M, F, A).
 
 %% @param msg
 %% @return ok | {false, Res}
@@ -175,10 +175,10 @@ cast(MapID, MapIndexID, Msg) ->
         false ->   
             ?WARNING("cast map false, MapID:~w, MapIndexID:~w, Msg:~w", [MapID, MapIndexID, Msg]);
         MapPid ->
-            game_gen_server:cast(MapPid, Msg)
+            behaviour_gen_server:cast(MapPid, Msg)
     end.
 cast(MapPid, Msg) ->
-    game_gen_server:cast(MapPid, Msg).
+    behaviour_gen_server:cast(MapPid, Msg).
 
 
 %% @param Callback {M, F, A} | {F, A} | F
@@ -194,7 +194,7 @@ call_state_apply(MapID, MapIndexID, Callback) ->
     end.
 call_state_apply(MapPid, Callback) ->
     {M, F, A} = util:transform_callback(Callback),
-    game_gen_server:call_state_apply(MapPid, M, F, A).
+    behaviour_gen_server:call_state_apply(MapPid, M, F, A).
 
 call_apply(MapID, MapIndexID, Callback) ->      
     case lib_map:get_map_pid(MapID, MapIndexID) of
@@ -206,7 +206,7 @@ call_apply(MapID, MapIndexID, Callback) ->
     end.
 call_apply(MapPid, Callback) ->
     {M, F, A} = util:transform_callback(Callback),
-    game_gen_server:call_apply(MapPid, M, F, A).
+    behaviour_gen_server:call_apply(MapPid, M, F, A).
 
 %% @param msg
 %% @return ok | {false, Res}
@@ -216,10 +216,10 @@ call(MapID, MapIndexID, Msg) ->
         false ->   
             ?WARNING("call map false, MapID:~w, MapIndexID:~w, Msg:~w", [MapID, MapIndexID, Msg]);
         MapPid ->
-            game_gen_server:call(MapPid, Msg)
+            behaviour_gen_server:call(MapPid, Msg)
     end.
 call(MapPid, Msg) ->
-    game_gen_server:call(MapPid, Msg).
+    behaviour_gen_server:call(MapPid, Msg).
 
 
 %% @doc 调试接口,获取状态

@@ -5,7 +5,7 @@
 %%%------------------------------------------------------------------------
 
 -module(srv_xxx).
--behaviour(game_gen_server).
+-behaviour(behaviour_gen_server).
 -compile(inline).
 
 %% include
@@ -25,7 +25,7 @@
 -record(state, {id}).
 
 start_link([]) ->
-    game_gen_server:start_link(?MODULE, [], []).
+    behaviour_gen_server:start_link(?MODULE, [], []).
 
 
 do_init([]) ->

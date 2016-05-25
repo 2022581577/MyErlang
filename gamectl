@@ -169,6 +169,7 @@ is_crashed()
 live ()
 {
     change_ulimit
+    echo "${ERL} ${NAME_FLAG} ${ERLANG_NODE} -pa ${EBINS} ${DEPS_EBIN_DIR} -setcookie ${COOKIE} -s ${APP_MOD} start ${ERLANG_OPTS} --extra ${ARGS} \"$@\""
     $ERL \
       $NAME_FLAG $ERLANG_NODE \
       -pa $EBINS $DEPS_EBIN_DIR \

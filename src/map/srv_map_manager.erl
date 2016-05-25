@@ -6,7 +6,7 @@
 %%%----------------------------------------------------------------------
 
 -module(srv_map_manager).
--behaviour(game_gen_server).
+-behaviour(behaviour_gen_server).
 -compile(inline).
 
 -export([do_init/1, do_call/3, do_cast/2, do_info/2, do_terminate/2]).
@@ -27,14 +27,14 @@
 %% TODO 后期需要添加跨服处理，到对应的跨服节点获取
 %% 根据地图跨服类型活动对应的节点
 start_map(MapID) ->
-    game_gen_server:call_apply(?MODULE, ?MODULE, do_start_map, [MapID]).
+    behaviour_gen_server:call_apply(?MODULE, ?MODULE, do_start_map, [MapID]).
 
 %% 删除映射关系
 del_map(MapID, MapIndexID) ->
-    game_gen_server:cast_apply(?MODULE, ?MODULE, do_del_map, [MapID, MapIndexID]).
+    behaviour_gen_server:cast_apply(?MODULE, ?MODULE, do_del_map, [MapID, MapIndexID]).
 
 start_link() ->
-	game_gen_server:start_link({local,?MODULE},?MODULE,[],[]).
+	behaviour_gen_server:start_link({local,?MODULE},?MODULE,[],[]).
 
 do_init([]) ->
     process_flag(trap_exit,true),

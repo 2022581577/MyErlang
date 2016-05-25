@@ -51,11 +51,11 @@ dialyzer:clean mmake mk_template2
 	(dialyzer --plt $(PLT) -Werror_handling  -r $(EBIN_DIR)/)
 
 mk_template:
-	@$(ERL) -pa $(EBIN_DIR) -noinput  -eval "case make:files([\"src/mod/game_gen_server.erl\"], [{outdir, \"ebin\"},{i,\"include\"}]) of error -> halt(1); _ -> halt(0) end"
+	@$(ERL) -pa $(EBIN_DIR) -noinput  -eval "case make:files([\"src/mod/behaviour_gen_server.erl\"], [{outdir, \"ebin\"},{i,\"include\"}]) of error -> halt(1); _ -> halt(0) end"
 
 mk_template2:
 	@$(ERL) -pa $(EBIN_DIR) -noinput  \
-		-eval "case make:files([\"src/mod/game_gen_server.erl\"], [{outdir, \"ebin\"},{i,\"include\"},debug_info]) of error -> halt(1); _ -> halt(0) end"
+		-eval "case make:files([\"src/mod/behaviour_gen_server.erl\"], [{outdir, \"ebin\"},{i,\"include\"},debug_info]) of error -> halt(1); _ -> halt(0) end"
 
 code:
 	chmod +x scripts/*.erl

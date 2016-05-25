@@ -7,7 +7,7 @@
 %%%           由分节点主动连接主节点
 %%%----------------------------------------------------------------------
 -module(srv_node).
--behaviour(game_gen_server).
+-behaviour(behaviour_gen_server).
 
 -include("common.hrl").
 -include("record.hrl").
@@ -23,7 +23,7 @@
 %% API functions
 %% ====================================================================
 start_link() ->
-    game_gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
+    behaviour_gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 
 do_init([]) ->
@@ -41,7 +41,7 @@ do_cast({register, RegNode}, State) ->
     ets:insert(?ETS_NODE, key_node_name(RegNode)),
     ets:insert(?ETS_NODE, key_platf_server(RegNode)),
     %% 反馈
-    game_gen_server:cast({?MODULE, RegNodeName}, {register_reply, local_node()}),
+    behaviour_gen_server:cast({?MODULE, RegNodeName}, {register_reply, local_node()}),
     {noreply, State};
 
 %% 游戏服中接收到注册反馈
@@ -113,7 +113,7 @@ do_info(loop, #state{cross_connects = CrossConnects} = State) ->
                 ?FALSE ->   
                     %% 没有在已连接的跨服节点列表中
                     net_kernel:connect_node(CrossNode), %% 连接节点
-                    game_gen_server:cast({?MODULE, CrossNode}, {register, local_node()}), %% 注册节点信息
+                    behaviour_gen_server:cast({?MODULE, CrossNode}, {register, local_node()}), %% 注册节点信息
                     ok;
                 _ ->
                     skip
