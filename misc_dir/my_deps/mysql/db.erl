@@ -77,7 +77,7 @@ start_mysql_pool(SupPid,ConnectCount)->
 	%% mysql:connect(PoolId, Host, Port, User, Password, Database, Encoding, Reconnect) ->
 	ConnPidList = [begin
                     ConnectChild = {util:to_atom("mysql_" ++ util:to_list(N)), {mysql, connect,
-							[?MYSQL_POOL,Host,Port,User,Password,DbName,Encode,true]},
+							[?BASE_MYSQL_POOL,Host,Port,User,Password,DbName,Encode,true]},
 							transient, 100, worker, [mysql]},
 					case supervisor:start_child(SupPid,ConnectChild) of
 					{ok,ConnectPid} ->

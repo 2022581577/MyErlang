@@ -62,7 +62,7 @@ do_info({inet_async,Socket,_Ref,{ok,?FLASH_POLICY_REQ}},#state{socket = Socket} 
 
 %% 数据包不能大于 2^16-1(64K)
 do_info({inet_async,Socket,_Ref,{ok,<<0:16,Len:16>>}},#state{socket = Socket,packet_len = 0} = State) ->
-    ?WARNING("Len:~w", [Len]),
+    ?INFO("Len:~w", [Len]),
     %% _NewRef = async_recv(Socket,Len - ?HEADER_LENGTH ,?HEART_TIMEOUT),
     %% Len约定是已经去掉了消息头信息的长度
     _NewRef = async_recv(Socket, Len, ?HEART_TIMEOUT),  
@@ -101,7 +101,7 @@ do_info({inet_async,_Socket,_Ref,{error,closed}},State) ->
 
 %% 接收数据
 do_info({inet_async,_Socket,_Ref,{error,Reason}},State) ->
-    ?INFO("Socket Error:~w",[Reason]),
+    ?WARNING("Socket Error:~w",[Reason]),
     {stop,normal,State};
 
 do_info({inet_reply,_Socket,ok},State) ->

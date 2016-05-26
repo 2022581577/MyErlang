@@ -112,7 +112,6 @@ handle_info(Info, State) ->
 
 terminate(Reason, State) ->
     Mod = get_callback_mod(),
-	io:format("~w stop...",[Mod]),
     Mod:do_terminate(Reason,State).
 
 code_change(_OldVsn, State, _Extra) -> 

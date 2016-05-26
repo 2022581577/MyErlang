@@ -14,7 +14,7 @@
 
 -export([do_init/1, do_call/3, do_cast/2, do_info/2, do_terminate/2]).
 
--export([start/2, start_link/2]).
+-export([start/3, start_link/3]).
 
 -export([cast_stop/1
         ,cast_stop/2
@@ -47,54 +47,25 @@
 -define(DUPLICATION_ADD_LIVE_TIME, 180).                        %% 额外给地图多180s的存活时间
 
 %% @doc 开启地图API
-start(MapID, MapIndexID) ->
+start(MapID, MapIndexID, Args) ->
     ProcessName = lib_map:get_map_process_name(MapID, MapIndexID),
     case erlang:whereis(ProcessName) of
         undefined ->
-            server_sup:start_map([MapID, MapIndexID]);
+            server_sup:start_map([MapID, MapIndexID, Args]);
         Pid ->
             behaviour_gen_server:cast_apply(Pid, srv_map, set_last_active, []),   
             {ok,Pid}
     end.
 
-start_link(MapID, MapIndexID) ->
+start_link(MapID, MapIndexID, Args) ->
     ProcessName = lib_map:get_map_process_name(MapID, MapIndexID),
-    behaviour_gen_server:start_link({local,ProcessName}, ?MODULE, [MapID, MapIndexID], []).
+    behaviour_gen_server:start_link({local,ProcessName}, ?MODULE, [MapID, MapIndexID, Args], []).
 
-do_init([MapID, MapIndexID]) ->
+do_init([MapID, MapIndexID, Args]) ->
     ?INFO("Start Map, MapID:~w, MapIndexID:~w",[MapID, MapIndexID]),
     process_flag(trap_exit,true),
-    
     erlang:send_after(?MAP_LOOP_TICK, self(), loop),
-    
-
-    lib_trap_block:set_block_trap_list([]),
-
-    lib_map_point:init(MapID),
-            
-
-    _TimeStamp = util:timestamp(),
-
-    MapInfo = #map_info{map_inst_id = {MapID, MapIndexID}
-                        ,map_id = MapID
-                        ,map_index_id = MapIndexID
-                        ,map_pid = self()},
-    ets:insert(?ETS_MAP_INFO, MapInfo),
-
-    set_last_active(),
-
-    MapTpl = data_map:get(MapID),
-
-    Map = #map{
-            map_id = MapID
-            ,map_index_id = MapIndexID 
-            ,map_type = MapTpl#tpl_map.map_type
-            ,map_sub_type = MapTpl#tpl_map.map_sub_type
-            %,aoi_map = aoi:create_map({0, 0}, {MapConfigTpl#tpl_map_config.width, MapConfigTpl#tpl_map_config.height})
-            ,create_time = util:longunixtime()
-        },
-    %% TODO 地图掩码、九宫格、NPC、怪物等处理
-    %{true, NewMap} = map:create_mon([Map, NewMonList]),
+    {ok, Map} = map_init:init(MapID, MapIndexID, Args),
     {ok, Map}.
 
 do_call(Info, _From, Map) -> 
@@ -244,7 +215,6 @@ p(ID) ->
 get_last_active() ->
     get(?MAP_LAST_ACTIVE_TIME).
 set_last_active() ->
-    %% Time = mod_timer:unixtime(),
     Time = util:timestamp() div 1000,
     set_last_active(Time).
 set_last_active(Time) ->

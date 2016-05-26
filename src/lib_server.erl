@@ -26,7 +26,6 @@ start(Sup) ->
 
     ok = netword_service(Sup),                          %% 网络相关服务
     ok = mysql_service(Sup),                            %% 数据库相关
-    ok = global_data_disk:init(),                       %% 数据库启动后开启
     ok = game_ets_init:init(),                          %% 各种ets初始化
     %% ok = game_counter:init(),                           %% 自增id计数器模块
 
@@ -35,6 +34,8 @@ start(Sup) ->
     {ok, _} = server_sup:start_child(srv_map_manager),  %% 地图管理进程
 
     game_node_interface:set_server_running(),
+
+    ?INFO("------Server Start Finish------"),
     ok.
 
 
@@ -51,20 +52,20 @@ error_logger_service(_Sup) ->
 netword_service(Sup) ->
     IP   = ?CONFIG(server_ip),
     Port = ?CONFIG(server_port),
-    io:format("IP:~w, Port:~w~n", [IP, Port]),
+    ?INFO("IP:~w, Port:~w~n", [IP, Port]),
     ok = tcp_listener_sup:start(Sup, IP, Port, ?TCP_OPT),        %% 端口监听
-    io:format("tcp_listener_sup finish!~n"),
+    ?INFO("tcp_listener_sup finish!~n"),
     ok = tcp_client_sup:start(Sup),          %% 连接进程
-    io:format("tcp_client_sup finish!~n"),
+    ?INFO("tcp_client_sup finish!~n"),
     ok = inets:start(),                         %% httpc服务
-    io:format("inets finish!~n"),
-    io:format("netword_service finish!~n"),
+    ?INFO("inets finish!~n"),
+    ?INFO("netword_service finish!~n"),
     ok.
     
 %% 数据库
 mysql_service(Sup) ->
     edb:init(Sup),
-    io:format("mysql_service finish!~n"),
+    ?INFO("mysql_service finish!~n"),
     ok.
 
 %% 关闭服务
@@ -72,7 +73,8 @@ stop() ->
     game_node_interface:set_server_stoping(),
     %% 踢掉玩家
 
-    ?GLOBAL_DATA_DISK:stop(),
+    %% 关闭各个系统
+    global_data_disk:stop(),
 
     %% 最后关闭
     ok.

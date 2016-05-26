@@ -73,7 +73,7 @@ do_init([UserID]) ->
     end. 
 
 do_cast({stop_user, Type}, User) ->
-    ?WARNING("cast stop user!"),
+    ?INFO("cast stop user!"),
     {stop, normal, User#user{logout_type = Type}};
 %    case lib_user:get_login_state() of
 %        true -> %% 在顶号中退出
@@ -127,7 +127,7 @@ do_cast(Info, User) ->
 	{noreply, User}.
 
 do_call({stop_user, Type}, _From, User) ->
-    ?WARNING("call stop user!"),
+    ?INFO("call stop user!"),
     {stop, normal, User#user{logout_type = Type}};
 
 do_call(Info, _From, User) -> 
@@ -169,11 +169,11 @@ do_info({inet_async,Socket,_Ref,{ok,Bin}},#user{user_id = UserID, acc_name = Acc
     cast_stop(self(), socket_not_match),
     {noreply,User};
 
-%% 接收出错处理
+%% 关闭处理
 do_info({inet_async,Socket,_Ref,{error,closed}},#user{user_id = UserID, other_data = #user_other{socket = UserSocket} = UserOther} = User) ->
     case Socket of
         UserSocket ->
-            ?WARNING("UserID:~w Socket Close...",[UserID]),
+            ?INFO("UserID:~w Socket Close...",[UserID]),
             NewSocket = close_socket(Socket),
             cast_stop(self(), socket_close),
             {noreply,User#user{other_data = UserOther#user_other{socket = NewSocket}}};
@@ -191,7 +191,7 @@ do_info({inet_async,Socket,_Ref,{error,Reason}},#user{user_id = UserID, other_da
             cast_stop(self(), socket_error),
             {noreply,User#user{other_data = UserOther#user_other{socket = NewSocket}}};
         _ ->
-            ?INFO("Invalue Socket:~w,UserSocket:~w,Reason:~w",[Socket,UserSocket,Reason]),
+            ?WARNING("Invalue Socket:~w,UserSocket:~w,Reason:~w",[Socket,UserSocket,Reason]),
             {noreply,User}
     end;
 	

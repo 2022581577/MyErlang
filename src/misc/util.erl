@@ -87,13 +87,13 @@ date() ->
 
 %% @doc 根据1970年以来的秒数获得日期
 seconds_to_localtime(Seconds) ->
-    DateTime = calendar:gregorian_seconds_to_datetime(Seconds + ?DIFF_SECONDS_0000_1900),
+    DateTime = calendar:gregorian_seconds_to_datetime(Seconds + ?DIFF_SECONDS_0000_1970),
     calendar:universal_time_to_local_time(DateTime).
 
-%% 根据日期和时间获得1979年以来的秒数
+%% 根据日期和时间获得1970年以来的秒数
 %% LocalTime::datetime1970()
 localtime_to_seconds(LocalTime) ->
-    calendar:datetime_to_gregorian_seconds(erlang:localtime_to_universaltime(LocalTime)) - ?DIFF_SECONDS_0000_1900.
+    calendar:datetime_to_gregorian_seconds(erlang:localtime_to_universaltime(LocalTime)) - ?DIFF_SECONDS_0000_1970.
 
 %% 根据1970年以来的天数获得对应时间戳
 days_to_unixtime(Days) ->

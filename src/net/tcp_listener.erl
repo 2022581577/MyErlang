@@ -47,7 +47,7 @@ handle_info(_Info, State) ->
     {noreply, State}.
 
 terminate(Reason, #state{sock=LSock}) ->
-    ?WARNING("Socket:~w close,Reason:~w",[LSock,Reason]),
+    ?INFO("Socket:~w close,Reason:~w",[LSock,Reason]),
     gen_tcp:close(LSock),
     ok.
 

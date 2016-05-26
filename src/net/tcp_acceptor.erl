@@ -51,11 +51,11 @@ handle_info({inet_async, LSock, Ref, {ok, Sock}}, State = #state{sock=LSock, ref
 handle_info({inet_async, LSock, Ref, {error, closed}},State=#state{sock=LSock, ref=Ref}) ->
     %% It would be wrong to attempt to restart the acceptor when we
     %% know this will fail.
-    ?WARNING("LSock Colsed:~w",[LSock]),
+    ?INFO("LSock Colsed:~w",[LSock]),
     {stop, normal, State};
 
 handle_info({inet_async, LSock, Ref, {error, Reason}},State=#state{sock=LSock, ref=Ref}) ->
-    ?WARNING("LSock Error SOcket:~w,Reason:~w",[LSock,Reason]),
+    ?INFO("LSock Error SOcket:~w,Reason:~w",[LSock,Reason]),
     {noreply,State};
     %%{stop, {accept_failed, Reason}, State};
 

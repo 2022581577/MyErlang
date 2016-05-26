@@ -57,7 +57,7 @@ reload_2() ->
 reload() ->
 	erlang:group_leader(erlang:whereis(user), self()),
 	Modules = all_changed(),
-	?WARNING("all module:~p",[Modules]),
+	?INFO("all module:~p",[Modules]),
 	[reload(Module) || Module <- Modules].
 
 %%
@@ -89,12 +89,12 @@ doit(From, To) ->
      end || {Module, Filename} <- code:all_loaded(), is_list(Filename)].
 
 reload(Module) ->
-    ?WARNING("Node:~w Reloading ~p ...", [node(), Module]),
+    ?INFO("Node:~w Reloading ~p ...", [node(), Module]),
     case code:soft_purge(Module) of
 		true ->
 		    case code:load_file(Module) of
 		        {module, Module} ->
-					?WARNING("Node:~w,Reload:~p,ok~n", [node(), Module]),
+					?INFO("Node:~w,Reload:~p,ok~n", [node(), Module]),
                     if
                         Module=:=data_switch ->
                             cron:reload();
@@ -102,15 +102,15 @@ reload(Module) ->
                     end,
 		            case erlang:function_exported(Module, test, 0) of
 		                true ->
-		                    ?WARNING(" - Calling ~p:test() ...", [Module]),
+		                    ?INFO(" - Calling ~p:test() ...", [Module]),
 		                    case catch Module:test() of
 		                        ok ->
-		                            ?WARNING("reload ~p ok.",[Module]);
+		                            ?INFO("reload ~p ok.",[Module]);
 		                        Reason ->
 		                            ?WARNING("reload ~p ok but call test fail: ~p.", [Module,Reason])
 		                    end;
 		                false ->
-		                    ?WARNING("reload ~p ok.",[Module])
+		                    ?INFO("reload ~p ok.",[Module])
 		            end;
 		        {error, Reason} ->
 		            ?WARNING("reload ~p fail: ~p.", [Module,Reason])

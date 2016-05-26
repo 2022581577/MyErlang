@@ -41,13 +41,10 @@ load_game_config() ->
     {ok, List} = file:consult(ConfigFile),
     NewList = reset_list(List),
     wg_dynamic_config:compile_kv(?GAME_CONF, NewList),
-    io:format("ListConfig:~p~n", [list_config()]),
-    io:format("server_port:~p~n", [get_config(server_port)]),
     ok.
 
 %% 重置列表，做合法性检查
 reset_list(List) ->
-    io:format("List:~w", [List]),
     ServerType  = proplists:get_value(server_type, List),
     ServerID    = proplists:get_value(server_id, List),
     Platform    = proplists:get_value(platform, List),

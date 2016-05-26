@@ -78,7 +78,7 @@ get_map_index_id(MapID) ->
                     ets:insert(?ETS_MAP_ID_LIST, {MapID, L ++ [IndexID]}),
                     IndexID;
                 [] ->   %% 没有对应地图
-                    ?WARNING("Open First Index! MapID:~w, MaxUser:~w",[MapID, MaxUser]),
+                    ?INFO("Open First Index! MapID:~w, MaxUser:~w",[MapID, MaxUser]),
                     IndexID = game_counter:get_map_index_id(MapID),
                     ets:insert(?ETS_MAP_ID_LIST, {MapID, [IndexID]}),
                     IndexID
@@ -105,7 +105,7 @@ get_map_counter(MapID, MaxUser) ->
         [{_,L}] ->
             case check_map_max_user(MapID, L,MaxUser) of
                 false ->    %% 现有地图人数都满了
-                    ?WARNING("Open New Index! MapID:~w, MaxUser:~w",[MapID, MaxUser]),
+                    ?INFO("Open New Index! MapID:~w, MaxUser:~w",[MapID, MaxUser]),
                     IndexID = game_counter:get_map_index_id(MapID),
                     ets:insert(?ETS_MAP_ID_LIST, {MapID, L ++ [IndexID]}),
                     IndexID;
@@ -113,7 +113,7 @@ get_map_counter(MapID, MaxUser) ->
                     IndexID
             end;
         [] ->   %% 没有对应地图
-            ?WARNING("Open First Index! MapID:~w, MaxUser:~w",[MapID, MaxUser]),
+            ?INFO("Open First Index! MapID:~w, MaxUser:~w",[MapID, MaxUser]),
             IndexID = game_counter:get_map_index_id(MapID),
             ets:insert(?ETS_MAP_ID_LIST, {MapID, [IndexID]}),
             IndexID

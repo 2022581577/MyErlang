@@ -66,6 +66,10 @@ execute(Pool, Sql, Args) ->
             throw({mysql_error, Error})
     end.
 
+%%% ---------------------------------
+%%%             读取操作
+%%% 读取操作可使用默认连接，减少代码量
+%%% ---------------------------------
 get_all(Table) ->
     get_all(Table, []).
 
@@ -118,6 +122,11 @@ get_one(Table,Field,WhereFields) ->
             undefined
     end.
 
+
+%%% -----------------------------------------
+%%%             插入更新删除操作
+%%% @TODO 后续加上数据库连接字段，可选连接
+%%% -----------------------------------------
 replace(Table,Fields) ->
     InsertSql = make_update_sql(Fields),
     Sql = lists:concat(["REPLACE `",Table,"` SET ",InsertSql]),
@@ -127,6 +136,16 @@ insert(Table,Fields) ->
     InsertSql = make_update_sql(Fields),
     Sql = lists:concat(["INSERT INTO `",Table,"` SET ",InsertSql]),
     execute(Sql).
+
+batch_insert_sql(Table, Fields, [[_ | FV] | T]) ->
+    FieldsSql = make_fields_sql(Fields),
+    ValuesSql = lists:concat([FV | T]),
+    lists:concat(["INSERT INTO `", Table, "` (", FieldsSql, ")", " VALUES ", ValuesSql]).
+
+batch_replace_sql(Table, Fields, [[_ | FV] | T]) ->
+    FieldsSql = make_fields_sql(Fields),
+    ValuesSql = lists:concat([FV | T]),
+    lists:concat(["REPLACE `", Table, "` (", FieldsSql, ")", " VALUES ", ValuesSql]).
 
 update(Table,Fields,WhereFields) ->
     UpdateSql = make_update_sql(Fields),
@@ -142,6 +161,8 @@ delete(Table,WhereFields,Limit)->
     LimitSql = make_limit_sql(Limit),
     Sql = lists:concat(["DELETE FROM `",Table,"` ",WhereSql,LimitSql]),
     execute(Sql).
+
+
 
 make_query_sql(Table,Fields,WhereFields,OrderFields,Limit)->
     FieldsSql = make_fields_sql(Fields),
@@ -218,17 +239,6 @@ make_value_sql([], ValueSql) ->
         [_ | T] ->
             T
     end.
-
-%% @doc 批量插入
-batch_insert_sql(Table, Fields, [[_ | FV] | T]) ->
-    FieldsSql = make_fields_sql(Fields),
-    ValuesSql = lists:concat([FV | T]),
-    lists:concat(["INSERT INTO `", Table, "` (", FieldsSql, ")", " VALUES ", ValuesSql]).
-
-batch_replace_sql(Table, Fields, [[_ | FV] | T]) ->
-    FieldsSql = make_fields_sql(Fields),
-    ValuesSql = lists:concat([FV | T]),
-    lists:concat(["REPLACE `", Table, "` (", FieldsSql, ")", " VALUES ", ValuesSql]).
 
 
 %% @doc Encode a value so that it can be included safely in a MySQL query.

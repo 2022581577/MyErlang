@@ -5,19 +5,18 @@
 %%%----------------------------------------------------------------------
 
 -module(global_data_disk).
--define(TABLE, global_data_disk).
+
+-include("common.hrl").
 
 -export([init/0,sync/0,stop/0]).
 -export([list/0,get/1,get/2,set/2,del/1]).
 
 -define(SYNC_INTERVAL, 15 * 60 * 1000).
-
--include("common.hrl").
-
+-define(TABLE, global_data_disk).
 -record(global_data, {key, value, is_dirty = 0}).
 
 init() ->
-    ets:new(?TABLE, [{keypos, #global_data.key}, named_table, public, set, {read_concurrency, true}]),
+    ets:new(?TABLE, [{keypos, #global_data.key} | ?ETS_OPT]),
     SysGlobalList = get_all(),
     ets:insert(?TABLE, SysGlobalList),
 	%% 后台连移到Global模块处理
@@ -38,14 +37,14 @@ get(K,Def) ->
 			Def
 	end.
 
+set(K,V) ->
+    ets:insert(?TABLE, #global_data{key = K, value = V, is_dirty = 1}).
+
 del(K) ->
     ets:delete(?TABLE, K),  %% 删除ets
     edb_util:delete(global_data, [{global_key, util:term_to_bitstring(K)}]). %% 删除数据库
 
-set(K,V) ->
-    ets:insert(?TABLE, #global_data{key = K, value = V}).
-
-%% 同步dets
+%% 同步
 sync() ->
 	try
         do_sync()

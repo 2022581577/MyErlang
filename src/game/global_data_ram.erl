@@ -5,13 +5,16 @@
 %%%----------------------------------------------------------------------
 
 -module(global_data_ram).
--define(TABLE, global_data_ram).
+
+-include("common.hrl").
 
 -export([init/0]).
 -export([list/0,get/1,get/2,set/2,del/1]).
 
+-define(TABLE, global_data_ram).
+
 init() ->
-	ets:new(?TABLE,[{keypos,1},named_table,public,set,{read_concurrency,true}]),
+	ets:new(?TABLE,[{keypos,1} | ?ETS_OPT]),
 	ok.
 
 list() ->

@@ -23,7 +23,10 @@
 -define(GLOBAL_DATA_DISK, global_data_disk).
 -define(GLOBAL_DATA_RAM, global_data_ram).
 
--define(MYSQL_POOL,mysql_pool).
+-define(MYSQL_CONNECT_COUNT,4).
+-define(BASE_MYSQL_POOL,    base_mysql_pool).
+-define(MYSQL_POOL,         mysql_pool).
+-define(LOG_MYSQL_POOL,     log_mysql_pool).
 -define(MYSQL_CONNECT_STATE,mysql_connect_state).
 
 -define(VERSION_SQL_TIMEOUT,(300 * 1000)).
@@ -45,8 +48,8 @@
 -define(GAME_STATUS_STOPING,7).
 
 %% Game Timer
--define(DIFF_SECONDS_1970_1900, 2208988800).
--define(DIFF_SECONDS_0000_1900, 62167219200).
+-define(DIFF_SECONDS_1900_1970, 2208988800).
+-define(DIFF_SECONDS_0000_1970, 62167219200).
 -define(TIMER_TEN_SEC,          10).    %% 10秒    
 -define(TIMER_ONE_MIN_SEC,      60).    %% 一分钟
 -define(TIMER_FIFTEEN_MIN_SEC,  900).   %% 15分钟
