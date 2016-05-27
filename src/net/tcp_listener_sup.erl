@@ -8,15 +8,18 @@
 -module(tcp_listener_sup).
 -behaviour(supervisor).
 
--export([start/4]).
+-define(TCP_LISTENER_NAME(Type),
+    list_to_atom(atom_to_list(tcp_listener_) ++ atom_to_list(Type))).
 
--export([start_link/3
+-export([start/2]).
+
+-export([start_link/1
         ,init/1]).
 
-start(Sup, IP, Port, TcpOpt) ->
+start(Sup, NetAddressL) ->
     ChildSpec = 
         {?MODULE
-         ,{?MODULE, start_link, [IP, Port, TcpOpt]}
+         ,{?MODULE, start_link, [NetAddressL]}
          ,transient
          ,infinity
          ,supervisor
@@ -24,10 +27,10 @@ start(Sup, IP, Port, TcpOpt) ->
     {ok, _} = supervisor:start_child(Sup, ChildSpec),
     ok. 
 
-start_link(IP, Port, TcpOpt) ->
-    supervisor:start_link({local,?MODULE}, ?MODULE, {IP, Port, TcpOpt}).
+start_link(NetAddressL) ->
+    supervisor:start_link({local,?MODULE}, ?MODULE, NetAddressL).
 
-init({IP, Port, TcpOpt}) ->
+init(NetAddressL) ->
     %% tcp_acceptor_sup需要在tcp_listener之前开启，tcp_listener有用到tcp_acceptor_sup
     ChildSpec1 = 
         {tcp_acceptor_sup
@@ -36,18 +39,13 @@ init({IP, Port, TcpOpt}) ->
          ,infinity
          ,supervisor
          ,[tcp_acceptor_sup]},
-    ChildSpec2 =    %% 监听游戏主端口
-        {tcp_listener_main
-         ,{tcp_listener, start_link, [IP, Port, TcpOpt]}
-         ,transient
-         ,16#ffffffff
-         ,worker
-         ,[tcp_listener]},
-    ChildSpec3 =    %% 监听地图端口
-        {tcp_listener_map
-         ,{tcp_listener, start_link, [IP, Port + 1, TcpOpt]}
-         ,transient
-         ,16#ffffffff
-         ,worker
-         ,[tcp_listener]},
-    {ok, {{one_for_all, 10, 10}, [ChildSpec1, ChildSpec2, ChildSpec3]}}.
+    ListenerChildSpecL =
+        [
+            {?TCP_LISTENER_NAME(Type)
+            ,{tcp_listener, start_link, [Type, IP, Port, TcpOpt]}
+            ,transient
+            ,16#ffffffff
+            ,worker
+            ,[tcp_listener]} || {Type, IP, Port, TcpOpt} <- NetAddressL
+        ],
+    {ok, {{one_for_all, 10, 10}, [ChildSpec1 | ListenerChildSpecL]}}.

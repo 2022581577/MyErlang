@@ -10,23 +10,23 @@
 
 -include("common.hrl").
 
--export([start_link/1]).
+-export([start_link/2]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
 
--record(state, {sock, ref}).
+-record(state, {type, sock, ref}).
 
 %%--------------------------------------------------------------------
 
-start_link(LSock) ->
-    gen_server:start_link(?MODULE, LSock, []).
+start_link(Type, LSock) ->
+    gen_server:start_link(?MODULE, [Type, LSock], []).
 
 %%--------------------------------------------------------------------
 
-init(LSock) ->
-    ?INFO("+++++++++++ LSock:~w +++++++++++",[LSock]),
+init([Type, LSock]) ->
+    ?INFO("+++++++++++Type:~w LSock:~w +++++++++++",[Type, LSock]),
     gen_server:cast(self(), accept),
-    {ok, #state{sock=LSock}}.
+    {ok, #state{type = Type, sock = LSock}}.
 
 handle_call(_Request, _From, State) ->
     {noreply, State}.
@@ -37,12 +37,12 @@ handle_cast(accept, State) ->
 handle_cast(_Msg, State) ->
     {noreply, State}.
 
-handle_info({inet_async, LSock, Ref, {ok, Sock}}, State = #state{sock=LSock, ref=Ref}) ->
+handle_info({inet_async, LSock, Ref, {ok, Sock}}, State = #state{type = Type, sock=LSock, ref=Ref}) ->
     %% accept more
     %% ?INFO("Accept Sock:~w,Ip:~w",[Sock,inet:peername(Sock)]),
     case set_sockopt(LSock,Sock) of
         ok ->
-            start_client(Sock);
+            start_client(Type, Sock);
         Error ->
             ?WARNING2("Accept Sock fail,Socket:~w,Error:~w",[Sock,Error])
     end,
@@ -98,8 +98,8 @@ set_sockopt(LSock, Sock) ->
     end.
 
 %% 开启客户端服务
-start_client(Sock) ->
-    {ok, Child} = supervisor:start_child(tcp_client_sup, []),
+start_client(Type, Sock) ->
+    {ok, Child} = supervisor:start_child(tcp_client_sup, [Type]),
     ok = gen_tcp:controlling_process(Sock, Child),
     gen_server:cast(Child,{set_socket, Sock}).
 

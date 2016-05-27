@@ -50,12 +50,14 @@ error_logger_service(_Sup) ->
 
 %% 网络相关
 netword_service(Sup) ->
-    IP   = ?CONFIG(server_ip),
-    Port = ?CONFIG(server_port),
+    IP      = ?CONFIG(server_ip),
+    Port    = ?CONFIG(server_port),
+    MapPort = ?CONFIG(map_port),
     ?INFO("IP:~w, Port:~w~n", [IP, Port]),
-    ok = tcp_listener_sup:start(Sup, IP, Port, ?TCP_OPT),        %% 端口监听
+    NetAddressL = [{game, IP, Port, ?TCP_OPT}, {map, IP, MapPort, ?TCP_OPT}],
+    ok = tcp_listener_sup:start(Sup, NetAddressL),        %% 端口监听
     ?INFO("tcp_listener_sup finish!~n"),
-    ok = tcp_client_sup:start(Sup),          %% 连接进程
+    ok = tcp_client_sup:start(Sup, srv_reader),          %% 连接进程
     ?INFO("tcp_client_sup finish!~n"),
     ok = inets:start(),                         %% httpc服务
     ?INFO("inets finish!~n"),

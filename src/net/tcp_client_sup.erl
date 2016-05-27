@@ -8,15 +8,15 @@
 
 -behaviour(supervisor).
 
--export([start/1]).
+-export([start/2]).
 
--export([start_link/0
+-export([start_link/1
         ,init/1]).
 
-start(Sup) ->
+start(Sup, ClientModule) ->
     ChildSpec = 
         {?MODULE
-         ,{?MODULE, start_link, []}
+         ,{?MODULE, start_link, [ClientModule]}
          ,transient
          ,infinity
          ,supervisor
@@ -24,15 +24,15 @@ start(Sup) ->
     {ok, _} = supervisor:start_child(Sup, ChildSpec),
     ok.
 
-start_link() ->
-    supervisor:start_link({local,?MODULE}, ?MODULE, []).
+start_link(ClientModule) ->
+    supervisor:start_link({local,?MODULE}, ?MODULE, [ClientModule]).
 
-init([]) ->
+init([ClientModule]) ->
     ChildSpec = 
         {srv_reader
-         ,{srv_reader, start_link, []}
+         ,{ClientModule, start_link, []}
          ,temporary
          ,brutal_kill
          ,worker
-         ,[srv_reader]},
+         ,[ClientModule]},
     {ok, {{simple_one_for_one, 10, 10}, [ChildSpec]}}.

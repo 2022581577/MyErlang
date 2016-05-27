@@ -19,6 +19,7 @@
               ,server_id       %% 服务器编号(config中的server_id)
               ,ip              %% ip(config中的server_ip)
               ,port            %% 端口(config中的server_port)
+              ,map_port        %% 地图连接端口(config中的map_port)
                }).
 
 -endif.

@@ -34,6 +34,7 @@
 
 %% 服务器类型
 -define(SERVER_TYPE_GAME, game).    %% 普通游戏服
+-define(SERVER_TYPE_MAP, map).     %% 地图服
 -define(SERVER_TYPE_CROSS, cross).%% 跨服类型1
 
 %% Game Status

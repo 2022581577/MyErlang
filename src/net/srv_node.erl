@@ -17,7 +17,7 @@
 
 -define(MODULE_LOOP_TICK, 5000).		%% 进程循环时间
 
--record(state, {cross_connects  = []}).   %% 已经连上的跨服节点
+-record(state, {node_connects  = []}).   %% 已经连上的跨服节点
 
 %% ====================================================================
 %% API functions
@@ -30,38 +30,33 @@ do_init([]) ->
     %% 监控节点
 	net_kernel:monitor_nodes(true, [{node_type, all}]),
     erlang:send_after(?MODULE_LOOP_TICK, self(), loop),
-    %% 获取连接列表信息
     {ok, #state{}}.
 
 
 %% 跨服节点接受游戏服节点的注册信息
 do_cast({register, RegNode}, State) ->
+    ?INFO("register! RegNode:~w", [RegNode]),
     #node{node_name = RegNodeName} = RegNode,
     %% 注册信息处理
     ets:insert(?ETS_NODE, key_node_name(RegNode)),
-    ets:insert(?ETS_NODE, key_platf_server(RegNode)),
+    ets:insert(?ETS_NODE, key_type_platf_server(RegNode)),
     %% 反馈
     behaviour_gen_server:cast({?MODULE, RegNodeName}, {register_reply, local_node()}),
     {noreply, State};
 
 %% 游戏服中接收到注册反馈
-do_cast({register_reply, ReplyNode}, #state{cross_connects = CrossConnects} = State) ->
-    #node{node_name = ReplyNodeName
-         ,node_type = ReplyServerType} = ReplyNode,
-    case ReplyServerType of
-        ?SERVER_TYPE_CROSS ->   %% 跨服注册返回
-            case lists:member(ReplyNodeName, CrossConnects) of
-                ?FALSE ->   
-                    ets:insert(?ETS_NODE, key_node_name(ReplyNode)),
-                    ets:insert(?ETS_NODE, key_platf_server(ReplyNode)),
-                    CrossConnects1 = [ReplyNodeName | CrossConnects];
-                _ ->
-                    CrossConnects1 = CrossConnects
-            end;
+do_cast({register_reply, ReplyNode}, #state{node_connects = NodeConnects} = State) ->
+    ?INFO("register_reply! ReplyNode:~w", [ReplyNode]),
+    #node{node_name = ReplyNodeName} = ReplyNode,
+    case lists:member(ReplyNodeName, NodeConnects) of
+        ?FALSE ->
+            ets:insert(?ETS_NODE, key_node_name(ReplyNode)),
+            ets:insert(?ETS_NODE, key_type_platf_server(ReplyNode)),
+            NodeConnects1 = [ReplyNodeName | lists:delete(ReplyNodeName, NodeConnects)];
         _ ->
-            CrossConnects1 = CrossConnects
+            NodeConnects1 = NodeConnects
     end,
-    State1 = State#state{cross_connects = CrossConnects1},
+    State1 = State#state{node_connects = NodeConnects1},
     {noreply, State1};
 
 do_cast(_Info, State) ->
@@ -82,18 +77,18 @@ do_info({nodeup, NodeName, Info}, State) ->
 
 
 %% 处理节点关闭事件(如果跨服节点关闭，则游戏服会收到该消息；如果是游戏服节点关闭，跨服服务器会收到该消息。需要区分处理)
-do_info({nodedown, NodeName, Info}, #state{cross_connects = CrossConnects} = State) ->
+do_info({nodedown, NodeName, Info}, #state{node_connects = NodeConnects} = State) ->
     ?INFO("Node down! NodeName:~w, Info:~w", [NodeName, Info]),
     case ets:lookup(?ETS_NODE, NodeName) of
         #node{key = NodeNameKey, node_type = NodeServerType} = Node ->
-            #node{key = PlatfServerKey} = key_platf_server(Node),
+            #node{key = TypePlatfServerKey} = key_type_platf_server(Node),
             ets:delete(?ETS_NODE, NodeNameKey),
-            ets:delete(?ETS_NODE, PlatfServerKey),
+            ets:delete(?ETS_NODE, TypePlatfServerKey),
             case ?CONFIG(server_type) of
                 ?SERVER_TYPE_GAME when NodeServerType =:= ?SERVER_TYPE_CROSS -> 
                     %% 游戏节点，需要把跨服链接列表去掉
-                    ConnectList1 = lists:delete(NodeName, CrossConnects),
-                    State1 = State#state{cross_connects = ConnectList1};
+                    ConnectList1 = lists:delete(NodeName, NodeConnects),
+                    State1 = State#state{node_connects = ConnectList1};
                 _ ->    %% 其他的暂时先不处理
                     State1 = State
             end;
@@ -102,22 +97,18 @@ do_info({nodedown, NodeName, Info}, #state{cross_connects = CrossConnects} = Sta
     end,
     {noreply, State1};
 
-do_info(loop, #state{cross_connects = CrossConnects} = State) ->
+do_info(loop, #state{node_connects = NodeConnects} = State) ->
     erlang:send_after(?MODULE_LOOP_TICK, self(), loop),
     %% 检测节点连通情况并进行连通(如果是游戏节点，需要连接到对应的跨服节点)
     case ?CONFIG(server_type) of
         ?SERVER_TYPE_GAME ->    
-            %% 连跨服
-            CrossNode = game_config:get_config(cross_node),
-            case lists:member(CrossNode, CrossConnects) of
-                ?FALSE ->   
-                    %% 没有在已连接的跨服节点列表中
-                    net_kernel:connect_node(CrossNode), %% 连接节点
-                    behaviour_gen_server:cast({?MODULE, CrossNode}, {register, local_node()}), %% 注册节点信息
-                    ok;
-                _ ->
-                    skip
-            end;
+            %% 游戏服连跨服
+            ConnNode = game_config:get_config(cross_node),
+            connect_node(ConnNode, NodeConnects);
+        ?SERVER_TYPE_MAP ->
+            %% 地图服连游戏服
+            ConnNode = game_config:get_config(game_node),
+            connect_node(ConnNode, NodeConnects);
         _ ->
             skip
     end,
@@ -133,7 +124,16 @@ do_terminate(_Reason, State) ->
 %%% -----------------------------------
 %%%           Local Fun
 %%% -----------------------------------
-
+connect_node(ConnNode, NodeConnects) ->
+    case lists:member(ConnNode, NodeConnects) of
+        ?FALSE ->
+            %% 没有在已连接的跨服节点列表中
+            net_kernel:connect_node(ConnNode), %% 连接节点
+            behaviour_gen_server:cast({?MODULE, ConnNode}, {register, local_node()}), %% 注册节点信息
+            ok;
+        _ ->
+            skip
+    end.
 
 %% @doc 获取当前节点的信息
 local_node() ->
@@ -141,21 +141,25 @@ local_node() ->
     NodeType = game_config:get_config(server_type),
     Platform = game_config:get_config(platform),
     ServerID = game_config:get_config(server_id),
-    Port     = game_config:get_config(server_port),
     IP       = game_config:get_config(server_ip),
+    Port     = game_config:get_config(server_port),
+    MapPort  = game_config:get_config(map_port),
     Node     = #node{node_name = NodeName
                     ,node_type = NodeType
                     ,platform  = Platform
                     ,server_id = ServerID
                     ,ip        = IP
-                    ,port      = Port},
+                    ,port      = Port
+                    ,map_port  = MapPort},
     Node.
 
 %% 节点名作为key
 key_node_name(#node{node_name = NodeName} = Node) ->
     Node#node{key = NodeName}.
 
-%% {平台,服务器id}作为key
-key_platf_server(#node{platform = Platform, server_id = ServerID} = Node) ->
-    Node#node{key = {Platform, ServerID}}.
+%% {类型,平台,服务器id}作为key
+key_type_platf_server(#node{node_type = NodeType
+                            ,platform = Platform
+                            ,server_id = ServerID} = Node) ->
+    Node#node{key = {NodeType, Platform, ServerID}}.
 

@@ -9,6 +9,7 @@
 %% include
 -include("common.hrl").
 -include("record.hrl").
+-include("tpl_map.hrl").
 
 %% export
 -export([init/3]).

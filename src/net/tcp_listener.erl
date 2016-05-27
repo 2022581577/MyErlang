@@ -10,7 +10,7 @@
 
 -include("common.hrl").
 
--export([start_link/3]).
+-export([start_link/4]).
 
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
@@ -18,23 +18,23 @@
 -record(state, {sock}).
 
 
-start_link(IPAddress, Port, SocketOpts) ->
-    gen_server:start_link(?MODULE, {IPAddress, Port, SocketOpts}, []).
+start_link(Type, IP, Port, SocketOpts) ->
+    gen_server:start_link(?MODULE, {Type, IP, Port, SocketOpts}, []).
 
 %%--------------------------------------------------------------------
 
-init({IPAddress, Port, SocketOpts}) ->
+init({Type, IP, Port, SocketOpts}) ->
     process_flag(trap_exit, true),  %% 需要在进程关闭时调用terminate来关闭LSock
     case gen_tcp:listen(Port, SocketOpts) of
         {ok, LSock} ->
             lists:foreach(fun (_) ->
-                                 {ok, _APid} = supervisor:start_child(tcp_acceptor_sup, [LSock])
+                                 {ok, _APid} = supervisor:start_child(tcp_acceptor_sup, [Type, LSock])
                           end,
                           lists:duplicate(10, dummy)),
             {ok, #state{sock = LSock}};
         {error, Reason} ->
             ?WARNING2("Star Listen Fail,Reason:~w",[Reason]),
-            {stop, {cannot_listen, IPAddress, Port, Reason}}
+            {stop, {cannot_listen, IP, Port, Reason}}
     end.
 
 handle_call(_Request, _From, State) ->
