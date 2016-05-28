@@ -4,7 +4,7 @@
 %%% @desc   : 玩家模块
 %%%----------------------------------------------------------------------
 
--module(lib_user).
+-module(user_util).
 -include("common.hrl").
 -include("record.hrl").
 
@@ -21,13 +21,13 @@ get_user_pid(UserID) ->
     ProcessName = get_user_process_name(UserID),
     case whereis(ProcessName) of
         undefined ->
-            false;
+            ?FALSE;
         Pid ->
             case is_process_alive(Pid) of
                 true ->
-                    Pid;
+                    {ok, Pid};
                 false ->
-                    false
+                    ?FALSE
             end 
     end.
 
@@ -36,7 +36,7 @@ is_online(UserID) ->
     ProcessName = get_user_process_name(UserID),
     case whereis(ProcessName) of
         undefined ->
-            false;
+            ?FALSE;
         Pid ->
             is_process_alive(Pid)
     end.

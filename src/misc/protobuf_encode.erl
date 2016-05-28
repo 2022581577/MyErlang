@@ -30,16 +30,13 @@
 %% ==============================
 encode(Data) ->
     %% s2cCmd
-    S2CCmd = erlang:element(1, Data),
-    [_, _, _ | CmdStr] = util:to_list(S2CCmd),
-    Cmd = util:to_atom(CmdStr),
+	{ok, Cmd} = get_cmd(Data),
     encode(Cmd, Data).
 encode(Cmd, Data) ->
 	encode(?PROTO_DATA_NO_ENCRYPT, <<>>, Cmd, Data).
 encode(EncryptMode, Key, Cmd, Data) when is_tuple(Data) ->
-	Mod 			= get_mod(Cmd),
-	Mod1 			= util:to_atom(Mod ++ "_pb"),
-	BodyIoList 		= Mod1:encode(Data),
+	{ok, Mod}		= get_mod(Cmd),
+	BodyIoList 		= Mod:encode(Data),
 	PackageSequence = 0,
 	IsZip 			= 0,
 	%% 打包先压缩 再加密
@@ -108,9 +105,8 @@ decode_no_decrypt(Binary, Direction)->
 %% @doc decode body
 %% @return {ok, Cmd, ArgList}
 decode_body(Cmd, DataBin, Direction) ->
-	Mod = get_mod(Cmd),
-	Mod1 = util:to_atom(Mod ++ "_pb"),
-	ArgList = Mod1:decode(util:to_atom(lists:concat([Direction,Cmd])), DataBin),
+	{ok, Mod}	= get_mod(Cmd),
+	ArgList 	= Mod:decode(util:to_atom(lists:concat([Direction, Cmd])), DataBin),
 	{ok, Cmd, ArgList}.
 
 %%
@@ -162,7 +158,12 @@ zip_compress(Binary) ->
 get_mod(Cmd) ->
     H1 = Cmd div 10000,
     H2 = (Cmd - H1 * 10000) div 1000,
-    "proto_" ++ [$0+H1,$0+H2].
+	Mod = util:to_atom("proto_" ++ [$0+H1,$0+H2] ++ "_pb"),
+	{ok, Mod}.
 
-
-
+get_cmd(Data) ->
+	%% s2cCmd
+	S2CCmd = erlang:element(1, Data),
+	[_, _, _ | CmdStr] = util:to_list(S2CCmd),
+	Cmd = util:to_atom(CmdStr),
+	{ok, Cmd}.

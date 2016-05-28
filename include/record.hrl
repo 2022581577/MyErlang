@@ -20,6 +20,13 @@
               ,ip              %% ip(config中的server_ip)
               ,port            %% 端口(config中的server_port)
               ,map_port        %% 地图连接端口(config中的map_port)
-               }).
+    }).
+
+-record(reader_state,{type                  %% 类型：game，map
+                     ,acc_name              %% 账号
+                     ,user_id               %% 最终使用的玩家id
+                     ,socket	            %% 控制权转交后需测试socket为 undefined
+                     ,packet_len =  0       %% 初始packet长度为0，从消息头接收到数据后重置packet长度
+    }).
 
 -endif.

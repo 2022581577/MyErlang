@@ -9,17 +9,18 @@
 -include("common.hrl").
 -include("record.hrl").
 
+-export([send_data/2]).
 -export([send_bin/2]).
 
 -export([add_msg/2]).
 -export([send_msg/1]).
 
--define(DIC_SEND_BUFFER, dic_send_buffer).  %% 消息发送缓冲区进程字典
--define(MAX_SEND_BUFFER_SIZE, 1400).        %% 最大发缓冲区大小(字节)
--define(USER_SEND_DELAY_TIME, 200).         %% 延迟200毫秒发送
 
-	
-%% @doc 直接把bin消息发给socket
+%% @doc 直接把消息发给socket
+send_data(User, Data) ->
+    {ok, Bin} = game_pack_send:pack(Data),
+    send_bin(User, Bin).
+
 send_bin(#user{other_data = #user_other{socket = Socket}} = _User, Bin) ->
     erlang:port_command(Socket, Bin).
 

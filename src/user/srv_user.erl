@@ -37,10 +37,8 @@
         ,i/1
         ,p/1]).	
 
--define(MODULE_LOOP_TICK,       5000).		%% 玩家循环时间 5秒
--define(MODULE_TINY_LOOP_TICK,   200).		%% 玩家小循环时间 200毫秒
-%% 玩家每次循环的增数
--define(PLAYER_LOOP_INCREACE, 5).   
+-define(MODULE_LOOP_TICK,        ?USER_LOOP_TICK).          %% 玩家循环时间 5秒
+-define(MODULE_TINY_LOOP_TICK,   ?USER_TINY_LOOP_TICK).     %% 玩家小循环时间 200毫秒
 
 start(UserID) ->
 	server_sup:start_user([UserID]).
@@ -49,14 +47,14 @@ start_link(UserID) ->
 
 
 do_init([UserID]) ->
-    case lib_user:get_user_pid(UserID) of
+    case user_util:get_user_pid(UserID) of
         false ->
             %% 在init的时候就load data 还是 发送一条消息给自己load data  
-            case user_loginout:init(UserID) of
+            case user_base:init(UserID) of
                 {ok, User} ->
                     process_flag(trap_exit,true),
                     %% loop最好在前端请求了玩家初始化协议后开启（需要注意重连时loop的处理）
-                    erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, ?PLAYER_LOOP_INCREACE}),
+                    erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, ?USER_LOOP_INCREASE}),
                     %% erlang:send_after(?MODULE_TINY_LOOP_TICK, self(), tiny_loop),
                     ProcessName = lib_user:get_user_process_name(UserID),
                     erlang:register(ProcessName, self()),
@@ -67,7 +65,7 @@ do_init([UserID]) ->
                     load_false
             end;
 
-        Pid ->  
+        {ok, Pid} ->
             ?WARNING("User Has been Started,UserID:~w,Pid:~w",[UserID,Pid]),
             process_exist
     end. 
@@ -75,27 +73,10 @@ do_init([UserID]) ->
 do_cast({stop_user, Type}, User) ->
     ?INFO("cast stop user!"),
     {stop, normal, User#user{logout_type = Type}};
-%    case lib_user:get_login_state() of
-%        true -> %% 在顶号中退出
-%            Ref = erlang:send_after(3000, self(), stop),
-%            lib_user:set_logout_ref(Ref),
-%            {noreply, User};
-%        _ ->
-%	        {stop,normal,User}
-%    end;
 
 %% Socket 控制转移
 do_cast({set_socket,Socket,Time,Index},#user{user_id = _UserID, other_data = #user_other{socket = UserSocket} = UserOther} = User) ->
     %% 判断顶号退出
-    %lib_user:set_login_state(false),
-    %OldRef = lib_user:get_logout_ref(),
-    %case erlang:is_reference(OldRef) of
-    %    true ->
-    %        erlang:cancel_timer(OldRef),
-    %        lib_user:set_login_state(undefined);
-    %    _ ->
-    %        skip
-    %end,
     _LoginType = 
         case is_port(UserSocket) of
             true ->
@@ -158,7 +139,8 @@ do_info({inet_async,Socket,_Ref,{ok,Bin}},#user{user_id = UserID, other_data = #
 					{noreply, User}
 			end;
 		Error ->
-            ?WARNING("Receive Data Error:~w,UserID:~w,Ip:~p,Bin:~w",[Error,UserID,lib_user:get_ip(),Bin]),
+            ?WARNING("Receive Data Error:~w,UserID:~w,Ip:~p,Bin:~w",
+                [Error, UserID, user_util:get_ip(), Bin]),
             cast_stop(self(), data_error),
             {noreply,User}
 	end;
@@ -212,8 +194,8 @@ do_info({loop, Time}, #user{other_data = #user_other{is_loop = 0}} = User) ->
     {noreply, User};
 do_info({loop, Time}, User) ->  %% 前端确认登录完成后才进行loop
     %% 加个判断，判断是否在socket断掉的时候，考虑是否需要断掉loop
-	erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, Time + ?PLAYER_LOOP_INCREACE}),
-    {ok, NewUser} = user_loop:loop(User,Time),
+	erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, Time + ?USER_LOOP_INCREASE}),
+    {ok, NewUser} = user_base:loop(User,Time),
 	{noreply,NewUser};
 
 %do_info(tiny_loop, User) ->
@@ -225,10 +207,10 @@ do_info(Info, User) ->
     ?WARNING("Not done do_info:~w",[Info]),
 	{noreply, User}.
 
-do_terminate(Reason, #user{user_id = UserID} = _User) ->   
+do_terminate(Reason, #user{user_id = UserID} = User) ->
     ?INFO("~w stop,UserID:~w,Reason:~w",[?MODULE,UserID,Reason]),
     %% 玩家下线处理
-    %lib_logout:logout(User),
+    {ok, _User1} = user_base:logout(User),
     ok.
 
 %%% ----------------------
@@ -289,7 +271,7 @@ cast_stop(UserX, Type) ->
         UserPid ->
             behaviour_gen_server:cast(UserPid, {stop_user, Type})
     end.
-	
+
 %% @doc 同步停止进程
 call_stop(UserX, Type) ->
     case analyze_user_x(UserX) of
@@ -389,9 +371,11 @@ p(ID) ->
 analyze_user_x(#user{other_data = #user_other{pid = UserPid}}) ->
     UserPid;
 analyze_user_x(UserID) when is_integer(UserID) ->
-    case lib_user:get_user_pid(UserID) of
-        false ->    {false, offline};
-        UserPid ->  UserPid
+    case user_util:get_user_pid(UserID) of
+        false ->
+            {false, offline};
+        {ok, UserPid} ->
+            UserPid
     end;
 analyze_user_x(UserPid) when is_pid(UserPid) ->
     UserPid;

@@ -85,34 +85,28 @@
 
 %% 需要存库的数据
 -record(user, {user_id          = 0
-              ,name             = <<>>
-              ,acc_name         = <<>>
+              ,acc_name         = <<"">>
+              ,name             = <<"">>
               ,server_id        = 1         %% 玩家当前server_id(config中的)
               ,reg_server_id    = 1         %% 玩家注册的server_id(注册时所在服的config中的)
               ,user_type        = 0         %% 玩家类型:0、普通玩家，1、新手指导员，2、GM
-              ,ip               = ""
+              ,ip               = <<"">>
 
               ,reg_time         = 0
-              ,is_online        = 0
               ,online_time      = 0         %% 在线时间
               ,total_online_time= 0         %% 累计在线时间
               ,login_time       = 0
               ,last_online_time = 0 
               ,last_update_time = 0         %% save db time
-              ,logout_type                  %% 下线类型
+              ,logout_type      = 0         %% 下线类型
 
-              ,recharge_gold    = 0
-              ,gold             = 0
-              ,bind_gold        = 0
-              ,gm_gold          = 0
               ,coin             = 0
-              ,bind_coin        = 0
 
-              ,map_id
-              ,pos_x
-              ,pos_y    
+              ,map_id           = 0
+              ,pos_x            = 0
+              ,pos_y            = 0
 
-              ,sex              = 1
+              ,gender           = 1
               ,career           = 1
               ,lv               = 1
               ,exp              = 0
@@ -121,7 +115,6 @@
               ,mp               = 0
 
               ,guild_id         = 0         %% 帮派id
-              ,guild_position   = 0         %% 帮派位置
 
               ,other_data       = #user_other{}    %% 存库时该字段清空
          }).

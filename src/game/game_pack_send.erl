@@ -11,7 +11,9 @@
 -include("tpl_map.hrl").
 
 -export([
-        send_to_one/2
+        send_to_socket/2
+
+        ,send_to_one/2
         ,nodelay_send_to_one/2
         ,send_to_users/2
         ,nodelay_send_to_users/2
@@ -27,6 +29,11 @@
     ]).
 
 -export([pack/1]).
+
+%% @doc 直接发给socket
+send_to_socket(Socket, Data) ->
+    {ok, Bin} = pack(Data),
+    erlang:port_command(Socket, Bin).
 
 %% @doc 给某个玩家发送消息
 %% 如果是当前节点，可以使用user_id，如果不确定节点，只能使用user_pid

@@ -52,7 +52,8 @@
 -define(DIFF_SECONDS_1900_1970, 2208988800).
 -define(DIFF_SECONDS_0000_1970, 62167219200).
 -define(TIMER_TEN_SEC,          10).    %% 10秒    
--define(TIMER_ONE_MIN_SEC,      60).    %% 一分钟
+-define(TIMER_ONE_MIN_SEC,      60).    %% 1分钟
+-define(TIMER_FIVE_MIN_SEC,     300).   %% 5分钟
 -define(TIMER_FIFTEEN_MIN_SEC,  900).   %% 15分钟
 -define(TIMER_THIRTY_MIN_SEC,   1800).  %% 30分钟
 -define(TIMER_ONE_HOUR_SEC,     3600).

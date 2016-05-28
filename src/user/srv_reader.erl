@@ -10,6 +10,7 @@
 -compile(inline).
 
 -include("common.hrl").
+-include("record.hrl").
 
 -define(FLASH_POLICY_REQ, <<"<pol">>).
 -define(FLASH_POLICY_REQ_LEN, 22).
@@ -20,10 +21,6 @@
 
 -export([start_link/1,stop/1]).
 
--record(state,{type                 %% 类型：game，map
-               ,socket	            %% 控制权转交后需测试socket为 undefined
-			   ,packet_len =  0     %% 初始packet长度为0，从消息头接收到数据后重置packet长度
-			   }).
 
 start_link(Type) ->
     behaviour_gen_server:start_link(?MODULE, [Type], []).
@@ -34,14 +31,14 @@ stop(Pid) ->
 do_init([Type]) ->
     %% ?INFO("Init ~w",[?MODULE]),
 	packet_encode:init_packet_index(),
-	{ok, #state{type = Type}}.
+	{ok, #reader_state{type = Type}}.
 
 do_cast({set_socket,Socket},State) ->    
     ?INFO("Set Socket:~w",[Socket]),    
     %% 开始接收消息头长度为4的消息
     async_recv(Socket,?HEADER_LENGTH,?HEART_TIMEOUT),    
     %lib_login:save_reader_info(#reader_info{socket = Socket}),    
-    {noreply,State#state{socket = Socket}};
+    {noreply,State#reader_state{socket = Socket}};
 
 do_cast(Info, State) -> 
     ?WARNING("Not done do_cast:~w",[Info]),
@@ -53,7 +50,7 @@ do_call(Info, _From, State) ->
 
 %%% inet_async,接收prim_inet:async_recv的反馈
 %% 接收安全沙箱信息
-do_info({inet_async,Socket,_Ref,{ok,?FLASH_POLICY_REQ}},#state{socket = Socket} = State) ->
+do_info({inet_async,Socket,_Ref,{ok,?FLASH_POLICY_REQ}},#reader_state{socket = Socket} = State) ->
     %?INFO("++++++++++++++++++ Send Prolicy ++++++++++++++++",[]),
     gen_tcp:send(Socket,?FLASH_POLICY_FILE),
 	% async_recv(Socket,?FLASH_POLICY_REQ_LEN,?HEART_TIMEOUT),
@@ -62,32 +59,32 @@ do_info({inet_async,Socket,_Ref,{ok,?FLASH_POLICY_REQ}},#state{socket = Socket} 
     {noreply,State};
 
 %% 数据包不能大于 2^16-1(64K)
-do_info({inet_async,Socket,_Ref,{ok,<<0:16,Len:16>>}},#state{socket = Socket,packet_len = 0} = State) ->
+do_info({inet_async,Socket,_Ref,{ok,<<0:16,Len:16>>}},#reader_state{socket = Socket,packet_len = 0} = State) ->
     ?INFO("Len:~w", [Len]),
     %% _NewRef = async_recv(Socket,Len - ?HEADER_LENGTH ,?HEART_TIMEOUT),
     %% Len约定是已经去掉了消息头信息的长度
     _NewRef = async_recv(Socket, Len, ?HEART_TIMEOUT),  
-    {noreply,State#state{packet_len = Len}};
+    {noreply,State#reader_state{packet_len = Len}};
 
-do_info({inet_async,Socket,_Ref,{ok,Bin}},#state{socket = Socket,packet_len = 0} = State) ->
+do_info({inet_async,Socket,_Ref,{ok,Bin}},#reader_state{socket = Socket,packet_len = 0} = State) ->
     ?INFO("Recevie Packet Length ~w,Bin:~w",[size(Bin),Bin]),
     %% 匹配不成功，在packet为0时收到非{ok,<<0:16,Len:16>>}的数据，继续接收消息头长度为4的消息
     _NewRef = async_recv(Socket,?HEADER_LENGTH,?HEART_TIMEOUT),
-    {noreply,State#state{packet_len = 0}};
+    {noreply,State#reader_state{packet_len = 0}};
 
 %% 接收协议体数据
-do_info({inet_async,Socket,_Ref,{ok,Bin}},#state{socket = Socket} = State) ->
+do_info({inet_async,Socket,_Ref,{ok,Bin}},#reader_state{socket = Socket} = State) ->
     ?INFO("Recevie Packet Length ~w,Bin:~w",[size(Bin),Bin]),
 	case protobuf_encode:decode(Bin) of
 		{Cmd,Data} ->
             %% lib_packet_monitor:check_packet_count(Cmd),
-			case routing(Cmd,Data,Socket) of
-                ok -> 
+			case routing(State, Cmd, Data) of
+                {ok, State1} ->
                     _NewRef = async_recv(Socket,?HEADER_LENGTH,?HEART_TIMEOUT),
-                    {noreply,State#state{packet_len = 0}};
-                error ->
+                    {noreply, State1#reader_state{packet_len = 0}};
+                {?FALSE, Res} ->
                     %% 登陆出错了
-                    ?WARNING("Error Socket:~w,Ip:~p",[Socket,util:get_ip(Socket)]),
+                    ?WARNING("Error Socket:~w,Ip:~p,Res:~w",[Socket,util:get_ip(Socket),Res]),
                     {stop,normal,State}
             end;
 		Error ->
@@ -113,7 +110,7 @@ do_info(Info, State) ->
     ?WARNING("Not done do_info:~w",[Info]),
 	{noreply, State}.
 
-do_terminate(_Reason, #state{socket=Socket}) ->
+do_terminate(_Reason, #reader_state{socket=Socket}) ->
 	%% ?INFO("~w stop...",[?MODULE]),
 	case is_port(Socket) of
 		true ->
@@ -129,13 +126,13 @@ async_recv(Sock, Length, Timeout) when is_port(Sock) ->
         {ok, Res}       -> Res
     end.
 
-routing(Cmd,Bin,Socket) ->
+routing(State, Cmd, Bin) ->
     case Cmd div 1000 of
         10 ->
-            {ok,Data} = pt_10:read(Cmd,Bin),
-            pp_account:handle(Cmd,Socket,Data);
+            {ok, Data} = pt_10:read(Cmd, Bin),
+            pp_login:handle(Cmd, Data, State);
         _ ->
-            error
+            {?FALSE, routing_error}
     end.
 
 %% 检查数据包总数,是否高于上限
