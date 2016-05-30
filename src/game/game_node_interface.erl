@@ -10,7 +10,7 @@
         ,set_status/1
         ,set_server_starting/0
         ,set_server_running/0
-        ,set_server_stoping/0]).
+        ,set_server_stopping/0]).
 
 status()->
     try
@@ -29,5 +29,5 @@ set_server_starting() ->
 set_server_running()->
     set_status(?GAME_STATUS_RUNNING).
 
-set_server_stoping()->
-    set_status(?GAME_STATUS_STOPING).
+set_server_stopping()->
+    set_status(?GAME_STATUS_STOPPING).

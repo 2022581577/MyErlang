@@ -7,46 +7,42 @@
 -module(global_data_disk).
 
 -include("common.hrl").
+-include("record.hrl").
 
 -export([init/0,sync/0,stop/0]).
 -export([list/0,get/1,get/2,set/2,del/1]).
 
 -define(SYNC_INTERVAL, 15 * 60 * 1000).
--define(TABLE, global_data_disk).
--record(global_data, {key, value, is_dirty = 0}).
+
 
 init() ->
-    ets:new(?TABLE, [{keypos, #global_data.key} | ?ETS_OPT]),
-    SysGlobalList = get_all(),
-    ets:insert(?TABLE, SysGlobalList),
-	%% 后台连移到Global模块处理
-	timer:apply_interval(?SYNC_INTERVAL, global_data_disk, sync, []),
-	ok.
+    game_db:load_all_value(global_data),
+    timer:apply_interval(?SYNC_INTERVAL, global_data_disk, sync, []),
+    ok.
 
 list() ->
-	ets:tab2list(?TABLE).
+    ets:tab2list(?ETS_GLOBAL_DATA).
 
 get(K) ->
-	get(K,undefined).
+    get(K, undefined).
 
-get(K,Def) ->
-	case ets:lookup(?TABLE,K) of
-        [#global_data{key = K, value = V}] ->
-			V;
-		[] ->
-			Def
-	end.
+get(K, Def) ->
+    case ets:lookup(?ETS_GLOBAL_DATA, K) of
+        [#global_data{global_key = K, value = V}] ->
+            V;
+        [] ->
+            Def
+    end.
 
-set(K,V) ->
-    ets:insert(?TABLE, #global_data{key = K, value = V, is_dirty = 1}).
+set(K, V) ->
+    ets:insert(?ETS_GLOBAL_DATA, #global_data{global_key = K, value = V, is_dirty = 1}).
 
 del(K) ->
-    ets:delete(?TABLE, K),  %% 删除ets
-    edb_util:delete(global_data, [{global_key, util:term_to_bitstring(K)}]). %% 删除数据库
+    game_db:del_value(?ETS_GLOBAL_DATA, K, util:term_to_bitstring(K)).
 
 %% 同步
 sync() ->
-	try
+    try
         do_sync()
     catch
         _:Reason ->
@@ -55,7 +51,7 @@ sync() ->
 
 %% 关服同步数据库
 stop() ->
-	try
+    try
         do_sync()
     catch
         _:Reason ->
@@ -65,17 +61,5 @@ stop() ->
 
 do_sync() ->
     EtsInfoList = list(),
-    [edb_util:replace(
-        global_data,
-        [{global_key, util:term_to_bitstring(K)}, {global_value, util:term_to_bitstring(V)}]
-    ) || #global_data{key = K, value = V, is_dirty = 1} <- EtsInfoList],
+    game_db:save_value(?UNDEFINED, EtsInfoList),
     ok.
-
-%%% ------------------------------
-%%%     数据库操作
-%%% ------------------------------
-%% @doc 获取所有数据
-get_all() ->
-    DbList = edb_util:get_all(global_data, [global_key, global_value], []),
-    [#global_data{key = util:bitstring_to_term(Key), value = util:bitstring_to_term(Value)}
-        || [Key, Value] <- DbList].

@@ -22,11 +22,19 @@
               ,map_port        %% 地图连接端口(config中的map_port)
     }).
 
+%% srv_reader的state
 -record(reader_state,{type                  %% 类型：game，map
                      ,acc_name              %% 账号
-                     ,user_id               %% 最终使用的玩家id
-                     ,socket	            %% 控制权转交后需测试socket为 undefined
-                     ,packet_len =  0       %% 初始packet长度为0，从消息头接收到数据后重置packet长度
+                     ,user_id       = 0     %% 最终使用的玩家id，默认0
+                     ,user_pid              %% 玩家pid
+                     ,socket                %% 控制权转交后需测试socket为 undefined
+                     ,packet_len    = 0     %% 初始packet长度为0，从消息头接收到数据后重置packet长度
+    }).
+
+%% 公共数据
+-record(global_data, {global_key
+                    ,value
+                    ,is_dirty = 0
     }).
 
 -endif.

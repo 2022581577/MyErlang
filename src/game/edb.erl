@@ -95,6 +95,7 @@ init_databases() ->
                 <<"CREATE TABLE `global_data` (
                 `global_key` varchar(50) NOT NULL,
                 `global_value` text NOT NULL,
+                `is_dirty` tinyint(1) unsigned zerofill NOT NULL,
                 PRIMARY KEY (`global_key`)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='全局信息';">>),
             ?INFO("create global data res:~w",[Res3])

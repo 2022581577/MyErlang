@@ -65,7 +65,7 @@ message s2c10101 {
 // 登陆时角色列表信息
 message simple_user {
     required int64 user_id = 1;
-    required string user_name = 2;
-    required int32 career_id = 3;
-    required int32 level = 4;
+    required string name = 2;
+    required int32 career = 3;
+    required int32 lv = 4;
 }

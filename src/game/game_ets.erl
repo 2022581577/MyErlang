@@ -4,11 +4,12 @@
 %%% @desc   : ets初始化模块
 %%%----------------------------------------------------------------------
 
--module(game_ets_init).
+-module(game_ets).
 -include("common.hrl").
 -include("record.hrl").
 
 -export([init/0]).
+-export([load/0]).
 
 init() ->
     ets:new(?ETS_NODE, [{keypos, #node.key} | ?ETS_OPT]),                           %% 节点信息
@@ -46,9 +47,14 @@ init() ->
     %% 阻挡点信息，每个地图资源一个ets表
     [ets:new(E, [{keypos,1} | ?ETS_OPT]) || E <- map_block:ets_map_block_name_list()],
     %% 内存数据库ets表初始化
-    game_mmdb:init(),
+    game_db:init(),
     ok.
 
+
+%% @doc 加载一些数据到ets
+load() ->
+    game_db:preload(),
+    ok.
 
 %% ============================================================================
 %% ================================ 机器授权检测 ==============================

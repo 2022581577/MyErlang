@@ -39,14 +39,14 @@
 
 %% Game Status
 -define(GAME_STATUS,game_status).
--define(GAME_STATUS_SUCCESS,0).
--define(GAME_STATUS_NORUN,1).
--define(GAME_STATUS_USAGE,2).
--define(GAME_STATUS_BADRPC,3).
--define(GAME_STATUS_ERROR,4).
--define(GAME_STATUS_STARTING,5).
--define(GAME_STATUS_RUNNING,6).
--define(GAME_STATUS_STOPING,7).
+-define(GAME_STATUS_SUCCESS,    0).
+-define(GAME_STATUS_NORUN,      1).
+-define(GAME_STATUS_USAGE,      2).
+-define(GAME_STATUS_BADRPC,     3).
+-define(GAME_STATUS_ERROR,      4).
+-define(GAME_STATUS_STARTING,   5).
+-define(GAME_STATUS_RUNNING,    6).
+-define(GAME_STATUS_STOPPING,   7).
 
 %% Game Timer
 -define(DIFF_SECONDS_1900_1970, 2208988800).
@@ -62,6 +62,17 @@
 %% Game Function
 -define(TRY(TryFun, TryErrRes), try (TryFun) catch _:_ -> (TryErrRes) end).
 -define(IF(Case,True,False), case Case of true -> True; _ -> False end).
--define(RECORD_FIELDS(Record),record_info(fields,Record)).
+
+
+%% 需要record_info转换的record名
+-define(RECORD_NAME_LIST, [user
+                        ,user_item
+                        ,user_misc
+                        ,guild
+                        ,global_data]).
+
+-define(RECORD_FIELDS(Record), record_info(fields,Record)).
+-define(RECORD_NAME_FIELDS(RecordName), {RecordName, ?RECORD_FIELDS(RecordName)}).
+-define(ALL_RECORD_FIELDS, [?RECORD_NAME_FIELDS(RecordName) || RecordName <- ?RECORD_NAME_LIST]).
 
 -endif.

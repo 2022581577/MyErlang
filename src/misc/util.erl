@@ -10,6 +10,8 @@
 
 -export([lager_filename/2]).
 -export([log_filename/1]).
+-export([to_ets_name/1
+        ,from_ets_name/1]).
 
 -export([to_integer/1
         ,to_binary/1
@@ -272,6 +274,16 @@ log_filename(FilePrefix, FileSuffix) ->
 one_to_two(One) ->
     Two = io_lib:format("~2..0B", [One]),
     lists:flatten(Two).
+
+%% 根据RecordName获取EtsName
+to_ets_name(RecordName) ->
+    util:to_atom("ets_" ++ util:to_list(RecordName)).
+
+%% 从EtsName取RecordName
+from_ets_name(EtsName) ->
+    [_, _, _, _ | NameStr] = util:to_list(EtsName),
+    util:to_atom(NameStr).
+
 
 %%f2s(N) when is_integer(N) ->
 %%    integer_to_list(N) ++ ".00";

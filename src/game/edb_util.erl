@@ -22,13 +22,14 @@
           get_row/1,
           get_row/2,
           get_row/3,
+          get_one/2,
           get_one/3]).
 
 -export([
          replace/2,
-         batch_replace_sql/3,
+         batch_replace/3,
          insert/2,
-         batch_insert_sql/3,
+         batch_insert/3,
          update/3,
          delete/2,
          delete/3
@@ -104,18 +105,20 @@ get_row(Sql) ->
             []
     end.
 
-get_row(Table,WhereFields)->
-    get_row(Table,[],WhereFields).
-get_row(Table,Fields,WhereFields)->
-    case get_limit(Table,Fields,WhereFields,[0,1]) of
+get_row(Table, WhereFields)->
+    get_row(Table, [], WhereFields).
+get_row(Table, Fields, WhereFields)->
+    case get_limit(Table, Fields, WhereFields, [0,1]) of
         [H | _T] ->
             H;
         _ ->
             []
     end.
 
-get_one(Table,Field,WhereFields) ->
-    case get_row(Table,[Field],WhereFields) of
+get_one(Table, WhereFields) ->
+    get_one(Table, [], WhereFields).
+get_one(Table, Fields, WhereFields) ->
+    case get_row(Table, Fields, WhereFields) of
         [H | _T] ->
             H;
         _->
@@ -137,15 +140,17 @@ insert(Table,Fields) ->
     Sql = lists:concat(["INSERT INTO `",Table,"` SET ",InsertSql]),
     execute(Sql).
 
-batch_insert_sql(Table, Fields, [[_ | FV] | T]) ->
+batch_insert(Table, Fields, [[_ | FV] | T]) ->
     FieldsSql = make_fields_sql(Fields),
     ValuesSql = lists:concat([FV | T]),
-    lists:concat(["INSERT INTO `", Table, "` (", FieldsSql, ")", " VALUES ", ValuesSql]).
+    Sql = lists:concat(["INSERT INTO `", Table, "` (", FieldsSql, ")", " VALUES ", ValuesSql]),
+    execute(Sql).
 
-batch_replace_sql(Table, Fields, [[_ | FV] | T]) ->
+batch_replace(Table, Fields, [[_ | FV] | T]) ->
     FieldsSql = make_fields_sql(Fields),
     ValuesSql = lists:concat([FV | T]),
-    lists:concat(["REPLACE `", Table, "` (", FieldsSql, ")", " VALUES ", ValuesSql]).
+    Sql = lists:concat(["REPLACE `", Table, "` (", FieldsSql, ")", " VALUES ", ValuesSql]),
+    execute(Sql).
 
 update(Table,Fields,WhereFields) ->
     UpdateSql = make_update_sql(Fields),

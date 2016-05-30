@@ -112,8 +112,10 @@ do_add_log1(Operation, TableName, Value, Dict) ->
 
 %% 全部数据存库
 save(State) ->
-	[batch_save(?OPERATION_INSERT, TableName, ValueList)|| {TableName,#log_table{value_list=ValueList}} <- dict:to_list(State#state.insert_dict)],
-	[batch_save(?OPERATION_INSERT, TableName, ValueList)|| {TableName,#log_table{value_list=ValueList}} <- dict:to_list(State#state.replace_dict)],
+	[batch_save(?OPERATION_INSERT, TableName, ValueList)
+        || {TableName,#log_table{value_list=ValueList}} <- dict:to_list(State#state.insert_dict)],
+	[batch_save(?OPERATION_INSERT, TableName, ValueList)
+        || {TableName,#log_table{value_list=ValueList}} <- dict:to_list(State#state.replace_dict)],
 	State#state{insert_dict=dict:new(),replace_dict=dict:new()}.
 
 batch_save(_, _, []) ->

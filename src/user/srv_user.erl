@@ -64,7 +64,6 @@ do_init([UserID]) ->
                     ?WARNING("Load user false,UserID:~w",[UserID]),
                     load_false
             end;
-
         {ok, Pid} ->
             ?WARNING("User Has been Started,UserID:~w,Pid:~w",[UserID,Pid]),
             process_exist
@@ -75,8 +74,10 @@ do_cast({stop_user, Type}, User) ->
     {stop, normal, User#user{logout_type = Type}};
 
 %% Socket 控制转移
-do_cast({set_socket,Socket,Time,Index},#user{user_id = _UserID, other_data = #user_other{socket = UserSocket} = UserOther} = User) ->
-    %% 判断顶号退出
+do_cast({set_socket, Socket, Time, Index}, User) ->
+    #user{user_id = _UserID
+        ,other_data = #user_other{socket = UserSocket} = UserOther} = User,
+        %% 判断顶号退出
     _LoginType = 
         case is_port(UserSocket) of
             true ->

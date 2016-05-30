@@ -25,8 +25,9 @@ start(Sup) ->
     game_node_interface:set_server_starting(),
 
     ok = netword_service(Sup),                          %% 网络相关服务
+    ok = game_ets:init(),                               %% 各种ets初始化(数据库初始化前执行，有用到?ETS_GLOBAL_DATA)
     ok = mysql_service(Sup),                            %% 数据库相关
-    ok = game_ets_init:init(),                          %% 各种ets初始化
+    ok = game_ets:load(),                               %% 一些ets的加载(数据库初始化后执行)
     %% ok = game_counter:init(),                           %% 自增id计数器模块
 
     {ok, _} = server_sup:start_child(srv_node),         %% 节点管理进程
@@ -72,7 +73,7 @@ mysql_service(Sup) ->
 
 %% 关闭服务
 stop() ->
-    game_node_interface:set_server_stoping(),
+    game_node_interface:set_server_stopping(),
     %% 踢掉玩家
 
     %% 关闭各个系统

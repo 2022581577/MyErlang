@@ -26,7 +26,7 @@
 %% ========================================================================
 %% @doc 初始化加载
 init(UserID) ->
-    case game_mmdb:get_user(UserID) of
+    case game_db:get_user(UserID) of
         #user{} = User ->
             {ok, UserN} = user_action:init(User),
             {ok, UserN};

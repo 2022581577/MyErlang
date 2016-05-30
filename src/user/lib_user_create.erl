@@ -105,6 +105,14 @@ create_user(State, Name, Career, Gender) ->
             ,gender         = Gender
             ,career         = Career
         },
-    {ok, _User1} = user_action:create(User),
+    {ok, User1} = user_action:create(User),
     %% 保存信息
+    save_user(User1),
     {ok, State}.
+
+save_user(User) ->
+    User1       = User#user{other_data = <<>>},
+    FieldValue  = lib_record:fields_value(User1),
+    ets:insert(?ETS_USER, User1),       %% 存ets
+    edb_util:insert(user, FieldValue),  %% 存库
+    ok.

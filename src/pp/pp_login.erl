@@ -37,6 +37,9 @@ handle(_Create, #c2s10002{} = Info, State) ->
     #c2s10002{user_name = Name, career = Career, gender = Gender} = Info,
     lib_user_create:create(State, Name, Career, Gender);
 
+handle(_Enter, #c2s10003{user_id = UserID}, State) ->
+    lib_user_login:enter(State, UserID);
+
 handle(Cmd, Info, State) ->
     ?WARNING("Error msg! Cmd:~w, Info:~w", [Cmd, Info]),
     {ok, State}.

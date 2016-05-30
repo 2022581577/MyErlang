@@ -9,12 +9,13 @@
 -define(ETS_MAP_ID_LIST,        ets_map_id_list).       %% 地图id映射
 -define(ETS_MAP_CONFIG,         ets_map_config).        %% 地图配置数据
 
-%%% 内存数据库相关ets
+%%% 内存数据库相关ets(和数据库表对应的ets命名方式：ets_表名，表名为record名)
 %% 玩家相关
 -define(ETS_USER,               ets_user).              %% 玩家数据的ets    #user{}
 -define(ETS_ACCOUNT_INFO,       ets_account_info).      %% 玩家账号数据信息
 -define(ETS_USER_ITEM,          ets_user_item).         %% 玩家道具数据的ets    {user_id, [#user_item{} | _]}
 %% 公共数据
+-define(ETS_GLOBAL_DATA,        ets_global_data).       %% 公共数据
 -define(ETS_GUILD,              ets_guild).             %% 公会数据的ets    #guild{}
 
 
