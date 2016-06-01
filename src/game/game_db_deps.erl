@@ -44,8 +44,15 @@ db_to_record(Record) ->
     Record.
 
 %% 判断is_dirty
-check_dirty(#user_misc{is_dirty = IsDirty} = UserMisc) ->
-    {IsDirty =:= 1, UserMisc#user_misc{is_dirty = 0}};
+check_dirty(#global_data{is_dirty = IsDirty} = Record) ->
+    {IsDirty =:= 1, Record#global_data{is_dirty = 0}};
+
+check_dirty(#user_item{is_dirty = IsDirty} = Record) ->
+    {IsDirty =:= 1, Record#user_item{is_dirty = 0}};
+
+check_dirty(#user_misc{is_dirty = IsDirty} = Record) ->
+    {IsDirty =:= 1, Record#user_misc{is_dirty = 0}};
+
 check_dirty(Record) ->
     {?TRUE, Record}.
 

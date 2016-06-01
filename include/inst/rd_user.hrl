@@ -7,7 +7,7 @@
                    ,value2      = 0
                    ,value3      = 0
                    ,value_text  = []    %% 自定义信息存储
-                   ,is_dirty    = 0     %% 是否脏数据，一般放record最后一个字段
+                   ,is_dirty    = 1     %% 是否脏数据，一般放record最后一个字段
     }).
 
 %% 玩家在进程中的临时数据和其他一些数据
@@ -118,14 +118,21 @@
               ,guild_id         = 0         %% 帮派id
 
               ,other_data       = #user_other{}    %% 存库时该字段清空
-         }).
+    }).
 
 -record(user_online, {user_id = 0
                       ,pid
-                  }).
+    }).
 
 -record(account_info, {acc_name = <<>>
                       ,user_ids = []
-                  }).
+    }).
+
+-record(user_item, {item_id     = 0
+                    ,tpl_id     = 0
+                    ,user_id    = 0
+                    ,location   = 0
+                    ,is_dirty   = 1
+    }).
 
 -endif.

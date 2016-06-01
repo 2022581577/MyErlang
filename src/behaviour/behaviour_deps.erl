@@ -4,7 +4,7 @@
 %%% @desc   : behaviour后续需要根据不同模块处理的一些事件
 %%%------------------------------------------------------------------------
 
--module(behaviour_support).
+-module(behaviour_deps).
 
 %% include
 -include("common.hrl").

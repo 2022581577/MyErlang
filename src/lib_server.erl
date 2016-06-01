@@ -28,7 +28,7 @@ start(Sup) ->
     ok = game_ets:init(),                               %% 各种ets初始化(数据库初始化前执行，有用到?ETS_GLOBAL_DATA)
     ok = mysql_service(Sup),                            %% 数据库相关
     ok = game_ets:load(),                               %% 一些ets的加载(数据库初始化后执行)
-    %% ok = game_counter:init(),                           %% 自增id计数器模块
+    ok = game_counter:init(),                           %% 自增id计数器模块
 
     {ok, _} = server_sup:start_child(srv_node),         %% 节点管理进程
     {ok, _} = server_sup:start_child(srv_log),          %% 统计日志模块

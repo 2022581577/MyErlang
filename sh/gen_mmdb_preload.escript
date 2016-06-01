@@ -3,7 +3,7 @@
 
 -mode(compile).
 
--include("../include/generation.hrl").
+-include("../include/old/generation.hrl").
 
 main(_Args) ->
     Name = "game_mmdb_preload",

@@ -14,10 +14,20 @@
 -include("common.hrl").
 -include("record.hrl").
 
+%% 需要record_info转换的record名
+-define(RECORD_NAME_FIELDS(FieldsRecordName), {FieldsRecordName, ?RECORD_FIELDS(FieldsRecordName)}).
+
+-define(ALL_RECORD_FIELDS,
+    [?RECORD_NAME_FIELDS(global_data)
+    ,?RECORD_NAME_FIELDS(user)
+    ,?RECORD_NAME_FIELDS(user_item)
+    ,?RECORD_NAME_FIELDS(guild)
+    ]).
+
 %% @doc 获取字段列表
-fields_list(RecordName) ->
-    case lists:keyfind(RecordName, 1, ?ALL_RECORD_FIELDS) of
-        {RecordName, Fields} ->
+fields_list(RecName) ->
+    case lists:keyfind(RecName, 1, ?ALL_RECORD_FIELDS) of
+        {RecName, Fields} ->
             {ok, Fields};
         _ ->
             ?FALSE
@@ -25,10 +35,10 @@ fields_list(RecordName) ->
 
 %% @doc 将record转换为 [{field,Val} ...] 形式
 fields_value(Record) ->
-    [RecordName | Value] = tuple_to_list(Record),
-    case fields_list(RecordName) of
+    [RecName | Value] = tuple_to_list(Record),
+    case fields_list(RecName) of
         {ok, Fields} ->
-            [RecordName | lists:zip(Fields, Value)];
+            [RecName | lists:zip(Fields, Value)];
         false ->
             ?WARNING("Get Record Fields Value Fail,Record:~w",[Record]),
             no_defined

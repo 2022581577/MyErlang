@@ -16,6 +16,7 @@
 
 %% export
 -export([create/4]).
+-export([test_create_user/4]).
 
 %% record and define
 -define(CREATE_SUCCESS,             1).
@@ -107,12 +108,23 @@ create_user(State, Name, Career, Gender) ->
         },
     {ok, User1} = user_action:create(User),
     %% 保存信息
-    save_user(User1),
+    game_db:new_value(User1),
     {ok, State}.
 
-save_user(User) ->
-    User1       = User#user{other_data = <<>>},
-    FieldValue  = lib_record:fields_value(User1),
-    ets:insert(?ETS_USER, User1),       %% 存ets
-    edb_util:insert(user, FieldValue),  %% 存库
+
+%% test
+test_create_user(AccName, Name, Career, Gender) ->
+    UserID  = game_counter:get_user_id(),
+    User    =
+        #user{user_id       = UserID
+            ,acc_name       = AccName
+            ,name           = Name
+            ,server_id      = ?CONFIG(server_id)
+            ,reg_server_id  = ?CONFIG(server_id)
+            ,ip             = "127.0.0.1"
+            ,reg_time       = util:unixtime()
+            ,gender         = Gender
+            ,career         = Career
+        },
+    game_db:new_value(User),
     ok.

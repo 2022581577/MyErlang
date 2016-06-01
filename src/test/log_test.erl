@@ -25,7 +25,7 @@ test(Format) ->
 
 test(Format, Args) ->
     %?TRACE(Format, Args),
-    ?D(Format, Args),  
+    ?DEBUG(Format, Args),
     ?INFO(Format, Args),
     ?WARNING(Format, Args),
     ?WARNING2(Format, Args),

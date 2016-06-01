@@ -35,13 +35,13 @@
         ,call_state_apply/2
         ,stop_all/0
         ,i/1
-        ,p/1]).	
+        ,p/1]).    
 
 -define(MODULE_LOOP_TICK,        ?USER_LOOP_TICK).          %% 玩家循环时间 5秒
 -define(MODULE_TINY_LOOP_TICK,   ?USER_TINY_LOOP_TICK).     %% 玩家小循环时间 200毫秒
 
 start(UserID) ->
-	server_sup:start_user([UserID]).
+    server_sup:start_user([UserID]).
 start_link(UserID) ->
     behaviour_gen_server:start_link(?MODULE, [UserID], []).
 
@@ -88,9 +88,9 @@ do_cast({set_socket, Socket, Time, Index}, User) ->
                 normal_login
         end,
 
-	packet_encode:save_packet_index(Time,Index,0,0),
+    packet_encode:save_packet_index(Time,Index,0,0),
     %% 消息处理
-	async_recv(Socket,?HEADER_LENGTH,?HEART_TIMEOUT),
+    async_recv(Socket,?HEADER_LENGTH,?HEART_TIMEOUT),
 
 
     %%% 重置心跳包错误时间
@@ -106,7 +106,7 @@ do_cast({set_socket, Socket, Time, Index}, User) ->
 
 do_cast(Info, User) -> 
     ?WARNING("Not done do_cast:~w",[Info]),
-	{noreply, User}.
+    {noreply, User}.
 
 do_call({stop_user, Type}, _From, User) ->
     ?INFO("call stop user!"),
@@ -114,7 +114,7 @@ do_call({stop_user, Type}, _From, User) ->
 
 do_call(Info, _From, User) -> 
     ?WARNING("Not done do_call:~w",[Info]),
-	{reply, ok, User}.
+    {reply, ok, User}.
 
 %% 数据接收, 上行数据包不能大于 2^16(64K)
 do_info({inet_async,Socket,_Ref,{ok,<<0:16,Len:16>>}},#user{other_data = #user_other{socket = Socket}} = User) ->
@@ -123,28 +123,28 @@ do_info({inet_async,Socket,_Ref,{ok,<<0:16,Len:16>>}},#user{other_data = #user_o
     {noreply,User};
 
 do_info({inet_async,Socket,_Ref,{ok,Bin}},#user{user_id = UserID, other_data = #user_other{socket = Socket}} = User) ->
-	case protobuf_encode:decode(Bin) of
-		{Cmd,Data} ->
-			_NewRef = async_recv(Socket,?HEADER_LENGTH,?HEART_TIMEOUT),	
+    case protobuf_encode:decode(Bin) of
+        {Cmd,Data} ->
+            _NewRef = async_recv(Socket,?HEADER_LENGTH,?HEART_TIMEOUT),    
 
             lib_packet_monitor:check_packet_count(Cmd),
             case user_routing:routing(Cmd, Data, User) of
                 {ok, #user{} = NewUser} ->
                     {ok, NewUser1} = after_routine(NewUser),    %% 按事务处理完后
-					{noreply, NewUser1};
-				{ok, ErrorUser} ->
-					?WARNING("Return Error User:~w",[ErrorUser]),
-					{noreply, User};
-				ErrorRes ->
-					?WARNING("Return Error Res:~w",[ErrorRes]),
-					{noreply, User}
-			end;
-		Error ->
+                    {noreply, NewUser1};
+                {ok, ErrorUser} ->
+                    ?WARNING("Return Error User:~w",[ErrorUser]),
+                    {noreply, User};
+                ErrorRes ->
+                    ?WARNING("Return Error Res:~w",[ErrorRes]),
+                    {noreply, User}
+            end;
+        Error ->
             ?WARNING("Receive Data Error:~w,UserID:~w,Ip:~p,Bin:~w",
                 [Error, UserID, user_util:get_ip(), Bin]),
             cast_stop(self(), data_error),
             {noreply,User}
-	end;
+    end;
 
 do_info({inet_async,Socket,_Ref,{ok,Bin}},#user{user_id = UserID, acc_name = AccName, other_data = #user_other{socket = UserSocket}} = User) ->
     %% Socket 不匹配
@@ -177,7 +177,7 @@ do_info({inet_async,Socket,_Ref,{error,Reason}},#user{user_id = UserID, other_da
             ?WARNING("Invalue Socket:~w,UserSocket:~w,Reason:~w",[Socket,UserSocket,Reason]),
             {noreply,User}
     end;
-	
+    
 do_info({inet_reply,_Socket,ok},User) ->
     {noreply,User};
 
@@ -191,22 +191,22 @@ do_info({inet_reply,Socket,{error,Reason}},#user{user_id = UserID, other_data = 
 
 
 do_info({loop, Time}, #user{other_data = #user_other{is_loop = 0}} = User) ->
-	erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, Time}),
+    erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, Time}),
     {noreply, User};
 do_info({loop, Time}, User) ->  %% 前端确认登录完成后才进行loop
     %% 加个判断，判断是否在socket断掉的时候，考虑是否需要断掉loop
-	erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, Time + ?USER_LOOP_INCREASE}),
+    erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, Time + ?USER_LOOP_INCREASE}),
     {ok, NewUser} = user_base:loop(User,Time),
-	{noreply,NewUser};
+    {noreply,NewUser};
 
 %do_info(tiny_loop, User) ->
-%	erlang:send_after(?MODULE_TINY_LOOP_TICK, self(), tiny_loop),
+%    erlang:send_after(?MODULE_TINY_LOOP_TICK, self(), tiny_loop),
 %    {ok, UserN} = user_send:send_msg(User),
 %    {noreply, UserN};
 
 do_info(Info, User) -> 
     ?WARNING("Not done do_info:~w",[Info]),
-	{noreply, User}.
+    {noreply, User}.
 
 do_terminate(Reason, #user{user_id = UserID} = User) ->
     ?INFO("~w stop,UserID:~w,Reason:~w",[?MODULE,UserID,Reason]),
@@ -359,9 +359,9 @@ call(UserX, Msg) ->
 
 %% @doc 调试接口,获取状态
 i(ID) ->
-	call(ID, get_state).
+    call(ID, get_state).
 p(ID) ->
-	case i(ID) of
+    case i(ID) of
         #user{} = User ->
             lib_record:print_record(User);
         R ->

@@ -145,7 +145,7 @@ do_call({state_apply, M, F, A}, _From, State) when M =/= os ->
         {ok, Reply, NewState} ->   
             Mod = get_callback_mod(),
             {ok, NewState1} = 
-                behaviour_support:behaviour_gen_server_state(Mod, NewState),
+                behaviour_deps:behaviour_gen_server_state(Mod, NewState),
             {reply, Reply, NewState1};
         {ok, Reply} ->              
             {reply, Reply, State};
@@ -185,7 +185,7 @@ do_cast({state_apply, M, F, A}, State) when M =/= os ->
         {ok, NewState} ->
             Mod = get_callback_mod(),
             {ok, NewState1} = 
-                behaviour_support:behaviour_gen_server_state(Mod, NewState),
+                behaviour_deps:behaviour_gen_server_state(Mod, NewState),
             {noreply, NewState1};
         _ ->
             {noreply, State}
@@ -220,7 +220,7 @@ do_info({state_apply, M, F, A}, State) when M =/= os ->
         {ok, NewState} ->
             Mod = get_callback_mod(),
             {ok, NewState1} = 
-                behaviour_support:behaviour_gen_server_state(Mod, NewState),
+                behaviour_deps:behaviour_gen_server_state(Mod, NewState),
             {noreply, NewState1};
         _ ->
             {noreply, State}

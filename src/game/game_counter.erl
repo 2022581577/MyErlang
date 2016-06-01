@@ -10,8 +10,9 @@
 
 -export([init/0]).
 
--export([get_user_id/0
-        ,get_map_index_id/1]).
+-export([get_user_id/0]).
+-export([get_item_id/0]).
+-export([get_map_index_id/1]).
 
 %% ID宏定义
 -define(COUNTER_USER_ID,counter_user_id).
@@ -24,16 +25,21 @@
 -define(COUNTER_TEAM_ID, counter_team_id).
 -define(COUNTER_MAP_INDEX_ID, counter_map_index_id).
 
+%% 普通自增id，不需要从数据库获取初始id的
 -define(COUNTER_COMMON_LIST, 
         [?COUNTER_NPC_ID
         ,?COUNTER_TEAM_ID
         ]).
 
-%% {ID宏定义, db_table, db_id, bitN, bslN}
+%% 特殊，需要从数据库获取初始id的
+%% 一般是全游戏唯一id，和服务器唯一编号有关
+%% 以便合服时不需要额外处理
+%%      {ID宏定义,               db_table,   db_id,      bitN,   bslN}
 -define(COUNTER_SPECIAL_LIST, 
-        [{?COUNTER_USER_ID, user, user_id, 64, 32}
-        ,{?COUNTER_ITEM_ID, user_item, item_id, 64, 32}
-        ,{?COUNTER_GUILD_ID, guild, id, 32, 18}]).
+        [{?COUNTER_USER_ID,     user,       user_id,    64,     32}
+        ,{?COUNTER_ITEM_ID,     user_item,  item_id,    64,     32}
+%        ,{?COUNTER_GUILD_ID,    guild,      guild_id,   32,     18}
+        ]).
 
 
 init() ->
@@ -68,6 +74,10 @@ bit_move(_BitN, BslN) ->
 %% @doc 获取玩家id，跟server_no有关
 get_user_id() ->
     ets:update_counter(?ETS_COUNTER, ?COUNTER_USER_ID, 1).
+
+%% @doc 获取玩家id，跟server_no有关
+get_item_id() ->
+    ets:update_counter(?ETS_COUNTER, ?COUNTER_ITEM_ID, 1).
 
 %% @doc 根据map_id获取地图index_id
 get_map_index_id(MapID) ->

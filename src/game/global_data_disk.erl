@@ -61,5 +61,6 @@ stop() ->
 
 do_sync() ->
     EtsInfoList = list(),
-    game_db:save_value(?UNDEFINED, EtsInfoList),
+    ?DEBUG("EtsInfoList:~w", [EtsInfoList]),
+    game_db:save_value(EtsInfoList),
     ok.

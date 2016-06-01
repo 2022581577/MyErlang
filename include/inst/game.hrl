@@ -30,7 +30,7 @@
 -define(MYSQL_CONNECT_STATE,mysql_connect_state).
 
 -define(VERSION_SQL_TIMEOUT,(300 * 1000)).
--define(SQL_VERSION, 1).
+-define(SQL_VERSION, 2).
 
 %% 服务器类型
 -define(SERVER_TYPE_GAME, game).    %% 普通游戏服
@@ -60,19 +60,8 @@
 -define(TIMER_ONE_DAY_SEC,      86400).
 
 %% Game Function
--define(TRY(TryFun, TryErrRes), try (TryFun) catch _:_ -> (TryErrRes) end).
--define(IF(Case,True,False), case Case of true -> True; _ -> False end).
-
-
-%% 需要record_info转换的record名
--define(RECORD_NAME_LIST, [user
-                        ,user_item
-                        ,user_misc
-                        ,guild
-                        ,global_data]).
-
--define(RECORD_FIELDS(Record), record_info(fields,Record)).
--define(RECORD_NAME_FIELDS(RecordName), {RecordName, ?RECORD_FIELDS(RecordName)}).
--define(ALL_RECORD_FIELDS, [?RECORD_NAME_FIELDS(RecordName) || RecordName <- ?RECORD_NAME_LIST]).
+-define(TRY(TryFun, TryErrRes),     try (TryFun) catch _:_ -> (TryErrRes) end).
+-define(IF(Case,True,False),        case Case of true -> True; _ -> False end).
+-define(RECORD_FIELDS(RecordFields),      record_info(fields, RecordFields)).
 
 -endif.

@@ -26,6 +26,7 @@
 -export([del_value/2]).
 -export([del_value/3]).
 -export([load_all_value/1]).
+-export([load_all_value/2]).
 
 %% record and define
 
@@ -35,16 +36,15 @@
 %% 对应内存数据库的ets初始化
 init() ->
     ets:new(?ETS_ACCOUNT_INFO,[{keypos,#account_info.acc_name} | ?ETS_OPT]),
-    [ets:new(util:ets_name(Name), [{keypos, KeyPos} | ?ETS_OPT])
+    [ets:new(util:to_ets_name(Name), [{keypos, KeyPos} | ?ETS_OPT])
         || #durable_record{rec_name = Name, ets_key = KeyPos} <- ?DURABLE_RECORD_LIST],
     ok.
 
 
 %% 对应内存数据库的预加载
 preload() ->
-    [load_all_value(RecName)
-        || #durable_record{rec_name = RecName
-                           ,is_preload = ?TRUE} <- ?DURABLE_RECORD_LIST],
+    [load_all_value(DR)
+        || #durable_record{is_preload = ?TRUE} = DR <- ?DURABLE_RECORD_LIST],
     ok.
 
 
@@ -71,12 +71,21 @@ get_value(EtsName, Key) ->
     case lists:keyfind(RecName, #durable_record.rec_name, ?DURABLE_RECORD_LIST) of
         #durable_record{db_key = KeyName, is_preload = IsPreLoad, is_list = IsList} ->
             case ets:lookup(EtsName, Key) of
-                [Value] when is_record(Value, RecName) ->
+                [{Key, Value}] when IsList andalso is_list(Value) ->
+                    ?DEBUG("1"),
                     {ok, Value};
-                [Value] ->
-                    ?WARNING("get ~w value false, error record! Value:~w", [EtsName, Value]),
-                    ?FALSE;
+                [Value] when not IsList ->
+                    ?DEBUG("Value:~w", [Value]),
+                    case is_record(Value, RecName) of
+                        ?TRUE ->
+                            {ok, Value};
+                        _ ->
+                            ?WARNING("get ~w value false! Key:~w, IsList:~w Value:~w",
+                                [EtsName, Key, IsList, Value]),
+                            ?FALSE
+                    end;
                 _ when IsPreLoad ->    %% 已从数据库加载，如果ets没有数据，返回false
+                    ?WARNING("Preloaded but no data! EtsName:~w, Key:~w", [EtsName, Key]),
                     ?FALSE;
                 _ ->    %%  未从数据库加载，当前可加载
                     db_get(RecName, KeyName, Key, IsList)
@@ -87,10 +96,12 @@ get_value(EtsName, Key) ->
     end.
 
 %% 保存数据到ets和数据库
-save_value(Record) ->
-    db_action(update, Record).
-%% Key：undefined或者{Key, RecordList}格式中的Key
-%% 如果类似ets_global_data那样一条数据一条ets，但需要批量save的话，Key为undefined
+save_value(Record) when is_tuple(Record) ->
+    db_action(update, Record);
+save_value(RecordList) when is_list(RecordList) ->
+    save_value(?UNDEFINED, RecordList).
+%% Key：undefined时表示为ets中的多条record 如 ets_global_data
+%% Key：ets_key = 1时为{Key, RecordList}格式中的Key  如 {UserID, ItemList}
 save_value(Key, RecordList) when is_list(RecordList) ->
     db_batch_action(replace, RecordList, Key).
 
@@ -108,24 +119,43 @@ del_value(EtsName, Key, DbKey) ->
     ok.
 
 
+%% ========================================================================
+%% Local functions
+%% ========================================================================
 %% 根据数据库名加载多有数据并转化成游戏内使用的record，存ets
+load_all_value(#durable_record{rec_name = Name, is_list = ?FALSE}) ->
+    load_all_value(Name);
+load_all_value(#durable_record{rec_name = Name, db_key = KeyName}) ->
+    load_all_value(Name, KeyName);
+
+%% 加载ets单条数据格式为#record{}的数据
 load_all_value(Name) ->
     DbValueList = edb_util:get_all(Name),
+    EtsName     = util:to_ets_name(Name),
     RecordList =
         [begin
              DbRecord   = util:to_tuple([Name | E]),
              Record     = game_db_deps:db_to_record(DbRecord),
-             ets:insert(util:to_ets_name(Name), Record),
              add_mapping(Record),
              Record
          end || E <- DbValueList],
+    ets:insert(EtsName, RecordList),
     {ok, RecordList}.
 
-%% ========================================================================
-%% Local functions
-%% ========================================================================
+%% 加载ets单条数据格式{Key, RecordList}的数据
+load_all_value(Name, KeyName) ->
+    %% 先获取
+    KeyList = edb_util:execute(io_lib:format("select distinct ~s from ~s;", [KeyName, Name])),
+    F = fun([Key], AccIn) ->
+        {ok, RecordList} = db_get(Name, KeyName, Key, ?TRUE),
+        [{Key, RecordList} | AccIn]
+        end,
+    ValueList = lists:foldl(F, [], KeyList),
+    {ok, ValueList}.
+
+
 db_get(TabName, KeyName, Key, _IsList = ?TRUE) ->   %% 列表
-    DbValueList = edb_util:get_all(TabName, [{KeyName, KeyName}]),
+    DbValueList = edb_util:get_all(TabName, [{KeyName, Key}]),
     RecordList  =
         [begin
              DbRecord  = util:to_tuple([TabName | E]),
@@ -141,7 +171,7 @@ db_get(TabName, KeyName, Key, _IsList) ->           %% 非列表
             ets:insert(util:to_ets_name(TabName), Record),
             {ok, Record};
         _ ->
-            ?WARNING("No such value! Name:~w, KeyName:~w, KeyValue:~w", [Name, KeyName, Key]),
+            ?WARNING("No such value! TabName:~w, KeyName:~w, KeyValue:~w", [TabName, KeyName, Key]),
             ?FALSE
     end.
 
@@ -167,7 +197,7 @@ add_account_mapping(AccName, UserID) ->
 db_action(Action, Record)
     when Action =:= insert orelse Action =:= replace orelse Action =:= update ->
     DbRecord = game_db_deps:record_to_db(Record),
-    [RecName, Fields] = lib_record:fields_value(DbRecord),
+    [RecName | Fields] = lib_record:fields_value(DbRecord),
     EtsName = util:to_ets_name(RecName),
     %% 先进行ets操作，防止数据库操作时间过长
     ets:insert(EtsName, Record),
@@ -186,7 +216,7 @@ db_action(Action, Record)
 db_batch_action(Action, RecordList, EtsKey) ->
     db_batch_action(Action, RecordList, EtsKey, ?UNDEFINED).
 
-db_batch_action(Action, RecordList, EtsKey, EtsName)
+db_batch_action(Action, RecordList, EtsKey, DefEtsName)
     when Action =:= insert orelse Action =:= replace ->
     F = fun(Record, {NameAccIn, SqlAccIn, EtsAccIn}) ->
         case game_db_deps:check_dirty(Record) of
@@ -194,28 +224,21 @@ db_batch_action(Action, RecordList, EtsKey, EtsName)
                 DbRecord        = game_db_deps:record_to_db(Record1),
                 [RecName | ValueList] = util:to_list(DbRecord),
                 ValueSql = edb_util:make_value_sql(ValueList),
-                case Action of
-                    insert ->   %% 自增id
-                        Head = ?IF(SqlAccIn =:= [], "(0, ", ", (0, "),
-                        ValueSql1 = Head ++ ValueSql ++ ")",
-                        {RecName, [ValueSql1 | SqlAccIn], [Record1 | EtsAccIn]};
-                    _ ->
-                        Head = ?IF(SqlAccIn =:= [], "(", ", ("),
-                        ValueSql1 = Head ++ ValueSql ++ ")",
-                        {RecName, [ValueSql1 | SqlAccIn], [Record1 | EtsAccIn]}
-                end;
+                Head = ?IF(SqlAccIn =:= [], "(", ", ("),
+                ValueSql1 = Head ++ ValueSql ++ ")",
+                {RecName, [ValueSql1 | SqlAccIn], [Record1 | EtsAccIn]};
             _ ->
                 {NameAccIn, SqlAccIn, [Record | EtsAccIn]}
         end
         end,
     case lists:foldl(F, {?UNDEFINED, [], []}, RecordList) of
-        {?UNDEFINED, _SqlList, _EtsList} when EtsName =/= ?UNDEFINED ->
+        {?UNDEFINED, _SqlList, _EtsList} when DefEtsName =/= ?UNDEFINED ->
             %% 空list，但有EtsName
             case EtsKey of
                 ?UNDEFINED ->   %% 一条记录就为1条ets信息
                     skip;
                 _ ->            %% ets信息结构为{Key, ValueList}
-                    ets:insert(EtsName, {EtsKey, []})
+                    ets:insert(DefEtsName, {EtsKey, []})
             end;
         {?UNDEFINED, _SqlList, _EtsList} ->
             ?WARNING("db_batch_action nothing, RecordList:~w", [RecordList]);

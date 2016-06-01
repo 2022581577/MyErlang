@@ -3,8 +3,8 @@
 
 -mode(compile).
 
-%-include("../include/common.hrl").
--include("../include/generation.hrl").
+%-include("../include/inst/common.hrl").
+-include("../include/old/generation.hrl").
 
 main(_Args) ->
     Name = "game_mmdb",
