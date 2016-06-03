@@ -45,8 +45,10 @@ loop(User, SumTime) ->
 
 %% @doc 保存
 save(User) ->
+    %% #user{}的保存
+    {ok, User1} = save_user(User),
     F           = fun(Module, {ok, UserIn}) -> Module:save(UserIn) end,
-    {ok, UserN} = lists:foldl(F, {ok, User}, save_modules()),
+    {ok, UserN} = lists:foldl(F, {ok, User1}, save_modules()),
     {ok, UserN}.
 
 %% ========================================================================
@@ -54,10 +56,11 @@ save(User) ->
 %% ========================================================================
 %% 注意有些数据的加载需要保证顺序
 init_modules() ->
-    [user_misc    %% 杂项
-    ,user_item    %% 道具
-    ,user_mail    %% 邮件
-    ,user_task    %% 任务
+    [
+%%     user_misc    %% 杂项
+%%    ,user_item    %% 道具
+%%    ,user_mail    %% 邮件
+%%    ,user_task    %% 任务
     ].
 
 create_modules() ->
@@ -68,9 +71,17 @@ loop_modules() ->
     ].
 
 save_modules() ->
-    [user_misc    %% 杂项
-    ,user_item    %% 道具
-    ,user_mail    %% 邮件
-    ,user_task    %% 任务
-    ,user_log     %% 日志
+    [
+%%     user_misc    %% 杂项
+%%    ,user_item    %% 道具
+%%    ,user_mail    %% 邮件
+%%    ,user_task    %% 任务
+%%    ,user_log     %% 日志
     ].
+
+%% 保存#user{}信息
+save_user(User) ->
+    Now = util:unixtime(),
+    User1 = User#user{last_update_time = Now},
+    game_db:save_value(User1),
+    {ok, User1}.

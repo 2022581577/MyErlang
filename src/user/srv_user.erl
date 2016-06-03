@@ -56,7 +56,7 @@ do_init([UserID]) ->
                     %% loop最好在前端请求了玩家初始化协议后开启（需要注意重连时loop的处理）
                     erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, ?USER_LOOP_INCREASE}),
                     %% erlang:send_after(?MODULE_TINY_LOOP_TICK, self(), tiny_loop),
-                    ProcessName = lib_user:get_user_process_name(UserID),
+                    ProcessName = user_util:get_user_process_name(UserID),
                     erlang:register(ProcessName, self()),
                     user_online:add(#user_online{user_id = UserID, pid = self()}),
                     {ok, User};

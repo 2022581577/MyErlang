@@ -72,10 +72,8 @@ get_value(EtsName, Key) ->
         #durable_record{db_key = KeyName, is_preload = IsPreLoad, is_list = IsList} ->
             case ets:lookup(EtsName, Key) of
                 [{Key, Value}] when IsList andalso is_list(Value) ->
-                    ?DEBUG("1"),
                     {ok, Value};
                 [Value] when not IsList ->
-                    ?DEBUG("Value:~w", [Value]),
                     case is_record(Value, RecName) of
                         ?TRUE ->
                             {ok, Value};
@@ -85,7 +83,8 @@ get_value(EtsName, Key) ->
                             ?FALSE
                     end;
                 _ when IsPreLoad ->    %% 已从数据库加载，如果ets没有数据，返回false
-                    ?WARNING("Preloaded but no data! EtsName:~w, Key:~w", [EtsName, Key]),
+                    ?WARNING("Preloaded but no data! EtsName:~w, Key:~w",
+                        [EtsName, Key]),
                     ?FALSE;
                 _ ->    %%  未从数据库加载，当前可加载
                     db_get(RecName, KeyName, Key, IsList)
@@ -114,7 +113,8 @@ del_value(EtsName, Key, DbKey) ->
         #durable_record{db_key = KeyName, is_list = IsList} ->
             db_del(RecName, KeyName, Key, DbKey, IsList);
         _ ->
-            ?WARNING("del value false, no durable record! EtsName:~w, Key:~w", [EtsName, Key])
+            ?WARNING("del value false, no durable record! EtsName:~w, Key:~w",
+                [EtsName, Key])
     end,
     ok.
 
@@ -136,7 +136,8 @@ load_all_value(Name) ->
         [begin
              DbRecord   = util:to_tuple([Name | E]),
              Record     = game_db_deps:db_to_record(DbRecord),
-             add_mapping(Record),
+             %% 有些数据在加载全部的时候需要加映射，如玩家数据
+             game_db_deps:add_mapping(Record),
              Record
          end || E <- DbValueList],
     ets:insert(EtsName, RecordList),
@@ -144,8 +145,9 @@ load_all_value(Name) ->
 
 %% 加载ets单条数据格式{Key, RecordList}的数据
 load_all_value(Name, KeyName) ->
-    %% 先获取
-    KeyList = edb_util:execute(io_lib:format("select distinct ~s from ~s;", [KeyName, Name])),
+    %% 先获取key列表，格式为[[Key1], [Key2] | _]
+    Sql     = io_lib:format("select distinct ~s from ~s;", [KeyName, Name]),
+    KeyList = edb_util:execute(Sql),
     F = fun([Key], AccIn) ->
         {ok, RecordList} = db_get(Name, KeyName, Key, ?TRUE),
         [{Key, RecordList} | AccIn]
@@ -171,26 +173,10 @@ db_get(TabName, KeyName, Key, _IsList) ->           %% 非列表
             ets:insert(util:to_ets_name(TabName), Record),
             {ok, Record};
         _ ->
-            ?WARNING("No such value! TabName:~w, KeyName:~w, KeyValue:~w", [TabName, KeyName, Key]),
+            ?WARNING("No such value! TabName:~w, KeyName:~w, KeyValue:~w",
+                [TabName, KeyName, Key]),
             ?FALSE
     end.
-
-
-%% 有些数据需要添加映射信息
-add_mapping(#user{user_id = UserID, acc_name = AccName}) ->
-    add_account_mapping(AccName, UserID);
-add_mapping(_ ) ->
-    skip.
-
-add_account_mapping(AccName, UserID) ->
-    AccountInfo1 =
-        case get_account_info(AccName) of
-            #account_info{user_ids = UserIDs} = AccountInfo ->
-                AccountInfo#account_info{user_ids = [UserID | lists:delete(UserID,UserIDs)]};
-            false ->
-                #account_info{acc_name = AccName, user_ids = [UserID]}
-        end,
-    ets:insert(?ETS_ACCOUNT_INFO, AccountInfo1).
 
 
 %% 单条操作 insert or replace or update
@@ -201,11 +187,14 @@ db_action(Action, Record)
     EtsName = util:to_ets_name(RecName),
     %% 先进行ets操作，防止数据库操作时间过长
     ets:insert(EtsName, Record),
-
     case Action of
-        update ->   %% update操作的话Fields的第一个字段为主键
-            [KeyField | Fields1] = Fields,
-            edb_util:Action(RecName, Fields1, [KeyField]);
+        update ->   %% update操作的话需要获取主键及对应值
+            #durable_record{db_key = KeyName} =
+                lists:keyfind(RecName, #durable_record.rec_name, ?DURABLE_RECORD_LIST),
+            {KeyName, Key}  = lists:keyfind(KeyName, 1, Fields),
+            Fields1         = lists:keydelete(KeyName, 1, Fields),
+            ?DEBUG("KeyName:~w, Key:~w, Fields1:~w", [KeyName, Key, Fields1]),
+            edb_util:Action(RecName, Fields1, [{KeyName, Key}]);
         _ ->
             edb_util:Action(RecName, Fields)
     end,

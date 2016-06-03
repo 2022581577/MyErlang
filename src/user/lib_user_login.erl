@@ -149,8 +149,8 @@ check_enter1(#reader_state{acc_name = AccName} = State, UserID) ->
     end.
 
 check_enter2(_State, UserID) ->
-    case game_db:get_user(UserID) of
-        #user{} ->
+    case game_db:get_value(?ETS_USER, UserID) of
+        {ok, #user{}} ->
             ?TRUE;
         _ ->
             {?FALSE, ?ENTER_ERROR_SEAL}
@@ -174,8 +174,8 @@ is_infant_allow() ->
 get_simple_users(AccName) ->
     UserIDList = get_user_id_list(AccName),
     F = fun(UserID, AccIn) ->
-            case game_db:get_user(UserID) of
-                #user{name = Name, career = Career, lv = Lv} ->
+            case game_db:get_value(?ETS_USER, UserID) of
+                {ok, #user{name = Name, career = Career, lv = Lv}} ->
                     SimpleUser =
                         #simple_user{user_id    = UserID
                                     ,name       = Name

@@ -26,7 +26,7 @@
 %% @doc 主要是#user{}中的各个字段的循环处理
 %%      包括最后存储
 loop(User, SumTime) ->
-    case user_loop:is_loop_time(SumTime, ?TIMER_FIVE_MIN_SEC) of
+    case is_loop_time(SumTime, ?TIMER_FIVE_MIN_SEC) of
         ?TRUE ->    %% 5分钟的循环
             {ok, UserN} = user_action:save(User),
             {ok, UserN};
