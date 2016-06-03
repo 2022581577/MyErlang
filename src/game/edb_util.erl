@@ -38,6 +38,8 @@
 -export([make_fields_sql/1, 
         make_value_sql/1]).
 
+-compile(export_all).
+
 -include("common.hrl").
 -include("../../deps/emysql/include/emysql.hrl").
 

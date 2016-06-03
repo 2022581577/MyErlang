@@ -50,5 +50,11 @@ reset_list(List) ->
     Platform    = proplists:get_value(platform, List),
     reset_list(ServerType, Platform, ServerID, List).
 reset_list(ServerType, Platform, ServerID, List) ->
-    DBName = lists:concat([ServerType, "_", Platform, "_", ServerID]),
-    lists:keystore(db_name, 1, List, {db_name, DBName}).
+    case lists:keyfind(db_name, 1, List) of
+        {db_name, _DBName} ->
+            List;
+        _ ->
+            DBName = lists:concat([ServerType, "_", Platform, "_", ServerID]),
+            lists:keystore(db_name, 1, List, {db_name, DBName})
+    end.
+

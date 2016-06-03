@@ -36,8 +36,9 @@
 %% 以便合服时不需要额外处理
 %%      {ID宏定义,               db_table,   db_id,      bitN,   bslN}
 -define(COUNTER_SPECIAL_LIST, 
-        [{?COUNTER_USER_ID,     user,       user_id,    64,     32}
-        ,{?COUNTER_ITEM_ID,     user_item,  item_id,    64,     32}
+        [
+%%            {?COUNTER_USER_ID,     user,       user_id,    64,     32}
+%%        ,{?COUNTER_ITEM_ID,     user_item,  item_id,    64,     32}
 %        ,{?COUNTER_GUILD_ID,    guild,      guild_id,   32,     18}
         ]).
 

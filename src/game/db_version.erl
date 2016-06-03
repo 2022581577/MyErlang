@@ -13,6 +13,7 @@
 %% export
 -export([update_version/0]).
 -export([execute/1]).
+-export([version_sql/1]).
 
 %% record and define
 
@@ -85,7 +86,8 @@ version_sql(N) ->
 
 %% 确保顺序执行，用?BASE_MYSQL_POOL
 execute(Sql) ->
-    edb_util:execute(?BASE_MYSQL_POOL, Sql).
+    Sql1 = unicode:characters_to_binary(Sql),   %% 中文编码转换
+    edb_util:execute(?BASE_MYSQL_POOL, Sql1).
 
 %% ========================================================================
 %% Local functions

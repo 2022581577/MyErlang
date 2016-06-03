@@ -91,8 +91,7 @@ init_databases() ->
             skip;
         _ ->    %% 没有global_data表，创建
             %% global_data表建立
-            Res3 = edb_util:execute(?BASE_MYSQL_POOL,
-                "CREATE TABLE `global_data` (
+            Res3 = db_version:execute("CREATE TABLE `global_data` (
                 `global_key` varchar(50) NOT NULL,
                 `global_value` text NOT NULL,
                 `is_dirty` tinyint(1) unsigned zerofill NOT NULL,
