@@ -34,7 +34,7 @@ make_(Node, App, Pid, Time, []) ->
     Pid2 = case Pid of undefined -> self(); _ -> Pid end,
     Node2 = case Node of undefined -> node(Pid2); _ -> Node end,
     App2 = case App of undefined -> application(Pid2); _ -> App end,
-    Time2 = case Time of undefined -> os:timestamp(); _ -> Time end,
+    Time2 = case Time of undefined -> erlang:timestamp(); _ -> Time end,
     {Node2, App2, Pid2, Time2}.
 
 application(Pid) when Pid =:= self() ->

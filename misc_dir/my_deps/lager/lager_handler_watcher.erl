@@ -111,7 +111,7 @@ install_handler(Event, Module, Config) ->
 -ifdef(TEST).
 
 from_now(Seconds) ->
-    {Mega, Secs, Micro} = os:timestamp(),
+    {Mega, Secs, Micro} = erlang:timestamp(),
     {Mega, Secs + Seconds, Micro}.
 
 reinstall_on_initial_failure_test_() ->

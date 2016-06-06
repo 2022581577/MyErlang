@@ -634,7 +634,7 @@ update_tracker(_Func, _Args, _CallerPid, Tracker) ->
 
 -spec timeout_to_timestamp(Timeout::non_neg_integer()) -> erlang:timestamp().
 timeout_to_timestamp(Timeout) ->
-    {MacroSecs, Secs, MicroSecs} = os:timestamp(),
+    {MacroSecs, Secs, MicroSecs} = erlang:timestamp(),
     MicroSecs2 = MicroSecs + Timeout * 1000,
     UpdMicroSecs = MicroSecs2 rem 1000000,
     Secs2 = Secs + MicroSecs2 div 1000000,
@@ -644,7 +644,7 @@ timeout_to_timestamp(Timeout) ->
 
 -spec is_expired(erlang:timestamp()) -> boolean().
 is_expired({MacroSecs, Secs, MicroSecs}) ->
-    {NowMacroSecs, NowSecs, NowMicroSecs} = os:timestamp(),
+    {NowMacroSecs, NowSecs, NowMicroSecs} = erlang:timestamp(),
     ((NowMacroSecs > MacroSecs) orelse
      (NowMacroSecs == MacroSecs andalso NowSecs > Secs) orelse
      (NowMacroSecs == MacroSecs andalso NowSecs == Secs andalso

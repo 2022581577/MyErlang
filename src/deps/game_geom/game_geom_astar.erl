@@ -65,9 +65,9 @@
 test_start(Max) ->
     PathData0 = array:new( [{size,(?MAP_WIDTH * ?MAP_HEIGHT)},{default,0},{fixed,true}] ),
     PathData1 = init_path_data(?PATH_DATA, 0, {?MAP_WIDTH,?MAP_HEIGHT}, PathData0),
-	StratTime = now(),
+	StratTime = erlang:timestamp(),
 	test(Max,PathData1),
-	EndTime = now(),
+	EndTime = erlang:timestamp(),
 	Time = timer:now_diff(EndTime, StratTime),			
     io:format("use time:~w~n",[Time]).
 
@@ -141,12 +141,12 @@ search_path(FromX,FromY,ToX,ToY,MapW,MapH,PathData) ->
    end.
    
 search_path2(_FromX,_FromY,ToX,ToY,StartNode,EndNode,MapW,MapH,PathData)->
-	StartTime = now(),
+	StartTime = erlang:timestamp(),
 	%% StartNode加入OpenList
 	OpenList = [StartNode],
   	case search(OpenList,ToX,ToY,EndNode,MapW,MapH,PathData,0) of
    		{ok,ResultList} ->
-			EndTime = now(),
+			EndTime = erlang:timestamp(),
 			Time = timer:now_diff(EndTime, StartTime),			
     		io:format("X1:~p,Y1:~p,X2:~p,Y2:~p per use time:~w~n",[_FromX,_FromY,ToX,ToY,Time]),			
     		{ok,ResultList};

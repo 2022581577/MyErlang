@@ -96,9 +96,9 @@ test() ->
 
 test1(Max) ->
 	CellArray = test(),
-	StratTime = now(),
+	StratTime = erlang:timestamp(),
 	lists:foreach(fun(_) -> navmesh:find_path(CellArray, vector2f:new(0, 0), vector2f:new(950, 520)) end, lists:seq(0, Max)),
-	EndTime = now(),
+	EndTime = erlang:timestamp(),
 	Time = timer:now_diff(EndTime, StratTime),			
     io:format("use time:~w~n",[Time]),
 	

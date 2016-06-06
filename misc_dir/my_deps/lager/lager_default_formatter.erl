@@ -130,7 +130,7 @@ get_metadata(Key, Metadata, Default) ->
 
 -ifdef(TEST).
 date_time_now() ->
-    Now = os:timestamp(),
+    Now = erlang:timestamp(),
     {Date, Time} = lager_util:format_time(lager_util:maybe_utc(lager_util:localtime_ms(Now))),
     {Date, Time, Now}.
 

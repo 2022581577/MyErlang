@@ -50,13 +50,13 @@
 
 
 make_info( ProcInfo ) ->
-	#mtop_info{now = now(),
-					  n_procs = length(ProcInfo),
-					  run_queue = erlang:statistics(run_queue),
-					  wall_clock = erlang:statistics(wall_clock),
-					  runtime = erlang:statistics(runtime),
-					  memi = mtop_memi(),
-					  procinfo = ProcInfo
+	#mtop_info{now = erlang:timestamp(),
+			  n_procs = length(ProcInfo),
+			  run_queue = erlang:statistics(run_queue),
+			  wall_clock = erlang:statistics(wall_clock),
+			  runtime = erlang:statistics(runtime),
+			  memi = mtop_memi(),
+			  procinfo = ProcInfo
 					 }.
 
 all() ->

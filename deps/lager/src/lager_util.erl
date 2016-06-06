@@ -189,7 +189,7 @@ ensure_logfile(Name, FD, Inode, Buffer) ->
 
 %% returns localtime with milliseconds included
 localtime_ms() ->
-    Now = os:timestamp(),
+    Now = erlang:timestamp(),
     localtime_ms(Now).
 
 localtime_ms(Now) ->
@@ -503,7 +503,7 @@ check_hwm(Shaper = #lager_shaper{mps = Mps, hwm = Hwm}) when Mps < Hwm ->
     {true, 0, Shaper#lager_shaper{mps=Mps+1}};
 check_hwm(Shaper = #lager_shaper{lasttime = Last, dropped = Drop}) ->
     %% are we still in the same second?
-    {M, S, _} = Now = os:timestamp(),
+    {M, S, _} = Now = erlang:timestamp(),
     case Last of
         {M, S, _} ->
             %% still in same second, but have exceeded the high water mark
@@ -515,7 +515,7 @@ check_hwm(Shaper = #lager_shaper{lasttime = Last, dropped = Drop}) ->
     end.
 
 discard_messages(Second, Count) ->
-    {M, S, _} = os:timestamp(),
+    {M, S, _} = erlang:timestamp(),
     case Second of
         {M, S, _} ->
             receive

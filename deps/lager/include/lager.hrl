@@ -117,7 +117,7 @@
                   %% how many messages we've received this second
                   mps = 0 :: non_neg_integer(),
                   %% the current second
-                  lasttime = os:timestamp() :: erlang:timestamp(),
+                  lasttime = erlang:timestamp() :: erlang:timestamp(),
                   %% count of dropped messages this second
                   dropped = 0 :: non_neg_integer()
                  }).

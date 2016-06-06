@@ -13,6 +13,7 @@
 %% export
 -export([update_version/0]).
 -export([execute/1]).
+-export([version_sql/0]).
 -export([version_sql/1]).
 
 %% record and define
@@ -33,6 +34,17 @@ update_version() ->
             global_data_disk:set(sql_version, ?SQL_VERSION),
             global_data_disk:sync()
     end,
+    ok.
+
+version_sql() ->
+    Sql = "CREATE TABLE `global_data` (
+            `global_key` varchar(50) NOT NULL,
+            `global_value` text NOT NULL,
+            `is_dirty` tinyint(1) unsigned zerofill NOT NULL,
+            PRIMARY KEY (`global_key`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='全局信息';",
+    Res = execute(Sql),
+    ?INFO("create global data res:~w",[Res]),
     ok.
 
 version_sql(1) ->

@@ -178,7 +178,7 @@ ensure_logfile(Name, FD, Inode, Buffer) ->
 
 %% returns localtime with milliseconds included
 localtime_ms() ->
-    Now = os:timestamp(),
+    Now = erlang:timestamp(),
     localtime_ms(Now).
 
 localtime_ms(Now) ->

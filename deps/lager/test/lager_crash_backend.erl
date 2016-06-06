@@ -28,7 +28,7 @@
 -endif.
 
 init([CrashBefore, CrashAfter]) ->
-    case is_tuple(CrashBefore) andalso (timer:now_diff(CrashBefore, os:timestamp()) > 0) of
+    case is_tuple(CrashBefore) andalso (timer:now_diff(CrashBefore, erlang:timestamp()) > 0) of
         true ->
             %?debugFmt("crashing!~n", []),
             {error, crashed};
@@ -36,7 +36,7 @@ init([CrashBefore, CrashAfter]) ->
             %?debugFmt("Not crashing!~n", []),
             case is_tuple(CrashAfter) of
                 true ->
-                    CrashTime = timer:now_diff(CrashAfter, os:timestamp()) div 1000,
+                    CrashTime = timer:now_diff(CrashAfter, erlang:timestamp()) div 1000,
                     case CrashTime > 0 of
                         true ->
                             %?debugFmt("crashing in ~p~n", [CrashTime]),

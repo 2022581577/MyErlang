@@ -39,7 +39,7 @@
         %% how many messages we've received this second
         mps = 0 :: non_neg_integer(),
         %% the current second
-        lasttime = os:timestamp() :: erlang:timestamp(),
+        lasttime = erlang:timestamp() :: erlang:timestamp(),
         %% count of dropped messages this second
         dropped = 0 :: non_neg_integer()
     }).
@@ -108,7 +108,7 @@ check_hwm(State = #state{mps = Mps, hwm = Hwm}) when Mps < Hwm ->
     {true, State#state{mps=Mps+1}};
 check_hwm(State = #state{hwm = Hwm, lasttime = Last, dropped = Drop}) ->
     %% are we still in the same second?
-    {M, S, _} = Now = os:timestamp(),
+    {M, S, _} = Now = erlang:timestamp(),
     case Last of
         {M, S, _} ->
             %% still in same second, but have exceeded the high water mark
@@ -127,7 +127,7 @@ check_hwm(State = #state{hwm = Hwm, lasttime = Last, dropped = Drop}) ->
     end.
 
 discard_messages(Second, Count) ->
-    {M, S, _} = os:timestamp(),
+    {M, S, _} = erlang:timestamp(),
     case Second of
         {M, S, _} ->
             receive

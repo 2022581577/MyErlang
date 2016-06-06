@@ -3,7 +3,7 @@
 -export([test/1]).
 
 test(N) ->
-    random:seed(now()),
+    random:seed(erlang:timestamp()),
     put(rc, 0),
     put(ru, 0),
     test1(N),

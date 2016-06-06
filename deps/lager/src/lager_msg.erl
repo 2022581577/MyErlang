@@ -30,7 +30,7 @@ new(Msg, Timestamp, Severity, Metadata, Destinations) ->
 
 -spec new(list(), lager:log_level(), [tuple()], list()) -> lager_msg().
 new(Msg, Severity, Metadata, Destinations) ->
-    Now = os:timestamp(),
+    Now = erlang:timestamp(),
     new(Msg, Now, Severity, Metadata, Destinations).
 
 -spec message(lager_msg()) -> list().

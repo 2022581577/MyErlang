@@ -100,10 +100,10 @@ test(Max,PathData,TotalTime) ->
 	test(Max - 1,PathData,TotalTime+Time).
 
 test(X1,Y1,X2,Y2,PathData) ->
-	StratTime = now(),
+	StratTime = erlang:timestamp(),
     case search_path(X1,Y1,X2,Y2,?MAP_WIDTH,?MAP_HEIGHT,PathData) of
         {ok,ResultList} ->
-			EndTime = now(),
+			EndTime = erlang:timestamp(),
 			Time = timer:now_diff(EndTime, StratTime),			
 %%     		io:format("X1:~p,Y1:~p,X2:~p,Y2:~p per use time:~w~n",[X1,Y1,X2,Y2,Time]),			
 %% 			show_result(0,ResultList,PathData),

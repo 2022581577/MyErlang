@@ -30,7 +30,7 @@
 -define(MYSQL_CONNECT_STATE,mysql_connect_state).
 
 -define(VERSION_SQL_TIMEOUT,(300 * 1000)).
--define(SQL_VERSION, 0).
+-define(SQL_VERSION, 2).
 
 %% 服务器类型
 -define(SERVER_TYPE_GAME, game).    %% 普通游戏服

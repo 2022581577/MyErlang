@@ -85,7 +85,7 @@ unixdays() ->
 
 %% 获取当前的unix日期
 date() ->
-    seconds_to_localtime(srv_timer:now_seconds()).
+    seconds_to_localtime(unixtime()).
 
 %% @doc 根据1970年以来的秒数获得日期
 seconds_to_localtime(Seconds) ->

@@ -717,12 +717,12 @@ rand(Min, Max) ->
             put("rand_seed", RandSeed);
         _ -> skip
     end,
-    %% random:seed(erlang:now()),
+    %% random:seed(erlang:timestamp()),
     M = Min - 1,
     random:uniform(Max - M) + M.
 
 my_rand(Min,Max) ->
-	random:seed(erlang:now()),
+	random:seed(erlang:timestamp()),
 	Seed = {random:uniform(99999), random:uniform(999999), random:uniform(999999)},
 	random:seed(Seed),
 	M = Min - 1,

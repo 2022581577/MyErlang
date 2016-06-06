@@ -31,7 +31,7 @@ now_seconds()->
 
 %毫秒
 now_milseconds() ->
-    {M, S, Ms} = os:timestamp(),
+    {M, S, Ms} = erlang:timestamp(),
     (M * 1000000000000 + S * 1000000 + Ms) div 1000.
 
 cpu_time() -> 
@@ -63,7 +63,7 @@ reset_timer() ->
 %% --------------------------------------------------------------------
 init([]) ->
 	ets:new(?ETS_TIMER, [set, protected, named_table]),
-	ets:insert(?ETS_TIMER, {?TIMER, {erlang:now(), 0}}),
+	ets:insert(?ETS_TIMER, {?TIMER, {erlang:timestamp(), 0}}),
 	erlang:send_after(?CLOCK, self(), {event, clock}),
     {ok, #timer_state{}}.
 
@@ -88,7 +88,7 @@ handle_call(_Request, _From, State) ->
 %%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
 handle_cast({change_timer, UnixTime}, State) ->
-    {M, S, _MS} = erlang:now(),
+    {M, S, _MS} = erlang:timestamp(),
     Diff = UnixTime - M * 1000000 - S,
     {noreply, State#timer_state{diff = Diff}};
 
@@ -131,7 +131,7 @@ code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
 
 get_now(Diff) ->
-    {M, S, MS} = erlang:now(),
+    {M, S, MS} = erlang:timestamp(),
     NewM = M + Diff div 1000000,
     NewS = S + Diff rem 1000000,
     {NewM, NewS, MS}.

@@ -69,7 +69,7 @@
         check_interval = ?DEFAULT_CHECK_INTERVAL :: non_neg_integer(),
         sync_interval = ?DEFAULT_SYNC_INTERVAL :: non_neg_integer(),
         sync_size = ?DEFAULT_SYNC_SIZE :: non_neg_integer(),
-        last_check = os:timestamp() :: erlang:timestamp()
+        last_check = erlang:timestamp() :: erlang:timestamp()
     }).
 
 -type option() :: {file, string()} | {level, lager:log_level()} |
@@ -396,14 +396,14 @@ rotation_test_() ->
                    {ok, {FD, Inode, _}} = lager_util:open_logfile("test.log", {SyncSize, SyncInterval}),
                    State0 = DefaultState#state{fd=FD, inode=Inode},
                    ?assertMatch(#state{name="test.log", level=?DEBUG, fd=FD, inode=Inode},
-                                write(State0, os:timestamp(), ?DEBUG, "hello world")),
+                                write(State0, erlang:timestamp(), ?DEBUG, "hello world")),
                    file:delete("test.log"),
-                   Result = write(State0, os:timestamp(), ?DEBUG, "hello world"),
+                   Result = write(State0, erlang:timestamp(), ?DEBUG, "hello world"),
                    %% assert file has changed
                    ?assert(#state{name="test.log", level=?DEBUG, fd=FD, inode=Inode} =/= Result),
                    ?assertMatch(#state{name="test.log", level=?DEBUG}, Result),
                    file:rename("test.log", "test.log.1"),
-                   Result2 = write(Result, os:timestamp(), ?DEBUG, "hello world"),
+                   Result2 = write(Result, erlang:timestamp(), ?DEBUG, "hello world"),
                    %% assert file has changed
                    ?assert(Result =/= Result2),
                    ?assertMatch(#state{name="test.log", level=?DEBUG}, Result2),
@@ -415,7 +415,7 @@ rotation_test_() ->
            fun() ->
                    CheckInterval = 3000, % 3 sec
                    RotationSize = 15,
-                   PreviousCheck = os:timestamp(),
+                   PreviousCheck = erlang:timestamp(),
 
                    {ok, {FD, Inode, _}} = lager_util:open_logfile("test.log", {SyncSize, SyncInterval}),
                    State0 = DefaultState#state{
