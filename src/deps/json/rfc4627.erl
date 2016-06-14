@@ -206,11 +206,11 @@ encode_utf16be_chars([], Acc) ->
     Acc;
 encode_utf16be_chars([B1, B2 | Rest], Acc) ->
     encode_utf16be_chars(Rest, [hex_digit((B2) band 16#F),
-				hex_digit((B2 bsr 4) band 16#F),
-				hex_digit((B1) band 16#F),
-				hex_digit((B1 bsr 4) band 16#F),
-				$u,
-				$\\ | Acc]).
+                hex_digit((B2 bsr 4) band 16#F),
+                hex_digit((B1) band 16#F),
+                hex_digit((B1 bsr 4) band 16#F),
+                $u,
+                $\\ | Acc]).
 
 %% @spec (Nibble::integer()) -> char()
 %% @doc Returns the character code corresponding to Nibble.
@@ -271,12 +271,12 @@ decode_noauto(Bin) when is_binary(Bin) ->
     decode_noauto(binary_to_list(Bin));
 decode_noauto(Chars) ->
     case catch parse(skipws(Chars)) of
-	{'EXIT', Reason} ->
-	    %% Reason is usually far too much information, but helps
-	    %% if needing to debug this module.
-	    {error, Reason};
-	{Value, Remaining} ->
-	    {ok, Value, skipws(Remaining)}
+    {'EXIT', Reason} ->
+        %% Reason is usually far too much information, but helps
+        %% if needing to debug this module.
+        {error, Reason};
+    {Value, Remaining} ->
+        {ok, Value, skipws(Remaining)}
     end.
 
 %% @spec ([byte()]) -> [char()]
@@ -361,17 +361,17 @@ skipws(Chars) ->
 
 parse_string(Chars, Acc) ->
     case parse_codepoint(Chars) of
-	{done, Rest} ->
-	    {lists:reverse(Acc), Rest};
-	{ok, Codepoint, Rest} ->
-	    parse_string(Rest, [Codepoint | Acc])
+    {done, Rest} ->
+        {lists:reverse(Acc), Rest};
+    {ok, Codepoint, Rest} ->
+        parse_string(Rest, [Codepoint | Acc])
     end.
 
 parse_codepoint([$" | Rest]) -> %% " emacs balancing
     {done, Rest};
 parse_codepoint([$\\, Key | Rest]) ->
     parse_general_char(Key, Rest);
-parse_codepoint([X | Rest]) ->					   
+parse_codepoint([X | Rest]) ->
     {ok, X, Rest}.
 
 parse_general_char($b, Rest) -> {ok, 8, Rest};
@@ -384,26 +384,26 @@ parse_general_char($\\, Rest) -> {ok, $\\, Rest};
 parse_general_char($", Rest) -> {ok, $", Rest};
 parse_general_char($u, [D0, D1, D2, D3 | Rest]) ->
     Codepoint =
-	(digit_hex(D0) bsl 12) +
-	(digit_hex(D1) bsl 8) +
-	(digit_hex(D2) bsl 4) +
-	(digit_hex(D3)),
+    (digit_hex(D0) bsl 12) +
+    (digit_hex(D1) bsl 8) +
+    (digit_hex(D2) bsl 4) +
+    (digit_hex(D3)),
     if
-	Codepoint >= 16#D800 andalso Codepoint < 16#DC00 ->
-	    % High half of surrogate pair
-	    case parse_codepoint(Rest) of
-		{low_surrogate_pair, Codepoint2, Rest1} ->
-		    [FinalCodepoint] =
-			xmerl_ucs:from_utf16be(<<Codepoint:16/big-unsigned-integer,
-						Codepoint2:16/big-unsigned-integer>>),
-		    {ok, FinalCodepoint, Rest1};
-		_ ->
-		    exit(incorrect_usage_of_surrogate_pair)
-	    end;
-	Codepoint >= 16#DC00 andalso Codepoint < 16#E000 ->
-	    {low_surrogate_pair, Codepoint, Rest};
-	true ->
-	    {ok, Codepoint, Rest}
+    Codepoint >= 16#D800 andalso Codepoint < 16#DC00 ->
+        % High half of surrogate pair
+        case parse_codepoint(Rest) of
+        {low_surrogate_pair, Codepoint2, Rest1} ->
+            [FinalCodepoint] =
+            xmerl_ucs:from_utf16be(<<Codepoint:16/big-unsigned-integer,
+                        Codepoint2:16/big-unsigned-integer>>),
+            {ok, FinalCodepoint, Rest1};
+        _ ->
+            exit(incorrect_usage_of_surrogate_pair)
+        end;
+    Codepoint >= 16#DC00 andalso Codepoint < 16#E000 ->
+        {low_surrogate_pair, Codepoint, Rest};
+    true ->
+        {ok, Codepoint, Rest}
     end.
 
 %% @spec (Hexchar::char()) -> integer()
@@ -439,23 +439,23 @@ digit_hex($f) -> 15.
 finish_number(Acc, Rest) ->
     Str = lists:reverse(Acc),
     {case catch list_to_integer(Str) of
-	 {'EXIT', _} -> list_to_float(Str);
-	 Value -> Value
+     {'EXIT', _} -> list_to_float(Str);
+     Value -> Value
      end, Rest}.
 
 parse_number([$- | Rest], Acc) ->
     parse_number1(Rest, [$- | Acc]);
 parse_number(Rest = [C | _], Acc) ->
     case is_digit(C) of
-	true -> parse_number1(Rest, Acc);
-	false -> exit(syntax_error)
+    true -> parse_number1(Rest, Acc);
+    false -> exit(syntax_error)
     end.
 
 parse_number1(Rest, Acc) ->
     {Acc1, Rest1} = parse_int_part(Rest, Acc),
     case Rest1 of
-	[] -> finish_number(Acc1, []);
-	[$. | More] ->
+    [] -> finish_number(Acc1, []);
+    [$. | More] ->
             {Acc2, Rest2} = parse_int_part(More, [$. | Acc1]),
             parse_exp(Rest2, Acc2, false);
         _ ->
@@ -469,8 +469,8 @@ parse_int_part0([], Acc) ->
     {Acc, []};
 parse_int_part0([Ch | Rest], Acc) ->
     case is_digit(Ch) of
-	true -> parse_int_part0(Rest, [Ch | Acc]);
-	false -> {Acc, [Ch | Rest]}
+    true -> parse_int_part0(Rest, [Ch | Acc]);
+    false -> {Acc, [Ch | Rest]}
     end.
 
 parse_exp([$e | Rest], Acc, NeedFrac) ->
@@ -482,9 +482,9 @@ parse_exp(Rest, Acc, _NeedFrac) ->
 
 parse_exp1(Rest, Acc, NeedFrac) ->
     {Acc1, Rest1} = parse_signed_int_part(Rest, if
-						    NeedFrac -> [$e, $0, $. | Acc];
-						    true -> [$e | Acc]
-						end),
+                            NeedFrac -> [$e, $0, $. | Acc];
+                            true -> [$e | Acc]
+                        end),
     finish_number(Acc1, Rest1).
 
 parse_signed_int_part([$+ | Rest], Acc) ->
@@ -541,10 +541,10 @@ encode_record_fields(_R, _Index, []) ->
     [];
 encode_record_fields(R, Index, [Field | Rest]) ->
     case element(Index, R) of
-	undefined ->
-	    encode_record_fields(R, Index + 1, Rest);
-	Value ->
-	    [{atom_to_list(Field), Value} | encode_record_fields(R, Index + 1, Rest)]
+    undefined ->
+        encode_record_fields(R, Index + 1, Rest);
+    Value ->
+        [{atom_to_list(Field), Value} | encode_record_fields(R, Index + 1, Rest)]
     end.
 
 %% @spec (JsonObject::jsonobj(), DefaultValue::Record, [atom()]) -> Record
@@ -564,20 +564,20 @@ decode_record_fields(_Values, _Fallback, _Index, []) ->
     [];
 decode_record_fields(Values, Fallback, Index, [Field | Rest]) ->
     [case lists:keysearch(atom_to_list(Field), 1, Values) of
-	 {value, {_, Value}} ->
-	     Value;
-	 false ->
-	     element(Index, Fallback)
+     {value, {_, Value}} ->
+         Value;
+     false ->
+         element(Index, Fallback)
      end | decode_record_fields(Values, Fallback, Index + 1, Rest)].
 
 %% @spec (JsonObject::jsonobj(), atom()) -> {ok, json()} | not_found
 %% @doc Retrieves the value of a named field of a JSON "object".
 get_field({obj, Props}, Key) ->
     case lists:keysearch(Key, 1, Props) of
-	{value, {_K, Val}} ->
-	    {ok, Val};
-	false ->
-	    not_found
+    {value, {_K, Val}} ->
+        {ok, Val};
+    false ->
+        not_found
     end.
 
 %% @spec (jsonobj(), atom(), json()) -> json()
@@ -585,10 +585,10 @@ get_field({obj, Props}, Key) ->
 %% default value if no such field is present.
 get_field(Obj, Key, DefaultValue) ->
     case get_field(Obj, Key) of
-	{ok, Val} ->
-	    Val;
-	not_found ->
-	    DefaultValue
+    {ok, Val} ->
+        Val;
+    not_found ->
+        DefaultValue
     end.
 
 %% @spec (JsonObject::jsonobj(), atom(), json()) -> jsonobj()

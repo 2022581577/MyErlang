@@ -112,12 +112,12 @@
 %%  <li>its identifier (JSON-RPC's service description "id" field) is "urn:uuid:afe1b4b5-23b0-4964-a74a-9168535c96b2"</li>
 %%  <li>its version string is "1.0"</li>
 %%  <li>
-%%	it defines just one method/procedure, which
-%%	<ul>
-%%	  <li>is named "test_proc"</li>
-%%	  <li>is marked "idempotent", which means it is permitted to be accessed via HTTP GET instead of only HTTP POST</li>
-%%	  <li>has a single parameter named "value" of type "str"</li>
-%%	</ul>
+%%    it defines just one method/procedure, which
+%%    <ul>
+%%      <li>is named "test_proc"</li>
+%%      <li>is marked "idempotent", which means it is permitted to be accessed via HTTP GET instead of only HTTP POST</li>
+%%      <li>has a single parameter named "value" of type "str"</li>
+%%    </ul>
 %%  </li>
 %% </ul>
 %%
@@ -268,16 +268,16 @@ gen_object_name() ->
 %% verbatim. The other fields in the description are constructed using
 %% the information in the `Service' record.
 system_describe(EndpointAddress,
-		#service{name = Name, id = Id, version = Version, summary = Summary,
-			 help = Help, procs = Procs}) ->
+        #service{name = Name, id = Id, version = Version, summary = Summary,
+             help = Help, procs = Procs}) ->
     remove_undefined({obj, [{"version", <<"1.0">>},
-			    {"name", Name},
-			    {"id", Id},
-			    {"version", Version},
-			    {"summary", Summary},
-			    {"help", Help},
-			    {"address", EndpointAddress},
-			    {"procs", [system_describe_proc(P) || P <- Procs]}]}).
+                {"name", Name},
+                {"id", Id},
+                {"version", Version},
+                {"summary", Summary},
+                {"help", Help},
+                {"address", EndpointAddress},
+                {"procs", [system_describe_proc(P) || P <- Procs]}]}).
 
 %% @spec (service(), jsonobj(), jsonobj()) -> jsonrpc_response()
 %% @doc Calls {@link jsonrpc_post/4} with a `Timeout' of `default'.
@@ -350,22 +350,22 @@ jsonrpc_post(ServiceRec, RequestInfo, RequestObj, Timeout) ->
 %% otherwise, `infinity' or a number of milliseconds is passed in to
 %% the `gen_server:call'.
 invoke_service_method(ServiceRec = #service{}, RequestId,
-		      PostOrGet, RequestInfo, EndpointAddress, Method, Args, Timeout) ->
+              PostOrGet, RequestInfo, EndpointAddress, Method, Args, Timeout) ->
     expand_jsonrpc_reply(
       RequestId,
       case Method of
-	  <<"system.describe">> ->
-	      {result, system_describe(EndpointAddress, ServiceRec)};
-	  <<"system.", _Rest/binary>> ->
-	      error_response(403, "System methods forbidden", Method);
-	  _ ->
-	      case lookup_service_proc(ServiceRec, Method) of
-		  {ok, ServiceProc} ->
-		      invoke_service(PostOrGet, ServiceRec#service.handler,
-				     RequestInfo, ServiceProc, Args, Timeout);
-		  not_found ->
-		      error_response(404, "Procedure not found", [EndpointAddress, Method])
-	      end
+      <<"system.describe">> ->
+          {result, system_describe(EndpointAddress, ServiceRec)};
+      <<"system.", _Rest/binary>> ->
+          error_response(403, "System methods forbidden", Method);
+      _ ->
+          case lookup_service_proc(ServiceRec, Method) of
+          {ok, ServiceProc} ->
+              invoke_service(PostOrGet, ServiceRec#service.handler,
+                     RequestInfo, ServiceProc, Args, Timeout);
+          not_found ->
+              error_response(404, "Procedure not found", [EndpointAddress, Method])
+          end
       end).
 
 %% @spec (CodeOrMessage::(integer() | string() | binary()), json()) -> {error, jsonobj()}
@@ -396,9 +396,9 @@ error_response(Code, Message, ErrorValue) when is_list(Message) ->
     error_response(Code, list_to_binary(Message), ErrorValue);
 error_response(Code, Message, ErrorValue) ->
     {error, {obj, [{"name", <<"JSONRPCError">>},
-		   {"code", Code},
-		   {"message", Message},
-		   {"error", ErrorValue}]}}.
+           {"code", Code},
+           {"message", Message},
+           {"error", ErrorValue}]}}.
 
 %% @spec (Name, Id, Version, Procs) -> service()
 %% where Name = binary() | string()
@@ -421,10 +421,10 @@ service(Name, Id, Version, Procs) when is_list(Version) ->
     service(Name, Id, list_to_binary(Version), Procs);
 service(Name, Id, Version, Procs) ->
     #service{name = Name, id = Id, version = Version,
-	     procs = [case P of
-			  {ProcName, Params} -> proc(ProcName, Params);
-			  #service_proc{} -> P
-		      end || P <- Procs]}.
+         procs = [case P of
+              {ProcName, Params} -> proc(ProcName, Params);
+              #service_proc{} -> P
+              end || P <- Procs]}.
 
 %% @spec (Handler, Name, Id, Version, Procs) -> service()
 %% where Handler = {pid, pid()} | {function, function()}
@@ -449,8 +449,8 @@ proc(Name, Params) ->
 
 build_jsonrpc_response(Id, ResultField) ->
     {obj, [{version, <<"1.1">>},
-	   {id, Id},
-	   ResultField]}.
+       {id, Id},
+       ResultField]}.
 
 expand_jsonrpc_reply(RequestId, {ResultOrError, Value}) ->
     {ResultOrError, build_jsonrpc_response(RequestId, {ResultOrError, Value}), {obj, []}};
@@ -481,18 +481,18 @@ binary_to_hex(<<B, Rest/binary>>) ->
 
 lookup_service_proc(#service{procs = Procs}, Method) ->
     case lists:keysearch(Method, #service_proc.name, Procs) of
-	{value, ServiceProc} ->
-	    {ok, ServiceProc};
-	false ->
-	    not_found
+    {value, ServiceProc} ->
+        {ok, ServiceProc};
+    false ->
+        not_found
     end.
 
 invoke_service(get, Handler, RequestInfo, ServiceProc, Args, Timeout) ->
     if
-	ServiceProc#service_proc.idempotent ->
-	    invoke_service1(Handler, RequestInfo, ServiceProc, Args, Timeout);
-	true ->
-	    error_response(403, "Non-idempotent method", ServiceProc#service_proc.name)
+    ServiceProc#service_proc.idempotent ->
+        invoke_service1(Handler, RequestInfo, ServiceProc, Args, Timeout);
+    true ->
+        error_response(403, "Non-idempotent method", ServiceProc#service_proc.name)
     end;
 invoke_service(post, Handler, RequestInfo, ServiceProc, Args, Timeout) ->
     invoke_service1(Handler, RequestInfo, ServiceProc, Args, Timeout).
@@ -500,12 +500,12 @@ invoke_service(post, Handler, RequestInfo, ServiceProc, Args, Timeout) ->
 invoke_service1(Handler, RequestInfo, #service_proc{name = Name, params = Params}, Args, Timeout) ->
     %%error_logger:info_msg("JSONRPC invoking ~p:~p(~p)", [Handler, Name, Args]),
     case catch run_handler(Handler, Name, RequestInfo, coerce_args(Params, Args), Timeout) of
-	{'EXIT', {{function_clause, _}, _}} ->
-	    error_response(404, "Undefined procedure", Name);
-	{'EXIT', Reason} ->
-	    error_response(500, "Internal error", list_to_binary(io_lib:format("~p", [Reason])));
-	Response ->
-	    Response
+    {'EXIT', {{function_clause, _}, _}} ->
+        error_response(404, "Undefined procedure", Name);
+    {'EXIT', Reason} ->
+        error_response(500, "Internal error", list_to_binary(io_lib:format("~p", [Reason])));
+    Response ->
+        Response
     end.
 
 run_handler({pid, Pid}, Name, RequestInfo, CoercedArgs, default) ->
@@ -519,8 +519,8 @@ coerce_args(_Params, Args) when is_list(Args) ->
     Args;
 coerce_args(Params, {obj, Fields}) ->
     [case lists:keysearch(binary_to_list(Name), 1, Fields) of
-	 {value, {_, Value}} -> coerce_value(Value, Type);
-	 false -> null
+     {value, {_, Value}} -> coerce_value(Value, Type);
+     false -> null
      end || #service_proc_param{name = Name, type = Type} <- Params].
 
 coerce_value(Value, _Type) when not(is_binary(Value)) ->
@@ -547,8 +547,8 @@ remove_undefined1([X | Rest]) ->
 
 system_describe_proc(P = #service_proc{params = Params}) ->
     remove_undefined(?RFC4627_FROM_RECORD(service_proc,
-					  P#service_proc{params = [system_describe_proc_param(A)
-								   || A <- Params]})).
+                      P#service_proc{params = [system_describe_proc_param(A)
+                                   || A <- Params]})).
 
 system_describe_proc_param(P = #service_proc_param{}) ->
     remove_undefined(?RFC4627_FROM_RECORD(service_proc_param, P)).

@@ -37,7 +37,7 @@ new(Center, R, Dir, Angle) ->
 
 
 %% @doc 判断是否在扇形区域内
--spec is_point_in_sector(Sector, TargetPoint) -> boolean() when
+-spec is_point_in(Sector, TargetPoint) -> boolean() when
     Sector :: #sector{},
     TargetPoint :: #vector2f{}.
 is_point_in(Sector, TargetPoint) ->

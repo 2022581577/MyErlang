@@ -84,23 +84,23 @@ handle(AliasPrefix, Req) ->
     Path = Req:get(path),
     QueryObj = {obj, [{K, list_to_binary(V)} || {K,V} <- Req:parse_qs()]},
     HeaderObj = {obj, [{normalize(K), list_to_binary(V)}
-		       || {K,V} <- mochiweb_headers:to_list(Req:get(headers))]},
+               || {K,V} <- mochiweb_headers:to_list(Req:get(headers))]},
     RequestInfo = {obj, [{"http_method", list_to_binary(atom_to_list(Req:get(method)))},
-			 {"http_query_parameters", QueryObj},
-			 {"http_headers", HeaderObj},
-			 {"remote_peername", list_to_binary(Req:get(peer))},
-			 {"scheme", <<"http">>}]},
+             {"http_query_parameters", QueryObj},
+             {"http_headers", HeaderObj},
+             {"remote_peername", list_to_binary(Req:get(peer))},
+             {"scheme", <<"http">>}]},
     Body = Req:recv_body(),
 
     case rfc4627_jsonrpc_http:invoke_service_method(AliasPrefix,
-						    Path,
-						    RequestInfo,
-						    Body) of
-	no_match ->
-	    no_match;
-	{ok, ResultEnc, ResponseInfo} ->
-	    {obj, ResponseHeaderFields} =
-		rfc4627:get_field(ResponseInfo, "http_headers", {obj, []}),
-	    Headers = [{K, binary_to_list(V)} || {K,V} <- ResponseHeaderFields],
-	    {ok, {200, Headers ++ [{"Content-type", "text/plain"}], ResultEnc}}
+                            Path,
+                            RequestInfo,
+                            Body) of
+    no_match ->
+        no_match;
+    {ok, ResultEnc, ResponseInfo} ->
+        {obj, ResponseHeaderFields} =
+        rfc4627:get_field(ResponseInfo, "http_headers", {obj, []}),
+        Headers = [{K, binary_to_list(V)} || {K,V} <- ResponseHeaderFields],
+        {ok, {200, Headers ++ [{"Content-type", "text/plain"}], ResultEnc}}
     end.

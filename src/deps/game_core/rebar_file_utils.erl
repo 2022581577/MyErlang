@@ -185,7 +185,7 @@ cp_r_win32({true, SourceDir}, {false, DestDir}) ->
     end;
 cp_r_win32(Source,Dest) ->
     Dst = {filelib:is_dir(Dest), Dest},
-	io:format("Source:~p,Dest:~p~n", [Source,Dest]),
+    io:format("Source:~p,Dest:~p~n", [Source,Dest]),
     lists:foreach(fun(Src) ->
                           ok = cp_r_win32({filelib:is_dir(Src), Src}, Dst)
                   end, filelib:wildcard(Source)),
