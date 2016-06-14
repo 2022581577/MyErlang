@@ -1,10 +1,10 @@
 {
     application, server,
     [
-        {description, "game_server"}
+        {description, "server"}
         ,{vsn, "1.0"}
-        ,{modules, [main]}
-        ,{registered, [game_server]}
+        ,{modules, []}
+        ,{registered, []}
         ,{applications, [kernel, sasl, stdlib]}
         ,{mod, {server_app, []}}
         ,{start_phases, []}

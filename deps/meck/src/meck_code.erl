@@ -75,7 +75,7 @@ compile_and_load_forms(AbsCode, Opts) ->
             load_binary(ModName, Binary),
             Binary;
         Error ->
-            exit({compile_forms, Error})
+            exit({compile_forms1, Error})
     end.
 
 -spec compile_options(binary() | module()) -> compile_options().

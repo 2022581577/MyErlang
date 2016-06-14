@@ -4,7 +4,7 @@
 %%% @desc   : 玩家模块
 %%%----------------------------------------------------------------------
 
--module(user_util).
+-module(user_api).
 -include("common.hrl").
 -include("record.hrl").
 

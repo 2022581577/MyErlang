@@ -17,7 +17,7 @@ export HOME=$ROOT
 GAME_CONF_FILE=$CONFDIR/game.config
 
 # 运行的程序及控制文件
-APP_MOD=main
+APP_MOD=server
 APP_CTL=game_ctl
 # define additional environment variables
 EBINS="$ROOT/ebin"

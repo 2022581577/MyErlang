@@ -4,7 +4,7 @@
 %%% @desc   : 地图接口
 %%%----------------------------------------------------------------------
 
--module(lib_map).
+-module(map_api).
 
 -include("common.hrl").
 -include("record.hrl").

@@ -36,9 +36,6 @@
         ,i/1
         ,p/1]).
 
--export([set_last_active/0,
-         get_last_active/0
-        ]).
 
 -define(MAP_LOOP_CHECK_SEND,((10 * 1000) div ?MAP_LOOP_TICK)).  %% 发送进程检查时间
 -define(MAP_LOOP_CHECK,(1000 div ?MAP_LOOP_TICK)).              %% 发送进程检查时间
@@ -48,7 +45,7 @@
 
 %% @doc 开启地图API
 start(MapID, MapIndexID, Args) ->
-    ProcessName = lib_map:get_map_process_name(MapID, MapIndexID),
+    ProcessName = map_api:get_map_process_name(MapID, MapIndexID),
     case erlang:whereis(ProcessName) of
         undefined ->
             server_sup:start_map([MapID, MapIndexID, Args]);
@@ -58,41 +55,39 @@ start(MapID, MapIndexID, Args) ->
     end.
 
 start_link(MapID, MapIndexID, Args) ->
-    ProcessName = lib_map:get_map_process_name(MapID, MapIndexID),
+    ProcessName = map_api:get_map_process_name(MapID, MapIndexID),
     behaviour_gen_server:start_link({local,ProcessName}, ?MODULE, [MapID, MapIndexID, Args], []).
 
 do_init([MapID, MapIndexID, Args]) ->
     ?INFO("Start Map, MapID:~w, MapIndexID:~w",[MapID, MapIndexID]),
     process_flag(trap_exit,true),
     erlang:send_after(?MAP_LOOP_TICK, self(), loop),
-    {ok, Map} = map_init:init(MapID, MapIndexID, Args),
+    {ok, Map} = map_base:init(MapID, MapIndexID, Args),
     {ok, Map}.
 
 do_call(Info, _From, Map) -> 
     ?WARNING("Not done do_call:~w",[Info]),
-	{reply, error, Map}.
+    {reply, error, Map}.
 
 
 do_cast(Info, Map) -> 
     ?WARNING("Not done do_cast:~w",[Info]),
-	{noreply, Map}.
+    {noreply, Map}.
 
 
-do_info(loop, #map{loop_count = LoopCount} = Map) ->
-    
+do_info(loop, Map) ->
     erlang:send_after(?MAP_LOOP_TICK, self(), loop),
-    
-    {noreply, Map#map{loop_count = LoopCount + 1}};
+    {ok, NewMap} = map_base:loop(Map),
+    {noreply, NewMap};
 
 do_info(Info, Map) -> 
     ?WARNING("Not done do_info:~w",[Info]),
-	{noreply, Map}.
+    {noreply, Map}.
 
-do_terminate(Reason, #map{map_id = MapID,map_index_id = MapIndexID}) ->
-	?INFO("~w stop,MapID:~w,MapIndexID:~w,Reason:~w...",[?MODULE, MapID, MapIndexID, Reason]),
-    ets:delete(?ETS_MAP_INFO, {MapID, MapIndexID}),
-    %% 在srv_map_manager中删除各种映射关系
-    srv_map_manager:del_map(MapID, MapIndexID),
+do_terminate(Reason, #map{map_id = MapID, map_index_id = MapIndexID} = Map) ->
+    ?INFO("~w stop,MapID:~w,MapIndexID:~w,Reason:~w...",
+        [?MODULE, MapID, MapIndexID, Reason]),
+    map_base:close(Map),
     ok.
 
 %%% -------------------------------------------
@@ -103,7 +98,7 @@ cast_stop(MapPid) ->
     cast(MapPid, stop).
 cast_stop(MapID, MapIndexID) ->
     cast(MapID, MapIndexID, stop).
-	
+    
 %% @doc 同步停止进程
 call_stop(MapPid) ->
     call(MapPid, stop).
@@ -115,7 +110,7 @@ call_stop(MapID, MapIndexID) ->
 %% @return ok | false
 %% 如果是MapID和MapIndexID，需要在地图进程所在节点调用；MapPid可在任意节点调用
 cast_state_apply(MapID, MapIndexID, Callback) ->      
-    case lib_map:get_map_pid(MapID, MapIndexID) of
+    case map_api:get_map_pid(MapID, MapIndexID) of
         false ->
             ?WARNING("cast state apply map false, MapID:~w, MapIndexID:~w, Callback:~w", [MapID, MapIndexID, Callback]),
             false;
@@ -127,7 +122,7 @@ cast_state_apply(MapPid, Callback) ->
     behaviour_gen_server:cast_state_apply(MapPid, M, F, A).
 
 cast_apply(MapID, MapIndexID, Callback) ->      
-    case lib_map:get_map_pid(MapID, MapIndexID) of
+    case map_api:get_map_pid(MapID, MapIndexID) of
         false ->
             ?WARNING("cast apply map false, MapID:~w, MapIndexID:~w, Callback:~w", [MapID, MapIndexID, Callback]),
             false;
@@ -142,7 +137,7 @@ cast_apply(MapPid, Callback) ->
 %% @return ok | {false, Res}
 %% 如果是MapID和MapIndexID，需要在地图进程所在节点调用；MapPid可在任意节点调用
 cast(MapID, MapIndexID, Msg) ->
-    case lib_map:get_map_pid(MapID, MapIndexID) of
+    case map_api:get_map_pid(MapID, MapIndexID) of
         false ->   
             ?WARNING("cast map false, MapID:~w, MapIndexID:~w, Msg:~w", [MapID, MapIndexID, Msg]);
         MapPid ->
@@ -156,7 +151,7 @@ cast(MapPid, Msg) ->
 %% @return ok | false
 %% 如果是MapID和MapIndexID，需要在地图进程所在节点调用；MapPid可在任意节点调用
 call_state_apply(MapID, MapIndexID, Callback) ->      
-    case lib_map:get_map_pid(MapID, MapIndexID) of
+    case map_api:get_map_pid(MapID, MapIndexID) of
         false ->
             ?WARNING("call state apply map false, MapID:~w, MapIndexID:~w, Callback:~w", [MapID, MapIndexID, Callback]),
             false;
@@ -168,7 +163,7 @@ call_state_apply(MapPid, Callback) ->
     behaviour_gen_server:call_state_apply(MapPid, M, F, A).
 
 call_apply(MapID, MapIndexID, Callback) ->      
-    case lib_map:get_map_pid(MapID, MapIndexID) of
+    case map_api:get_map_pid(MapID, MapIndexID) of
         false ->
             ?WARNING("call apply map false, MapID:~w, MapIndexID:~w, Callback:~w", [MapID, MapIndexID, Callback]),
             false;
@@ -183,7 +178,7 @@ call_apply(MapPid, Callback) ->
 %% @return ok | {false, Res}
 %% 如果是MapID和MapIndexID，需要在地图进程所在节点调用；MapPid可在任意节点调用
 call(MapID, MapIndexID, Msg) ->
-    case lib_map:get_map_pid(MapID, MapIndexID) of
+    case map_api:get_map_pid(MapID, MapIndexID) of
         false ->   
             ?WARNING("call map false, MapID:~w, MapIndexID:~w, Msg:~w", [MapID, MapIndexID, Msg]);
         MapPid ->
@@ -195,29 +190,11 @@ call(MapPid, Msg) ->
 
 %% @doc 调试接口,获取状态
 i(ID) ->
-	call(ID, get_state).
+    call(ID, get_state).
 p(ID) ->
-	case i(ID) of
+    case i(ID) of
         #map{} = Map ->
             lib_record:print_record(Map);
         R ->
             R
     end.
-
-%%% -------------------------------------------
-%%%             -----API-----
-%%% -------------------------------------------
-	
-
-%% @doc 设置地图最后访问时间，用于关闭无用的地图进程
--define(MAP_LAST_ACTIVE_TIME,map_last_active_time).
--define(MAP_NONE_ACTIVE_TIME, (10 * 60)). %% 非活动地图存活时间
-get_last_active() ->
-    get(?MAP_LAST_ACTIVE_TIME).
-set_last_active() ->
-    Time = util:timestamp() div 1000,
-    set_last_active(Time).
-set_last_active(Time) ->
-    put(?MAP_LAST_ACTIVE_TIME,Time).
-
-

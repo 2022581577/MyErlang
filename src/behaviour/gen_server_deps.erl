@@ -1,17 +1,17 @@
 %%%------------------------------------------------------------------------
 %%% @author : 
 %%% @date   :
-%%% @desc   : behaviour后续需要根据不同模块处理的一些事件
+%%% @desc   : behaviour_gen_server后续需要根据不同模块处理的一些事件
 %%%------------------------------------------------------------------------
 
--module(behaviour_deps).
+-module(gen_server_deps).
 
 %% include
 -include("common.hrl").
 -include("record.hrl").
 
 %% export
--export([behaviour_gen_server_state/2]).
+-export([deps_action/2]).
 -export([]).
 -export([]).
 -export([]).
@@ -22,10 +22,10 @@
 %% ========================================================================
 %% API functions
 %% ========================================================================
-behaviour_gen_server_state(srv_user, User) ->
+deps_action(srv_user, User) ->
     {ok, User1} = srv_user:after_routine(User),
     {ok, User1};
-behaviour_gen_server_state(_, State) ->
+deps_action(_, State) ->
     {ok, State}.
 
 %% ========================================================================

@@ -58,7 +58,7 @@ login(State, AccName, Infant, TimeStamp, Sign, ServerID) ->
 enter(#reader_state{socket = Sock} = State, UserID) ->
     case check_enter(State, UserID) of
         ?TRUE ->
-            case user_util:get_user_pid(UserID) of
+            case user_api:get_user_pid(UserID) of
                 {ok, Pid} ->    %% 已有角色登陆
                     State1 = State#reader_state{user_id = UserID, user_pid = Pid},
                     duplicate_enter(State1),

@@ -65,6 +65,16 @@
         %,server_merge_days/0
 		]).
 
+%% 数学
+-export([
+    ceil/1
+    ,floor/1
+    ,round_float/1
+    ,correct_float/1
+    ,get_by_bit/2
+    ,update_by_bit/3
+]).
+
 -export([transform_callback/1]).
 
 %%
@@ -404,3 +414,55 @@ transform_callback(_) ->
 
 prefix_server_id_str2server_id(PrefixServerIDStr) ->
     util:to_integer(PrefixServerIDStr -- util:to_list(?CONFIG(prefix))).
+
+%%
+%% 数学操作
+%%
+%% @doc 向上取整
+ceil(N) when is_integer(N) -> N;
+ceil(N) ->
+    N1 = correct_float(N),
+    case trunc(N1) of
+        M when M == N1 ->
+            M;
+        M when N > 0 ->
+            M + 1;
+        M -> M
+    end.
+
+%% @doc 向下取整
+floor(X) when is_integer(X) -> X;
+floor(X) ->
+    X1 = correct_float(X),
+    case trunc(X1) of
+        T when T == X1 ->
+            T;
+        T when X > 0 ->
+            T;
+        T -> T - 1
+    end.
+
+%% 浮点数保留6位小数
+round_float(F) ->
+    correct_float(F).
+
+correct_float(N) ->
+    list_to_float(float_to_list(N, [{decimals, 6}])).
+
+%% return 0 || 1
+get_by_bit(Int32, N) when N>0,N<33->
+    Max = 32,
+    Start = N-1,
+    End = Max-N,
+    <<_Head:End/binary-unit:1, State:1, _Body:Start/binary-unit:1>> = <<Int32:32>>,
+    State.
+
+%% v = 1 || 0
+%% return Int32
+update_by_bit(Int32, N, V) when N>0 andalso N<33 andalso (V=:=0 orelse V=:=1) ->
+    Max = 32,
+    Start = N-1,
+    End = Max-N,
+    <<Head:End/binary-unit:1, _:1, Body:Start/binary-unit:1>> = <<Int32:32>>,
+    <<NewInt32:32>> = <<Head:End/binary-unit:1, V:1, Body:Start/binary-unit:1>>,
+    NewInt32.

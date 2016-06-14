@@ -8,7 +8,7 @@ start werl ^
     -name game_zbb_s1_38001@127.0.0.1 ^
     -pa ebin %PA% ^
 	-setcookie node-cookie ^
-	-s main start
+	-s server start
 exit
 
 PAUSE

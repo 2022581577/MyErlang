@@ -47,7 +47,7 @@ start_link(UserID) ->
 
 
 do_init([UserID]) ->
-    case user_util:get_user_pid(UserID) of
+    case user_api:get_user_pid(UserID) of
         false ->
             %% 在init的时候就load data 还是 发送一条消息给自己load data  
             case user_base:init(UserID) of
@@ -56,7 +56,7 @@ do_init([UserID]) ->
                     %% loop最好在前端请求了玩家初始化协议后开启（需要注意重连时loop的处理）
                     erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, ?USER_LOOP_INCREASE}),
                     %% erlang:send_after(?MODULE_TINY_LOOP_TICK, self(), tiny_loop),
-                    ProcessName = user_util:get_user_process_name(UserID),
+                    ProcessName = user_api:get_user_process_name(UserID),
                     erlang:register(ProcessName, self()),
                     user_online:add(#user_online{user_id = UserID, pid = self()}),
                     {ok, User};
@@ -141,7 +141,7 @@ do_info({inet_async,Socket,_Ref,{ok,Bin}},#user{user_id = UserID, other_data = #
             end;
         Error ->
             ?WARNING("Receive Data Error:~w,UserID:~w,Ip:~p,Bin:~w",
-                [Error, UserID, user_util:get_ip(), Bin]),
+                [Error, UserID, user_api:get_ip(), Bin]),
             cast_stop(self(), data_error),
             {noreply,User}
     end;
@@ -372,7 +372,7 @@ p(ID) ->
 analyze_user_x(#user{other_data = #user_other{pid = UserPid}}) ->
     UserPid;
 analyze_user_x(UserID) when is_integer(UserID) ->
-    case user_util:get_user_pid(UserID) of
+    case user_api:get_user_pid(UserID) of
         false ->
             {false, offline};
         {ok, UserPid} ->
