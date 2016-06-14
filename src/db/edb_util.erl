@@ -293,14 +293,14 @@ two_digits(Nums) when is_list(Nums) ->
 two_digits(Num) ->
     [Str] = io_lib:format("~b", [Num]),
     case length(Str) of
-	1 -> [$0 | Str];
-	_ -> Str
+    1 -> [$0 | Str];
+    _ -> Str
     end.
 
 %%  Quote a string or binary value so that it can be included safely in a
 %%  MySQL query.
 quote(String) when is_list(String) ->
-    [39 | lists:reverse([39 | quote(String, [])])];	%% 39 is $'
+    [39 | lists:reverse([39 | quote(String, [])])];    %% 39 is $'
 quote(Bin) when is_binary(Bin) ->
     list_to_binary(quote(binary_to_list(Bin))).
 
@@ -314,10 +314,10 @@ quote([13 | Rest], Acc) ->
     quote(Rest, [$r, $\\ | Acc]);
 quote([$\\ | Rest], Acc) ->
     quote(Rest, [$\\ , $\\ | Acc]);
-quote([39 | Rest], Acc) ->		%% 39 is $'
-    quote(Rest, [39, $\\ | Acc]);	%% 39 is $'
-quote([34 | Rest], Acc) ->		%% 34 is $"
-    quote(Rest, [34, $\\ | Acc]);	%% 34 is $"
+quote([39 | Rest], Acc) ->        %% 39 is $'
+    quote(Rest, [39, $\\ | Acc]);    %% 39 is $'
+quote([34 | Rest], Acc) ->        %% 34 is $"
+    quote(Rest, [34, $\\ | Acc]);    %% 34 is $"
 quote([26 | Rest], Acc) ->
     quote(Rest, [$Z, $\\ | Acc]);
 quote([C | Rest], Acc) ->

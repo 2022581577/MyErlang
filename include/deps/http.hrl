@@ -8,20 +8,20 @@
 -type http_method() :: 'POST' | 'GET' | 'HEAD' | 'PUT' | 'DELETE' | 'TRACE'.
 
 -record(abs_path, {
-	  path :: string()
-	 }).
+      path :: string()
+     }).
 
 -record(absoluteURI, {
-	  scheme :: http | https,
-	  host   :: string(),
-	  port   :: http_port(),
-	  path   :: string()
-	 }).
+      scheme :: http | https,
+      host   :: string(),
+      port   :: http_port(),
+      path   :: string()
+     }).
 
 -record(scheme, {
-	  scheme :: string(),
-	  path   :: string()
-	 }).
+      scheme :: string(),
+      path   :: string()
+     }).
 
 -type http_uri()     :: #abs_path{} | #absoluteURI{} | #scheme{}.
 -type http_version() :: {integer(), integer()}.
@@ -30,19 +30,19 @@
 -type http_body()    :: iolist() | binary().
 
 -record(http_request, {
-	  method = 'GET'  :: http_method(),
-	  uri             :: http_uri(),
-	  version = {1,1} :: http_version(),
-	  headers = []    :: http_headers(),
-	  body = <<>>     :: http_body()
-	 }).
+      method = 'GET'  :: http_method(),
+      uri             :: http_uri(),
+      version = {1,1} :: http_version(),
+      headers = []    :: http_headers(),
+      body = <<>>     :: http_body()
+     }).
 
 -record(http_response, {
-	  version = {1,1} :: http_version(),
-	  status = 200    :: http_status(),
-	  headers = []    :: http_headers(),
-	  body = <<>>     :: http_body()
-	 }).
+      version = {1,1} :: http_version(),
+      status = 200    :: http_status(),
+      headers = []    :: http_headers(),
+      body = <<>>     :: http_body()
+     }).
 
 -type http_request()  :: #http_request{}.
 -type http_response() :: #http_response{} | undefined.

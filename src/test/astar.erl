@@ -17,17 +17,17 @@
 -export([]).
 
 %% record and define
--record(astar_node, {
-    key         %% 主键{x,y}
-    ,x
-    ,y
-    ,parent     %% 父节点的主键
-    ,g          %% g值   当前格子到起点的移动耗费
-    ,h          %% h值   当前格子到终点的移动耗费
-    ,f          %% f值
-    ,state      %% 状态 0表示在close列表，1表示在open列表
-    ,layer      %% 层
-}).
+%%-record(astar_node, {
+%%    key         %% 主键{x,y}
+%%    ,x
+%%    ,y
+%%    ,parent     %% 父节点的主键
+%%    ,g          %% g值   当前格子到起点的移动耗费
+%%    ,h          %% h值   当前格子到终点的移动耗费
+%%    ,f          %% f值
+%%    ,state      %% 状态 0表示在close列表，1表示在open列表
+%%    ,layer      %% 层
+%%}).
 
 %% ========================================================================
 %% API functions

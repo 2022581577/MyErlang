@@ -30,7 +30,7 @@
 %% have to supply a constant record name in the source text.
 
 -define(RFC4627_FROM_RECORD(RName, R),
-	rfc4627:from_record(R, RName, record_info(fields, RName))).
+    rfc4627:from_record(R, RName, record_info(fields, RName))).
 
 -define(RFC4627_TO_RECORD(RName, R),
-	rfc4627:to_record(R, #RName{}, record_info(fields, RName))).
+    rfc4627:to_record(R, #RName{}, record_info(fields, RName))).

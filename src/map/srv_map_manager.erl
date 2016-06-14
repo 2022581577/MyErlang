@@ -34,24 +34,24 @@ del_map(MapID, MapIndexID) ->
     behaviour_gen_server:cast_apply(?MODULE, ?MODULE, do_del_map, [MapID, MapIndexID]).
 
 start_link() ->
-	behaviour_gen_server:start_link({local,?MODULE},?MODULE,[],[]).
+    behaviour_gen_server:start_link({local,?MODULE},?MODULE,[],[]).
 
 do_init([]) ->
     process_flag(trap_exit,true),
     %% TODO 可考虑是否把一些基础地图开启
-	{ok,#state{}}.
+    {ok,#state{}}.
 
 do_cast(Info, State) -> 
     ?WARNING("Not done do_cast:~w",[Info]),
-	{noreply, State}.
+    {noreply, State}.
 
 do_call(Info, _From, State) -> 
     ?WARNING("Not done do_call:~w",[Info]),
-	{reply, ok, State}.
+    {reply, ok, State}.
 
 do_info(Info, State) -> 
     ?WARNING("Not done do_info:~w",[Info]),
-	{noreply, State}.
+    {noreply, State}.
 
 do_terminate(_Reason, _State) ->
     ok.

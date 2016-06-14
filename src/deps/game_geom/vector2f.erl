@@ -56,10 +56,10 @@ distance_squared(#vector2f{x = X, y = Y}, #vector2f{x = TargetX, y = TargetY}) -
 	Dx*Dx + Dy*Dy.
 
 add(#vector2f{x = X, y = Y}, #vector2f{x = TargetX, y = TargetY}) ->
-	?MODULE:new(X+TargetX, Y+TargetY).
+	vector2f:new(X+TargetX, Y+TargetY).
 
 subtract(#vector2f{x = X, y = Y}, #vector2f{x = TargetX, y = TargetY}) ->
-	?MODULE:new(X - TargetX, Y - TargetY).
+	vector2f:new(X - TargetX, Y - TargetY).
 
 %% @doc 点积
 dot(#vector2f{x = X, y = Y}, #vector2f{x = TargetX, y = TargetY}) ->
@@ -70,22 +70,22 @@ cross(#vector2f{x = X, y = Y}, #vector2f{x = TargetX, y = TargetY}) ->
 	X*TargetY - TargetX*Y.
 
 mult(#vector2f{x = X, y = Y}, Scalar) ->
-	?MODULE:new(X*Scalar, Y*Scalar).
+	vector2f:new(X*Scalar, Y*Scalar).
 
 divide(#vector2f{x = X, y = Y}, Scalar) ->
-	?MODULE:new(X/Scalar, Y/Scalar).
+	vector2f:new(X/Scalar, Y/Scalar).
 
 normalize(Vector) ->
-	case (Length = ?MODULE:length(Vector)) == 0 of
-		true ->
-			?MODULE:divide(Vector, 1);
+	case vector2f:length(Vector) of
+		Length when Length =/= 0 ->
+			vector2f:divide(Vector, Length);
 		_ ->
-			?MODULE:divide(Vector, Length)
+			vector2f:divide(Vector, 1)
 	end.
 
 %% @doc Vector到OtherVector的弧度(顺时针为正 逆时针为负)
 angle_between(Vector, OtherVector) ->
-	?MODULE:angle(Vector) - ?MODULE:angle(OtherVector).
+	vector2f:angle(Vector) - vector2f:angle(OtherVector).
 
 
 %% @doc 确定两个指定点之间的点。 参数 changeAmnt(比例 0.x) 确定新的内插点相对于参数 pt1 和 pt2 指定的两个端点所处的位置 
@@ -93,7 +93,7 @@ angle_between(Vector, OtherVector) ->
 interpolate(#vector2f{x = X, y = Y}, #vector2f{x = TargetX, y = TargetY}, ChangeAmnt) ->
 	TempX = (1 - ChangeAmnt) * X + ChangeAmnt * TargetX,
 	TempY = (1 - ChangeAmnt) * Y + ChangeAmnt * TargetY,
-	?MODULE:new(TempX, TempY).
+	vector2f:new(TempX, TempY).
 
 equal(#vector2f{x = X, y = Y}, #vector2f{x = TargetX, y = TargetY}) ->
 	Epsilon = 0.000001,

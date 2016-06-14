@@ -15,7 +15,7 @@
 -export([start_link/0]).
 -export([do_init/1, do_call/3, do_cast/2, do_info/2, do_terminate/2]).
 
--define(MODULE_LOOP_TICK, 5000).		%% 进程循环时间
+-define(MODULE_LOOP_TICK, 5000).        %% 进程循环时间
 
 -record(state, {node_connects  = []}).   %% 已经连上的跨服节点
 
@@ -28,7 +28,7 @@ start_link() ->
 
 do_init([]) ->
     %% 监控节点
-	net_kernel:monitor_nodes(true, [{node_type, all}]),
+    net_kernel:monitor_nodes(true, [{node_type, all}]),
     erlang:send_after(?MODULE_LOOP_TICK, self(), loop),
     {ok, #state{}}.
 
@@ -64,7 +64,7 @@ do_cast(_Info, State) ->
 
 
 do_call(get_state, _From, State) ->
-	{reply, State, State};
+    {reply, State, State};
 
 do_call(_Info, _From, State) ->
     {reply, ok, State}.

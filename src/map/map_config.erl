@@ -35,14 +35,14 @@ load_map_config() ->
 
 %% @doc 根据id加载地图配置
 load_map_config(SourceID) ->
-	case file:read_file(lists:concat(["./map/map", SourceID])) of
-		{ok, Binary} ->
-			<<EncryptMode:8, _IsZip:8, EncryptBin/binary>> = Binary,
-			{ok, _Cmd, Data, _TimeStamp} = game_protobuf:decode_package(EncryptMode, "", EncryptBin), 
-			parse_data(Data);
-		{error, _Reason} ->
-			?WARNING("read_map error SourceID:~w, Reason:~w", [SourceID, _Reason])
-	end.
+    case file:read_file(lists:concat(["./map/map", SourceID])) of
+        {ok, Binary} ->
+            <<EncryptMode:8, _IsZip:8, EncryptBin/binary>> = Binary,
+            {ok, _Cmd, Data, _TimeStamp} = game_protobuf:decode_package(EncryptMode, "", EncryptBin),
+            parse_data(Data);
+        {error, _Reason} ->
+            ?WARNING("read_map error SourceID:~w, Reason:~w", [SourceID, _Reason])
+    end.
 
 %% @doc 根据地图id获取地图配置
 get_map_config(MapID) ->
@@ -58,50 +58,50 @@ get_map_config(MapID) ->
 %% Internal functions
 %% ====================================================================
 parse_data(#c2s60002{source_id = SourceID
-		            ,width = Width
-		            ,height = Height
-		            ,block_list = BlockList
-		            ,npc_list = NpcList
-		            ,monster_list = MonsterList
-		            ,collect_list = CollectList
-		            ,door_list = DoorList
-		            ,born_point = BornPointList
-    	            ,name = MapName
-    	            ,min_level = MinLevel
+                    ,width = Width
+                    ,height = Height
+                    ,block_list = BlockList
+                    ,npc_list = NpcList
+                    ,monster_list = MonsterList
+                    ,collect_list = CollectList
+                    ,door_list = DoorList
+                    ,born_point = BornPointList
+                    ,name = MapName
+                    ,min_level = MinLevel
                     ,dup_mon_list = DupMonList}) ->
     %% 根据像素计算横线纵向格子数，TODO 与前端商量格子数计算规则
-	ColNum = Width div ?CELL_WIDTH + 1,
-	RowNum = Height div ?CELL_HEIGHT + 1,
-	MapConfig = #tpl_map_config{source_id = SourceID
-  		                       ,map_name = MapName
-  		                       ,min_level = MinLevel
-  		                       ,width = Width
- 		                       ,height = Height
-		                       ,relive_point = pointlist2obj(BornPointList)
-		                       ,mon_list = itemlist2obj(MonsterList)
-		                       ,door_list = doorlist2obj(DoorList)
-		                       ,npc_list = itemlist2obj(NpcList)
-		                       ,collect_list = itemlist2obj(CollectList)
-		                       ,dup_mon_list = dupmon2obj(DupMonList)
-		                       ,col_num = ColNum
-		                       ,row_num = RowNum},
-	ets:insert(?ETS_MAP_CONFIG, MapConfig),
+    ColNum = Width div ?CELL_WIDTH + 1,
+    RowNum = Height div ?CELL_HEIGHT + 1,
+    MapConfig = #tpl_map_config{source_id = SourceID
+                                 ,map_name = MapName
+                                 ,min_level = MinLevel
+                                 ,width = Width
+                                ,height = Height
+                               ,relive_point = pointlist2obj(BornPointList)
+                               ,mon_list = itemlist2obj(MonsterList)
+                               ,door_list = doorlist2obj(DoorList)
+                               ,npc_list = itemlist2obj(NpcList)
+                               ,collect_list = itemlist2obj(CollectList)
+                               ,dup_mon_list = dupmon2obj(DupMonList)
+                               ,col_num = ColNum
+                               ,row_num = RowNum},
+    ets:insert(?ETS_MAP_CONFIG, MapConfig),
     %% 阻挡点，放入到对应ets中，TODO ets的new是否能够提前new，方便统一管理
     map_block:load_map_block(SourceID, BlockList),
-	ok.
+    ok.
 
 %% 各种格式转换，TODO 可以和前端商定好地图编辑器生成的数据格式
 itemlist2obj(List) ->
-	[{Id, X, Y} || {c2s60002_item,X,Y,Id,_Type} <- List].
+    [{Id, X, Y} || {c2s60002_item,X,Y,Id,_Type} <- List].
 
 doorlist2obj(List) ->
-	[{Id, X, Y, TargetX, TargetY} || {c2s60002_door,X,Y,Id,TargetX,TargetY} <- List].
+    [{Id, X, Y, TargetX, TargetY} || {c2s60002_door,X,Y,Id,TargetX,TargetY} <- List].
 
 dupmon2obj(List) ->
-	[itemlist2obj(L1)||{c2s60002_item_list,L1} <- List].
+    [itemlist2obj(L1)||{c2s60002_item_list,L1} <- List].
 
 pointlist2obj(List) ->
-	[{X, Y} || {c2s60002_point,X,Y} <- List].
+    [{X, Y} || {c2s60002_point,X,Y} <- List].
 
 
 tpl2source(MapID) ->
