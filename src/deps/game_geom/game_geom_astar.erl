@@ -81,7 +81,7 @@ test(X1,Y1,X2,Y2,PathData) ->
     case search_path(X1,Y1,X2,Y2,?MAP_WIDTH,?MAP_HEIGHT,PathData) of
         {ok,ResultList} ->
 %%             show_result(0,ResultList,PathData),
-%%             io:format("result list:~p~n",[ResultList]),
+            io:format("result list:~p~n",[ResultList]),
             ResultList;
         {false,Msg} ->
             io:format("error:~p!",[Msg])

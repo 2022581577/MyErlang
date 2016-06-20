@@ -64,4 +64,6 @@
 -define(IF(Case,True,False),        case Case of true -> True; _ -> False end).
 -define(RECORD_FIELDS(RecordFields),      record_info(fields, RecordFields)).
 
+-define(SRV_SUP_LIST, [srv_user, srv_map, srv_send]).
+
 -endif.

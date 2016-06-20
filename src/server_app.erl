@@ -13,9 +13,8 @@
         ,stop/1]).
 
 start(_Type, _StartArgs) ->
-    %% 开启主监控树
-    {ok, Sup} = server_sup:start_link(),
-    ok = start(Sup),
+
+    {ok, Sup} = start(),
     {ok, Sup}.
 
 stop(_State) ->
@@ -26,7 +25,14 @@ stop(_State) ->
 %%      LOCAL Function
 %% -------------------------
 %% @doc 开启服务
-start(Sup) ->
+start() ->
+    %% 开启主监控树
+    {ok, Sup} = server_sup:start_link(),
+    %% 开启一些进程的监控树
+    {ok, _} = server_sup:start_sup_child(srv_map),
+    {ok, _} = server_sup:start_sup_child(srv_user),
+    {ok, _} = server_sup:start_sup_child(srv_send),
+
     game_config:init(),                                 %% 加载配置
 
     {ok, _} = server_sup:start_child(srv_timer),        %% 时间管理进程
@@ -51,7 +57,7 @@ start(Sup) ->
     game_node_interface:set_server_running(),
 
     ?INFO("------Server Start Finish------"),
-    ok.
+    {ok, Sup}.
 
 
 %% 开启错误日志

@@ -41,7 +41,8 @@
 -define(MODULE_TINY_LOOP_TICK,   ?USER_TINY_LOOP_TICK).     %% 玩家小循环时间 200毫秒
 
 start(UserID) ->
-    server_sup:start_user([UserID]).
+    srv_sup:start_child(?MODULE, [UserID]).
+
 start_link(UserID) ->
     behaviour_gen_server:start_link(?MODULE, [UserID], []).
 
@@ -49,21 +50,13 @@ start_link(UserID) ->
 do_init([UserID]) ->
     case user_api:get_user_pid(UserID) of
         false ->
-            %% 在init的时候就load data 还是 发送一条消息给自己load data  
-            case user_base:init(UserID) of
-                {ok, User} ->
-                    process_flag(trap_exit,true),
-                    %% loop最好在前端请求了玩家初始化协议后开启（需要注意重连时loop的处理）
-                    erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, ?USER_LOOP_INCREASE}),
-                    %% erlang:send_after(?MODULE_TINY_LOOP_TICK, self(), tiny_loop),
-                    ProcessName = user_api:get_user_process_name(UserID),
-                    erlang:register(ProcessName, self()),
-                    user_online:add(#user_online{user_id = UserID, pid = self()}),
-                    {ok, User};
-                _ ->
-                    ?WARNING("Load user false,UserID:~w",[UserID]),
-                    load_false
-            end;
+            {ok, User} = user_base:init(UserID),
+            process_flag(trap_exit, true),
+            erlang:register(user_api:get_user_process_name(UserID), self()),
+            %% loop最好在前端请求了玩家初始化协议后开启（需要注意重连时loop的处理）
+            erlang:send_after(?MODULE_LOOP_TICK, self(), {loop, ?USER_LOOP_INCREASE}),
+            %% erlang:send_after(?MODULE_TINY_LOOP_TICK, self(), tiny_loop),
+            {ok, User};
         {ok, Pid} ->
             ?WARNING("User Has been Started,UserID:~w,Pid:~w",[UserID,Pid]),
             process_exist

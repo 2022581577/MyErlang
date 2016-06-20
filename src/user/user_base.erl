@@ -29,8 +29,10 @@ init(UserID) ->
     case game_db:get_value(?ETS_USER, UserID) of
         {ok, #user{} = User} ->
             {ok, UserN} = user_action:init(User),
+            user_online:add(#user_online{user_id = UserID, pid = self()}),
             {ok, UserN};
         _ ->
+            ?WARNING("Load user false, UserID:~w",[UserID]),
             ?FALSE
     end.
 

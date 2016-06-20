@@ -48,7 +48,7 @@ start(MapID, MapIndexID, Args) ->
     ProcessName = map_api:get_map_process_name(MapID, MapIndexID),
     case erlang:whereis(ProcessName) of
         undefined ->
-            server_sup:start_map([MapID, MapIndexID, Args]);
+            srv_sup:start_child(?MODULE, [MapID, MapIndexID, Args]);
         Pid ->
             behaviour_gen_server:cast_apply(Pid, srv_map, set_last_active, []),   
             {ok,Pid}
@@ -60,9 +60,9 @@ start_link(MapID, MapIndexID, Args) ->
 
 do_init([MapID, MapIndexID, Args]) ->
     ?INFO("Start Map, MapID:~w, MapIndexID:~w",[MapID, MapIndexID]),
+    {ok, Map} = map_base:init(MapID, MapIndexID, Args),
     process_flag(trap_exit,true),
     erlang:send_after(?MAP_LOOP_TICK, self(), loop),
-    {ok, Map} = map_base:init(MapID, MapIndexID, Args),
     {ok, Map}.
 
 do_call(Info, _From, Map) -> 
