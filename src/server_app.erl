@@ -26,20 +26,20 @@ stop(_State) ->
 %% -------------------------
 %% @doc 开启服务
 start() ->
+    game_config:init(),                                 %% 加载配置
+
     %% 开启主监控树
     {ok, Sup} = server_sup:start_link(),
+    %    ok = log_lager:init(),                              %% lager
+    ok = error_logger_service(Sup),                     %% 错误日志相关
+
     %% 开启一些进程的监控树
     {ok, _} = server_sup:start_sup_child(srv_map),
     {ok, _} = server_sup:start_sup_child(srv_user),
     {ok, _} = server_sup:start_sup_child(srv_send),
 
-    game_config:init(),                                 %% 加载配置
-
     {ok, _} = server_sup:start_child(srv_timer),        %% 时间管理进程
 
-%    ok = log_lager:init(),                              %% lager
-
-    ok = error_logger_service(Sup),                     %% 错误日志相关
     ok = global_data_ram:init(),                        %% 需要在一开始init，game_node_interface中有用到
 
     game_node_interface:set_server_starting(),
