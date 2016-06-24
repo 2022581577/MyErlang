@@ -68,25 +68,25 @@ logger_src(Loglevel) ->
     %% Helper functions
     test_msg(Module, Line, Format, Args) when " ++ L ++ " >= 6 ->
             notify(info_msg,
-                   \"T(~p:~p:~p) : \"++Format++\"~n\",
+                   \"T (~p:~p:~p) : \"++Format++\"~n\",
                    [self(), Module, Line]++Args);
     test_msg(_,_,_,_) -> ok.
 
     debug_msg(Module, Line, Format, Args) when " ++ L ++ " >= 5 ->
             notify(info_msg,
-                   \"D(~p:~p:~p) : \"++Format++\"~n\",
+                   \"D (~p:~p:~p) : \"++Format++\"~n\",
                    [self(), Module, Line]++Args);
     debug_msg(_,_,_,_) -> ok.
 
     info_msg(Module, Line, Format, Args) when " ++ L ++ " >= 4 ->
             notify(info_msg,
-                   \"I(~p:~p:~p) : \"++Format++\"~n\",
+                   \"I (~p:~p:~p) : \"++Format++\"~n\",
                    [self(), Module, Line]++Args);
     info_msg(_,_,_,_) -> ok.
 
     warning_msg(Module, Line, Format, Args) when " ++ L ++ " >= 3 ->
             notify(error,
-                   \"W(~p:~p:~p) : \"++Format++\"~n\",
+                   \"W (~p:~p:~p) : \"++Format++\"~n\",
                    [self(), Module, Line]++Args);
     warning_msg(_,_,_,_) -> ok.
 
@@ -97,14 +97,14 @@ logger_src(Loglevel) ->
 				ok;
 			_ ->
             	notify(error,
-                   \"E(~p:~p:~p) : \"++Format++\"~n\",
+                   \"E (~p:~p:~p) : \"++Format++\"~n\",
                    [self(), Module, Line]++Args)
 		end;
     error_msg(_,_,_,_) -> ok.
 
     critical_msg(Module, Line, Format, Args) when " ++ L ++ " >= 1 ->
             notify(error,
-                   \"C(~p:~p:~p) : \"++Format++\"~n\",
+                   \"C (~p:~p:~p) : \"++Format++\"~n\",
                    [self(), Module, Line]++Args);
     critical_msg(_,_,_,_) -> ok.
 

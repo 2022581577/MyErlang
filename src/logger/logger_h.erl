@@ -203,9 +203,9 @@ string_p1(_) ->  false.
 
 write_time(Time) -> write_time(Time, "ERROR REPORT").
 
-write_time({{Y,Mo,D},{H,Mi,S}}, Type) ->
-    io_lib:format("~n=~s==== ~w-~.2.0w-~.2.0w ~.2.0w:~.2.0w:~.2.0w ===~n",
-		  [Type, Y, Mo, D, H, Mi, S]).
+write_time({{Y,Mo,D},{H,Mi,S}}, _Type) ->
+    io_lib:format("~w-~.2.0w-~.2.0w ~.2.0w:~.2.0w:~.2.0w ",
+		  [Y, Mo, D, H, Mi, S]).
 
 %% @doc Rename the log file if exists, to "*-old.log".
 %% This is needed in systems when the file must be closed before rotation (Windows).

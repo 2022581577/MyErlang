@@ -14,14 +14,14 @@
 
 status()->
     try
-        global_data_ram:get(?GAME_STATUS)
+        application:get_env(server, ?GAME_STATUS)
     catch
         _:_ ->
             ?GAME_STATUS_ERROR
     end.
 
 set_status(Status) ->
-    global_data_ram:set(?GAME_STATUS,Status).
+    application:set_env(server, ?GAME_STATUS, Status).
 
 set_server_starting() ->
     set_status(?GAME_STATUS_STARTING).

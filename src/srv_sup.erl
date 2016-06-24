@@ -17,7 +17,8 @@ start_link(Mod) ->
     {ok, Sup}.
 
 start_child(Mod, Args) ->
-    supervisor:start_child(Mod, Args).
+    Name = util:to_atom(util:to_list(Mod) ++ "_sup"),
+    supervisor:start_child(Name, Args).
 
 init([Name, Mod, Modules]) ->
     {ok, {{simple_one_for_one, 3, 10},
