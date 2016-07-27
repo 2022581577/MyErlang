@@ -34,11 +34,7 @@
         test_connection/2, need_test_connection/1
 ]).
 
--compile(export_all).
-
 -include("emysql.hrl").
--include("../../../include/inst/common.hrl").
--include("../../../include/inst/record.hrl").
 
 %% MYSQL COMMANDS
 -define(COM_SLEEP, 16#00).
@@ -91,18 +87,15 @@ canonicalize_query(Q) when is_binary(Q) -> Q;
 canonicalize_query(QL) when is_list(QL) -> iolist_to_binary(QL).
 
 execute(Connection, StmtName, []) when is_atom(StmtName) ->
-    ?INFO("execute, StmtName:~w", [StmtName]),
     prepare_statement(Connection, StmtName),
     StmtNameBin = atom_to_binary(StmtName, utf8),
     Packet = <<?COM_QUERY, "EXECUTE ", StmtNameBin/binary>>,
     send_recv(Connection, Packet);
 execute(Connection, Query, []) ->
-    ?INFO("execute, Query:~w", [Query]),
     QB = canonicalize_query(Query),
     Packet = <<?COM_QUERY, QB/binary>>,
     send_recv(Connection, Packet);
 execute(Connection, Query, Args) when (is_list(Query) orelse is_binary(Query)) andalso is_list(Args) ->
-    ?INFO("execute, Query:~w, Args:~w", [Query, Args]),
     StmtName = "stmt_"++integer_to_list(erlang:phash2(Query)),
     ok = prepare(Connection, StmtName, Query),
     Ret =
@@ -341,7 +334,7 @@ need_test_connection(Conn) ->
      (Conn#emysql_connection.last_test_time + Conn#emysql_connection.test_period < now_seconds()).
 
 now_seconds() ->
-   {M, S, _} = erlang:timestamp(),
+   {M, S, _} = os:timestamp(),
    M * 1000000 + S.
 
 %%--------------------------------------------------------------------
@@ -369,7 +362,6 @@ set_params(Connection, Num, Values, _) ->
 	emysql_tcp:send_and_recv_packet(Connection#emysql_connection.socket, Packet, 0).
 
 set_params_packet(NumStart, Values) ->
-    io:format("set_params_packet!"),
 	BinValues = [encode(Val, binary) || Val <- Values],
 	BinNums = [encode(Num, binary) || Num <- lists:seq(NumStart, NumStart + length(Values) - 1)],
 	BinPairs = lists:zip(BinNums, BinValues),

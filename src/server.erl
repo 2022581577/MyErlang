@@ -10,16 +10,21 @@
 -export([start/0
         ,stop/0]).
 
--define(APPS, [sasl, crypto, emysql, server]).
+-export([start_applications/1]).
+-export([stop_applications/1]).
+
+-define(APP_SERVER, server).
 
 start() ->
     prep_start(),
-    ok = start_applications(?APPS),
+    {ok, _} = application:ensure_all_started(?APP_SERVER),
+%%    ok = start_applications(?APPS),
     ok.
 
 stop() ->
     prep_stop(),
-    ok = stop_applications(lists:reverse(?APPS)),
+    application:stop(?APP_SERVER),
+%%    ok = stop_applications(lists:reverse(?APPS)),
     timer:sleep(5000),
     erlang:halt(0, [{flush, false}]).
 

@@ -10,6 +10,7 @@
 -include("common.hrl").
 
 -export([start/2
+        ,prep_stop/1
         ,stop/1]).
 
 start(_Type, _StartArgs) ->
@@ -17,8 +18,12 @@ start(_Type, _StartArgs) ->
     {ok, Sup} = start(),
     {ok, Sup}.
 
-stop(_State) ->
+prep_stop(State) ->
     stop(),
+    State.
+
+
+stop(_State) ->
     ok.
 
 %% -------------------------

@@ -26,22 +26,6 @@
 %% OTHER DEALINGS IN THE SOFTWARE.
 
 
--record(pool, {pool_id :: atom(), 
-	       size :: number(), 
-	       user :: string(), 
-	       password :: string(), 
-	       host :: string(), 
-	       port :: number(), 
-	       database :: string(), 
-	       encoding :: utf8 | latin1 | {utf8, utf8_unicode_ci} | {utf8, utf8_general_ci},
-	       available=queue:new() :: queue:queue(),
-	       locked=gb_trees:empty() :: gb_tree:tree(),
-	       waiting=queue:new() :: queue:queue(),
-	       start_cmds=[] :: string(), 
-	       conn_test_period=0 :: number(), 
-	       connect_timeout=infinity :: number() | infinity,
-	       warnings=false :: boolean()}).
-
 -record(emysql_connection, {id :: string(), 
 			    pool_id :: atom(), 
 			    encoding :: atom(), % maybe could be latin1 | utf8 ?
@@ -57,6 +41,22 @@
 			    last_test_time=0 :: number(), 
 			    monitor_ref :: reference(),
 			    warnings=false :: boolean()}).
+
+-record(pool, {pool_id :: atom(), 
+         size :: number(), 
+         user :: string(), 
+         password :: string(), 
+         host :: string(), 
+         port :: number(), 
+         database :: string(), 
+         encoding :: utf8 | latin1 | {utf8, utf8_unicode_ci} | {utf8, utf8_general_ci},
+         available=queue:new() :: queue:queue(#emysql_connection{}), 
+         locked=gb_trees:empty() :: gb_trees:gb_tree(string(), #emysql_connection{}), 
+         waiting=queue:new() :: queue:queue(pid()), 
+         start_cmds=[] :: string(), 
+         conn_test_period=0 :: number(), 
+         connect_timeout=infinity :: number() | infinity,
+         warnings=false :: boolean()}).
 
 -record(greeting, {protocol_version :: number(), 
                    server_version :: binary(), 

@@ -55,7 +55,7 @@ select_all() ->
 %% Description: Initiates the server
 %%--------------------------------------------------------------------
 init([]) ->
-	apply(random, seed, tuple_to_list(erlang:timestamp())),
+	apply(random, seed, tuple_to_list(now())),
 	{ok, #state{}}.
 
 %%--------------------------------------------------------------------

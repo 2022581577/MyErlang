@@ -6,6 +6,9 @@
 
 	git checkout origin/stable
 
+#### Aug 26 2014 hd | doc
+* Adapted for R18
+
 #### Jun 21 2013 hd | doc
 * Remove utf-8 encoding of binary data
   *Rationale*: The user must ensure that data passed to the MySQL
