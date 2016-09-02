@@ -20,7 +20,7 @@
 %% ========================================================================
 %% API functions
 %% ========================================================================
-handle(_HeartBeta, #c2s10000{}, #reader_state{socket = Sock} = State) ->
+handle(_HeartBeta, #c2s10000{}, #game_reader_state{socket = Sock} = State) ->
     TimeStamp = util:unixtime(),
     game_pack_send:send_to_socket(Sock, #s2c10000{timestamp = TimeStamp}),
     {ok, State};

@@ -86,8 +86,9 @@ service(netword, Sup) ->
     MapPort = ?CONFIG(map_port),
     ?INFO("IP:~w, Port:~w", [IP, Port]),
     NetAddressL = [{game, IP, Port, ?TCP_OPT}, {map, IP, MapPort, ?TCP_OPT}],
-    ok = tcp_listener_sup:start(Sup, NetAddressL),        %% 端口监听
-    ok = tcp_client_sup:start(Sup, srv_reader),          %% 连接进程
+    ok = tcp_acceptor_sup:start(Sup),                   %% acceptor
+    ok = tcp_listener_sup:start(Sup, NetAddressL),      %% listener
+    ok = tcp_client_sup:start(Sup, srv_reader),         %% 连接进程
     ok = inets:start(),                         %% httpc服务
     ?INFO("netword_service finish!"),
     ok;

@@ -29,8 +29,8 @@ start_link(ClientModule) ->
 
 init([ClientModule]) ->
     ChildSpec = 
-        {srv_reader
-         ,{ClientModule, start_link, []}
+        {tcp_client
+         ,{tcp_client, start_link, []}
          ,temporary
          ,brutal_kill
          ,worker

@@ -31,14 +31,6 @@ start_link(NetAddressL) ->
     supervisor:start_link({local,?MODULE}, ?MODULE, NetAddressL).
 
 init(NetAddressL) ->
-    %% tcp_acceptor_sup需要在tcp_listener之前开启，tcp_listener有用到tcp_acceptor_sup
-    ChildSpec1 = 
-        {tcp_acceptor_sup
-         ,{tcp_acceptor_sup, start_link, []}
-         ,transient
-         ,infinity
-         ,supervisor
-         ,[tcp_acceptor_sup]},
     ListenerChildSpecL =
         [
             {?TCP_LISTENER_NAME(Type)
@@ -48,4 +40,4 @@ init(NetAddressL) ->
             ,worker
             ,[tcp_listener]} || {Type, IP, Port, TcpOpt} <- NetAddressL
         ],
-    {ok, {{one_for_all, 10, 10}, [ChildSpec1 | ListenerChildSpecL]}}.
+    {ok, {{one_for_all, 10, 10}, ListenerChildSpecL}}.

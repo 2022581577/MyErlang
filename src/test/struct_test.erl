@@ -105,20 +105,20 @@ test_dict_store(Dict, N) when N > 0 ->
 test_dict_store(Dict, _) ->
     Dict.
 
-test_map_fold(Map, M) when M > 0 ->
-    maps:fold(fun(), Map),
-    test_map_fold(Map, M - 1);
-test_map_fold(_, _) ->
-    ok.
-
-test_list_out(List, M) when M > 0 ->
-    lists:keyfind(M, 1, List),
-    test_list_out(List, M - 1);
-test_list_out(_, _) ->
-    ok.
-
-test_dict_out(Dict, M) when M > 0 ->
-    dict:find(M, Dict),
-    test_dict_out(Dict, M - 1);
-test_dict_out(_, _) ->
-    ok.
+%%test_map_fold(Map, M) when M > 0 ->
+%%    maps:fold(fun(), Map),
+%%    test_map_fold(Map, M - 1);
+%%test_map_fold(_, _) ->
+%%    ok.
+%%
+%%test_list_out(List, M) when M > 0 ->
+%%    lists:keyfind(M, 1, List),
+%%    test_list_out(List, M - 1);
+%%test_list_out(_, _) ->
+%%    ok.
+%%
+%%test_dict_out(Dict, M) when M > 0 ->
+%%    dict:find(M, Dict),
+%%    test_dict_out(Dict, M - 1);
+%%test_dict_out(_, _) ->
+%%    ok.

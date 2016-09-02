@@ -23,13 +23,20 @@
     }).
 
 %% srv_reader的state
--record(reader_state,{type                  %% 类型：game，map
+-record(reader_state,{type                  %% 类型
                      ,acc_name              %% 账号
                      ,user_id       = 0     %% 最终使用的玩家id，默认0
                      ,user_pid              %% 玩家pid
                      ,socket                %% 控制权转交后需测试socket为 undefined
                      ,packet_len    = 0     %% 初始packet长度为0，从消息头接收到数据后重置packet长度
     }).
+
+%% game_reader的state
+-record(game_reader_state, {
+    user_id     = 0,        %% 最终使用的玩家id，默认0
+    socket      = undefined,%% socket
+    user_pid    = undefined %% 玩家pid
+}).
 
 %% 公共数据
 -record(global_data, {global_key
